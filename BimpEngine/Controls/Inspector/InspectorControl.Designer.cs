@@ -34,10 +34,8 @@
             pictureBox1 = new PictureBox();
             label1 = new Label();
             flpContenedor = new FlowLayoutPanel();
-            btnAddComponent = new Button();
             panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
-            flpContenedor.SuspendLayout();
             SuspendLayout();
             // 
             // panel1
@@ -70,16 +68,7 @@
             // 
             resources.ApplyResources(flpContenedor, "flpContenedor");
             flpContenedor.BackColor = Color.FromArgb(40, 40, 40);
-            flpContenedor.Controls.Add(btnAddComponent);
             flpContenedor.Name = "flpContenedor";
-            // 
-            // btnAddComponent
-            // 
-            resources.ApplyResources(btnAddComponent, "btnAddComponent");
-            btnAddComponent.BackColor = Color.FromArgb(30, 30, 30);
-            btnAddComponent.FlatAppearance.BorderSize = 0;
-            btnAddComponent.Name = "btnAddComponent";
-            btnAddComponent.UseVisualStyleBackColor = false;
             // 
             // InspectorControl
             // 
@@ -93,9 +82,7 @@
             Name = "InspectorControl";
             panel1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
-            flpContenedor.ResumeLayout(false);
             ResumeLayout(false);
-            PerformLayout();
         }
 
         #endregion
@@ -105,6 +92,5 @@
         private PictureBox pictureBox1;
         private Label label1;
         private FlowLayoutPanel flpContenedor;
-        private Button btnAddComponent;
     }
 }

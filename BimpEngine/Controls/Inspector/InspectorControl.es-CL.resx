@@ -134,32 +134,23 @@
   <data name="flpContenedor.AutoScrollMargin" type="System.Drawing.Size, System.Drawing">
     <value>2, 0</value>
   </data>
-  <data name="flpContenedor.AutoSize" type="System.Boolean, mscorlib">
-    <value>True</value>
-  </data>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="btnAddComponent.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
-    <value>Bottom</value>
-  </data>
-  <data name="btnAddComponent.FlatStyle" type="System.Windows.Forms.FlatStyle, System.Windows.Forms">
-    <value>Flat</value>
-  </data>
-  <data name="btnAddComponent.Size" type="System.Drawing.Size, System.Drawing">
-    <value>227, 32</value>
-  </data>
-  <data name="btnAddComponent.Text" xml:space="preserve">
-    <value>Agregar Componente</value>
-  </data>
   <data name="flpContenedor.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
     <value>Fill</value>
   </data>
+  <data name="flpContenedor.FlowDirection" type="System.Windows.Forms.FlowDirection, System.Windows.Forms">
+    <value>TopDown</value>
+  </data>
   <data name="flpContenedor.Size" type="System.Drawing.Size, System.Drawing">
-    <value>255, 611</value>
+    <value>255, 603</value>
+  </data>
+  <data name="$this.AutoSize" type="System.Boolean, mscorlib">
+    <value>False</value>
   </data>
   <data name="$this.MaximumSize" type="System.Drawing.Size, System.Drawing">
     <value>0, 0</value>
   </data>
   <data name="$this.Size" type="System.Drawing.Size, System.Drawing">
-    <value>255, 641</value>
+    <value>255, 633</value>
   </data>
 </root>

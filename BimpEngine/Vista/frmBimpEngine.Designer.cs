@@ -337,7 +337,6 @@
             // 
             // pnlContenedor
             // 
-            pnlContenedor.AutoSize = true;
             pnlContenedor.Dock = DockStyle.Fill;
             pnlContenedor.Location = new Point(0, 57);
             pnlContenedor.Name = "pnlContenedor";
