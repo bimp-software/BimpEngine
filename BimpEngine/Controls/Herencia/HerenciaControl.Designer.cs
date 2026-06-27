@@ -100,18 +100,24 @@
             // 
             // ListHerencia
             // 
+            ListHerencia.AllowDrop = true;
             ListHerencia.BackColor = Color.FromArgb(40, 40, 40);
             ListHerencia.BorderStyle = BorderStyle.None;
             ListHerencia.Dock = DockStyle.Fill;
             ListHerencia.ForeColor = Color.White;
             ListHerencia.FullRowSelect = true;
             ListHerencia.ItemHeight = 20;
+            ListHerencia.LabelEdit = true;
             ListHerencia.LineColor = Color.White;
             ListHerencia.Location = new Point(0, 34);
             ListHerencia.Name = "ListHerencia";
             ListHerencia.ShowLines = false;
             ListHerencia.Size = new Size(255, 558);
             ListHerencia.TabIndex = 0;
+            ListHerencia.ItemDrag += ListHerencia_ItemDrag;
+            ListHerencia.DragDrop += ListHerencia_DragDrop;
+            ListHerencia.DragEnter += ListHerencia_DragEnter;
+            ListHerencia.DragOver += ListHerencia_DragOver;
             // 
             // panel3
             // 

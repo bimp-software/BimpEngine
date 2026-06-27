@@ -3,19 +3,10 @@ using BimpEngine.Controls.Escena;
 using BimpEngine.Controls.Herencia;
 using BimpEngine.Controls.Inspector;
 using BimpEngine.Controls.Proyecto;
-using BimpEngine.Engine.Debug;
 using BimpEngine.Engine.Editor;
 using BimpEngine.Engine.Editor.Layouts;
 using BimpEngine.Engine.Entities;
 using BimpEngine.Engine.Entities.Primitive;
-using Microsoft.VisualBasic.ApplicationServices;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
-using System.Windows.Forms;
 using Windows.System;
 
 namespace BimpEngine.Vista
@@ -133,6 +124,47 @@ namespace BimpEngine.Vista
             {
                 hierarchy.RefreshObject(obj);
                 sceneView.RefrescarEscena();
+            };
+
+            inspector.OnChildCreated += (hijo, padre) =>
+            {
+                hierarchy.AddObject(hijo, padre);
+                sceneView.RefrescarEscena();
+            };
+
+            hierarchy.OnObjectReparented += (hijo, nuevoPadre) =>
+            {
+                hijo.Parent?.RemoveChild(hijo);
+                sceneView.GetScene().Objetos.Remove(hijo);
+
+                if (nuevoPadre != null)
+                {
+                    nuevoPadre.AddChild(hijo);
+                }
+                else
+                {
+                    sceneView.GetScene().Add(hijo);
+                }
+
+                sceneView.RefrescarEscena();
+            };
+
+            hierarchy.OnObjectDeleted += (obj) =>
+            {
+                obj.Parent?.RemoveChild(obj);
+                sceneView.GetScene().Remove(obj);
+                inspector.ShowObject(null);
+                sceneView.RefrescarEscena();
+            };
+
+            hierarchy.OnObjectDuplicated += (obj) =>
+            {
+                var clon = obj.Clone();
+                clon.Name = sceneView.GetScene().GenerarNombre(obj.Name);
+                sceneView.GetScene().Add(clon);
+                hierarchy.AddObject(clon, clon.Parent);
+                sceneView.SetSelection(clon, sceneView.GetScene().Objetos.Count - 1);
+                inspector.ShowObject(clon);
             };
 
             editorViews = new Dictionary<string, EditorView>()

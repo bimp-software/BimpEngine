@@ -14,11 +14,12 @@ namespace BimpEngine.Controls.Inspector
 {
     public partial class InspectorControl : UserControl
     {
-        public event Action<PrimitiveType> OnCreatePrimitive;
+        private Objetos _objetoActual;
+        private Button btnAddComponent;
 
         public event Action<Objetos> OnObjectModified;
-
-        private Button btnAddComponent;
+        public event Action<PrimitiveType> OnCreatePrimitive;
+        public event Action<Objetos, Objetos> OnChildCreated;
 
         public InspectorControl()
         {
@@ -33,7 +34,7 @@ namespace BimpEngine.Controls.Inspector
             flpContenedor.WrapContents = false;
             flpContenedor.AutoScroll = true;
 
-            // Botón creado completamente por código
+            // Botón creado por código
             btnAddComponent = new Button
             {
                 Text = "Agregar Componente",
@@ -44,17 +45,44 @@ namespace BimpEngine.Controls.Inspector
                 Cursor = Cursors.Hand
             };
             btnAddComponent.FlatAppearance.BorderSize = 0;
+            btnAddComponent.Click += (s, e) => AbrirMenuComponentes();
 
             flpContenedor.Controls.Add(btnAddComponent);
 
             flpContenedor.Resize += (s, e) =>
             {
                 int w = flpContenedor.ClientSize.Width - 6;
-                btnAddComponent.Width = w;
-
                 foreach (Control c in flpContenedor.Controls)
                     c.Width = w;
             };
+        }
+
+        private void AbrirMenuComponentes()
+        {
+            if (_objetoActual == null) return;
+
+            var frm = new frmAddComponent(_objetoActual);
+            var pos = PointToScreen(new Point(0, btnAddComponent.Bottom));
+            frm.Location = pos;
+
+            frm.OnComponentSelected += (nombre) => AgregarComponentePorNombre(nombre);
+            frm.Show();
+        }
+
+        private void AgregarComponentePorNombre(string nombre)
+        {
+            UserControl control = nombre switch
+            {
+                "Mueblería" => new FurnitureControl(),
+                _ => null
+            };
+
+            if (control == null) return;
+
+            if (control is IInspectorComponent comp)
+                comp.SetObject(_objetoActual);
+
+            AddComponent(control);
         }
 
         public void ClearInspector()
@@ -70,56 +98,35 @@ namespace BimpEngine.Controls.Inspector
 
         private void AddComponent(UserControl control)
         {
-            if (flpContenedor.Controls.Count > 0 && flpContenedor.Controls[0] != btnAddComponent)
-            {
-                var separador = new Panel
-                {
-                    Height = 4,
-                    BackColor = Color.FromArgb(40, 40, 40)
-                };
-                separador.Width = flpContenedor.ClientSize.Width - 6;
-                flpContenedor.Controls.Add(separador);
-            }
-
             if (control is VariableControl vc)
                 vc.OnObjectModified += (obj) => OnObjectModified?.Invoke(obj);
 
             if (control is TransformControl tc)
                 tc.OnObjectModified += (obj) => OnObjectModified?.Invoke(obj);
 
-            control.Width = flpContenedor.ClientSize.Width - 6;
+            if (control is FurnitureControl fc)
+                fc.OnChildCreated += (hijo, padre) => OnChildCreated?.Invoke(hijo, padre);
+
+            int w = flpContenedor.ClientSize.Width - 6;
+            control.Width = w;
             flpContenedor.Controls.Add(control);
             flpContenedor.Controls.SetChildIndex(btnAddComponent, flpContenedor.Controls.Count - 1);
         }
 
         public void ShowObject(Objetos obj)
         {
+            _objetoActual = obj;
             ClearInspector();
 
-            if (obj == null)
-                return;
+            if (obj == null) return;
 
-            VariableControl variable = new VariableControl();
+            var variable = new VariableControl();
             variable.SetObject(obj);
             AddComponent(variable);
 
-            TransformControl transform = new TransformControl();
+            var transform = new TransformControl();
             transform.SetObject(obj);
             AddComponent(transform);
-
-            //// Componentes específicos según el tipo
-            //if (obj is CameraObject camera)
-            //{
-            //    var camControl = new CameraControl();
-            //    camControl.SetObject(camera);
-            //    AddComponent(camControl);
-            //}
-            //else if (obj is PrimitiveObject)
-            //{
-            //    var meshControl = new MeshRendererControl();
-            //    meshControl.SetObject(obj);
-            //    AddComponent(meshControl);
-            //}
         }
 
         public void RefreshObject(Objetos obj)

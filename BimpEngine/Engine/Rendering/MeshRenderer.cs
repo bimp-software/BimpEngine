@@ -10,6 +10,14 @@ namespace BimpEngine.Engine.Rendering
         {
             if (mesh == null) return;
 
+            if (Material.BlueprintMode)
+                DrawBlueprint(gl, mesh, isSelected);
+            else
+                DrawSolid(gl, mesh, isSelected);
+        }
+
+        private void DrawSolid(OpenGL gl, Mesh mesh, bool isSelected)
+        {
             gl.Color(
                 Material.Color.R / 255.0,
                 Material.Color.G / 255.0,
@@ -28,9 +36,45 @@ namespace BimpEngine.Engine.Rendering
                 DrawSelectionBox(gl, mesh);
         }
 
+        private void DrawBlueprint(OpenGL gl, Mesh mesh, bool isSelected)
+        {
+            // 1. Caras rellenas con azul oscuro semisólido
+            gl.Enable(OpenGL.GL_POLYGON_OFFSET_FILL);
+            gl.PolygonOffset(1f, 1f);
+
+            gl.Color(0.05, 0.12, 0.28); // azul muy oscuro
+
+            gl.Begin(OpenGL.GL_TRIANGLES);
+            foreach (int index in mesh.Triangles)
+            {
+                var v = mesh.Vertices[index];
+                gl.Vertex(v.vector.X, v.vector.Y, v.vector.Z);
+            }
+            gl.End();
+
+            gl.Disable(OpenGL.GL_POLYGON_OFFSET_FILL);
+
+            // 2. Aristas en azul claro
+            gl.Color(0.3, 0.7, 1.0);
+            gl.LineWidth(1.2f);
+
+            gl.PolygonMode(OpenGL.GL_FRONT_AND_BACK, OpenGL.GL_LINE);
+            gl.Begin(OpenGL.GL_TRIANGLES);
+            foreach (int index in mesh.Triangles)
+            {
+                var v = mesh.Vertices[index];
+                gl.Vertex(v.vector.X, v.vector.Y, v.vector.Z);
+            }
+            gl.End();
+            gl.PolygonMode(OpenGL.GL_FRONT_AND_BACK, OpenGL.GL_FILL);
+
+            // 3. Si está seleccionado, bounding box en naranja
+            if (isSelected)
+                DrawSelectionBox(gl, mesh);
+        }
+
         private void DrawSelectionBox(OpenGL gl, Mesh mesh)
         {
-            // Calcular AABB
             double minX = double.MaxValue, minY = double.MaxValue, minZ = double.MaxValue;
             double maxX = double.MinValue, maxY = double.MinValue, maxZ = double.MinValue;
 
@@ -44,34 +88,26 @@ namespace BimpEngine.Engine.Rendering
                 if (v.vector.Z > maxZ) maxZ = v.vector.Z;
             }
 
-            // Expandir levemente para que no quede pegado al mesh
-            double offset = 0.02;
-            minX -= offset; minY -= offset; minZ -= offset;
-            maxX += offset; maxY += offset; maxZ += offset;
+            double o = 0.02;
+            minX -= o; minY -= o; minZ -= o;
+            maxX += o; maxY += o; maxZ += o;
 
-            gl.Color(1.0, 0.5, 0.0); // naranja
+            gl.Color(1.0, 0.5, 0.0);
             gl.LineWidth(1.5f);
 
             gl.Begin(OpenGL.GL_LINES);
-
-            // Cara inferior
             gl.Vertex(minX, minY, minZ); gl.Vertex(maxX, minY, minZ);
             gl.Vertex(maxX, minY, minZ); gl.Vertex(maxX, minY, maxZ);
             gl.Vertex(maxX, minY, maxZ); gl.Vertex(minX, minY, maxZ);
             gl.Vertex(minX, minY, maxZ); gl.Vertex(minX, minY, minZ);
-
-            // Cara superior
             gl.Vertex(minX, maxY, minZ); gl.Vertex(maxX, maxY, minZ);
             gl.Vertex(maxX, maxY, minZ); gl.Vertex(maxX, maxY, maxZ);
             gl.Vertex(maxX, maxY, maxZ); gl.Vertex(minX, maxY, maxZ);
             gl.Vertex(minX, maxY, maxZ); gl.Vertex(minX, maxY, minZ);
-
-            // Aristas verticales
             gl.Vertex(minX, minY, minZ); gl.Vertex(minX, maxY, minZ);
             gl.Vertex(maxX, minY, minZ); gl.Vertex(maxX, maxY, minZ);
             gl.Vertex(maxX, minY, maxZ); gl.Vertex(maxX, maxY, maxZ);
             gl.Vertex(minX, minY, maxZ); gl.Vertex(minX, maxY, maxZ);
-
             gl.End();
         }
     }

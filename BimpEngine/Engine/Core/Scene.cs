@@ -1,8 +1,5 @@
 ﻿using BimpEngine.Engine.Entities;
 using BimpEngine.Engine.World;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace BimpEngine.Engine.Core
 {
@@ -15,8 +12,7 @@ namespace BimpEngine.Engine.Core
         public CameraObject MainCamera { get; set; } = new CameraObject();
         public void Add(Objetos objeto)
         {
-            if (objeto == null)
-                return;
+            if (objeto == null) return;
 
             objeto.Name = GenerarNombre(objeto.Name);
             Objetos.Add(objeto);
@@ -67,7 +63,7 @@ namespace BimpEngine.Engine.Core
             }
         }
 
-        private string GenerarNombre(string nombreBase)
+        public string GenerarNombre(string nombreBase)
         {
             var nombres = Objetos.Select(o => o.Name).ToList();
 

@@ -8,5 +8,6 @@ namespace BimpEngine.Engine.Rendering
         public bool IsSolid { get; set; } = true;
         public bool HasTexture { get; set; }
         public Texture Texture { get; set; } = new Texture();
+        public bool BlueprintMode { get; set; } = false;
     }
 }
