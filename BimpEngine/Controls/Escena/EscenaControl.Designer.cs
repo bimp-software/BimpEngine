@@ -99,7 +99,7 @@
             // 
             glControl.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             glControl.AutoSize = true;
-            glControl.DrawFPS = false;
+            glControl.DrawFPS = true;
             glControl.ForeColor = Color.White;
             glControl.Location = new Point(4, 32);
             glControl.Margin = new Padding(4, 3, 4, 3);

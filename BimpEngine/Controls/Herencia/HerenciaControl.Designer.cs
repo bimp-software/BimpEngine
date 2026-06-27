@@ -136,6 +136,7 @@
             // 
             // tbBuscarHerencia
             // 
+            tbBuscarHerencia.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             tbBuscarHerencia.BackColor = Color.FromArgb(48, 48, 48);
             tbBuscarHerencia.BorderStyle = BorderStyle.None;
             tbBuscarHerencia.Font = new Font("Segoe UI", 12F);

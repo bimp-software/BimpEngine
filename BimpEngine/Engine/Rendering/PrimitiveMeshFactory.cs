@@ -36,18 +36,23 @@ namespace BimpEngine.Engine.Rendering
             return mesh;
         }
 
-        public static Mesh CreateTriangle(double size = 1) 
+        public static Mesh CreateTriangle(double size = 2.0)
         {
             Mesh mesh = new Mesh();
-            double h = size / 2.0;
 
-            mesh.Vertices.Add(new Vertex(0, h, 0));
-            mesh.Vertices.Add(new Vertex(-h, -h, 0));
-            mesh.Vertices.Add(new Vertex(h, -h, 0));
+            double h = size / 2.0;
+            double apex = size * 0.816; 
+            mesh.Vertices.Add(new Vertex(0, -h, h));      
+            mesh.Vertices.Add(new Vertex(-h, -h, -h * 0.5));     
+            mesh.Vertices.Add(new Vertex(h, -h, -h * 0.5));    
+            mesh.Vertices.Add(new Vertex(0, apex - h, 0));         
 
             mesh.Triangles.AddRange(new int[]
             {
-                0,1,2
+                0, 2, 1,
+                0, 1, 3,
+                1, 2, 3,
+                2, 0, 3,
             });
 
             return mesh;

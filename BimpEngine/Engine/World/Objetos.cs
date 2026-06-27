@@ -39,7 +39,7 @@ namespace BimpEngine.Engine.World
                 Transform.Scale.Y,
                 Transform.Scale.Z);
 
-            MeshRenderer.Draw(gl, MeshFilter.Mesh);
+            MeshRenderer.Draw(gl, MeshFilter.Mesh, IsSelected);
 
             gl.PopMatrix();
         }

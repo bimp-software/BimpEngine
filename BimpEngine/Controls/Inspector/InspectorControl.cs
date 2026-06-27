@@ -1,4 +1,6 @@
 ﻿using BimpEngine.Controls.Inspector.Componentes;
+using BimpEngine.Engine.Core.Interface;
+using BimpEngine.Engine.Entities;
 using BimpEngine.Engine.World;
 using System;
 using System.Collections.Generic;
@@ -12,6 +14,10 @@ namespace BimpEngine.Controls.Inspector
 {
     public partial class InspectorControl : UserControl
     {
+        public event Action<PrimitiveType> OnCreatePrimitive;
+
+        public event Action<Objetos> OnObjectModified;
+
         private Button btnAddComponent;
 
         public InspectorControl()
@@ -43,7 +49,11 @@ namespace BimpEngine.Controls.Inspector
 
             flpContenedor.Resize += (s, e) =>
             {
-                btnAddComponent.Width = flpContenedor.ClientSize.Width - 6;
+                int w = flpContenedor.ClientSize.Width - 6;
+                btnAddComponent.Width = w;
+
+                foreach (Control c in flpContenedor.Controls)
+                    c.Width = w;
             };
         }
 
@@ -60,6 +70,23 @@ namespace BimpEngine.Controls.Inspector
 
         private void AddComponent(UserControl control)
         {
+            if (flpContenedor.Controls.Count > 0 && flpContenedor.Controls[0] != btnAddComponent)
+            {
+                var separador = new Panel
+                {
+                    Height = 4,
+                    BackColor = Color.FromArgb(40, 40, 40)
+                };
+                separador.Width = flpContenedor.ClientSize.Width - 6;
+                flpContenedor.Controls.Add(separador);
+            }
+
+            if (control is VariableControl vc)
+                vc.OnObjectModified += (obj) => OnObjectModified?.Invoke(obj);
+
+            if (control is TransformControl tc)
+                tc.OnObjectModified += (obj) => OnObjectModified?.Invoke(obj);
+
             control.Width = flpContenedor.ClientSize.Width - 6;
             flpContenedor.Controls.Add(control);
             flpContenedor.Controls.SetChildIndex(btnAddComponent, flpContenedor.Controls.Count - 1);
@@ -75,6 +102,35 @@ namespace BimpEngine.Controls.Inspector
             VariableControl variable = new VariableControl();
             variable.SetObject(obj);
             AddComponent(variable);
+
+            TransformControl transform = new TransformControl();
+            transform.SetObject(obj);
+            AddComponent(transform);
+
+            //// Componentes específicos según el tipo
+            //if (obj is CameraObject camera)
+            //{
+            //    var camControl = new CameraControl();
+            //    camControl.SetObject(camera);
+            //    AddComponent(camControl);
+            //}
+            //else if (obj is PrimitiveObject)
+            //{
+            //    var meshControl = new MeshRendererControl();
+            //    meshControl.SetObject(obj);
+            //    AddComponent(meshControl);
+            //}
+        }
+
+        public void RefreshObject(Objetos obj)
+        {
+            if (obj == null) return;
+
+            foreach (Control c in flpContenedor.Controls)
+            {
+                if (c is IInspectorComponent comp)
+                    comp.Refresh(obj);
+            }
         }
     }
 }

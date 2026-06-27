@@ -6,6 +6,8 @@ using BimpEngine.Controls.Proyecto;
 using BimpEngine.Engine.Debug;
 using BimpEngine.Engine.Editor;
 using BimpEngine.Engine.Editor.Layouts;
+using BimpEngine.Engine.Entities;
+using BimpEngine.Engine.Entities.Primitive;
 using Microsoft.VisualBasic.ApplicationServices;
 using System;
 using System.Collections.Generic;
@@ -100,45 +102,76 @@ namespace BimpEngine.Vista
             console = new ConsolaControl();
             proyecto = new ProyectoControl();
 
-            editorViews = new Dictionary<string, EditorView>()
+            sceneView.OnObjectSelected += (obj) =>
             {
-                {
-                    "Hierarchy",
-                    new EditorView(
-                        "Hierarchy",
-                        hierarchy)
-                },
-
-                {
-                    "Scene",
-                    new EditorView(
-                        "Scene",
-                        sceneView)
-                },
-
-                {
-                    "Inspector",
-                    new EditorView(
-                        "Inspector",
-                        inspector)
-                },
-
-                {
-                    "Console",
-                    new EditorView(
-                        "Console",
-                        console)
-                },
-
-                {
-                    "Project",
-                    new EditorView(
-                        "Project",
-                        proyecto)
-                }
+                inspector.ShowObject(obj);
+                hierarchy.SelectObject(obj);
             };
 
-            layoutManager.SetLayout(new DefaultLayout(),editorViews);
+            sceneView.OnObjectChanged += (obj) =>
+            {
+                inspector.RefreshObject(obj);
+                hierarchy.RefreshObject(obj);
+            };
+
+            hierarchy.OnObjectSelected += (obj, index) =>
+            {
+                sceneView.SetSelection(obj, index);
+                inspector.ShowObject(obj);
+            };
+
+            inspector.OnCreatePrimitive += (tipo) =>
+            {
+                var obj = PrimitiveFactory.Create(tipo);
+                sceneView.GetScene().Add(obj);
+                hierarchy.AddObject(obj);
+                sceneView.SetSelection(obj, sceneView.GetScene().Objetos.Count - 1);
+                inspector.ShowObject(obj);
+            };
+
+            inspector.OnObjectModified += (obj) =>
+            {
+                hierarchy.RefreshObject(obj);
+                sceneView.RefrescarEscena();
+            };
+
+            editorViews = new Dictionary<string, EditorView>()
+            {
+                { "Hierarchy", new EditorView("Hierarchy", hierarchy) },
+                { "Scene",     new EditorView("Scene",     sceneView) },
+                { "Inspector", new EditorView("Inspector", inspector) },
+                { "Console",   new EditorView("Console",   console)  },
+                { "Project",   new EditorView("Project",   proyecto) }
+            };
+
+            layoutManager.SetLayout(new DefaultLayout(), editorViews);
+        }
+
+        private void tsmCubo_Click(object sender, EventArgs e)
+        {
+            var cubo = new Cube();
+            sceneView.GetScene().Add(cubo);
+            hierarchy.AddObject(cubo);
+            sceneView.SetSelection(cubo, sceneView.GetScene().Objetos.Count - 1);
+            inspector.ShowObject(cubo);
+        }
+
+        private void tsmTriangulo_Click(object sender, EventArgs e)
+        {
+            var triangulo = new Triangle();
+            sceneView.GetScene().Add(triangulo);
+            hierarchy.AddObject(triangulo);
+            sceneView.SetSelection(triangulo, sceneView.GetScene().Objetos.Count - 1);
+            inspector.ShowObject(triangulo);
+        }
+
+        private void tsmCilindro_Click(object sender, EventArgs e)
+        {
+            var cilindro = new Cylinder();
+            sceneView.GetScene().Add(cilindro);
+            hierarchy.AddObject(cilindro);
+            sceneView.SetSelection(cilindro, sceneView.GetScene().Objetos.Count - 1);
+            inspector.ShowObject(cilindro);
         }
     }
 }

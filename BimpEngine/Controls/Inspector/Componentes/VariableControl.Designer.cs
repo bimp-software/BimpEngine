@@ -45,7 +45,7 @@
             panel1.Dock = DockStyle.Top;
             panel1.Location = new Point(0, 0);
             panel1.Name = "panel1";
-            panel1.Size = new Size(227, 26);
+            panel1.Size = new Size(225, 26);
             panel1.TabIndex = 1;
             // 
             // label1
@@ -72,11 +72,12 @@
             panel2.Dock = DockStyle.Fill;
             panel2.Location = new Point(0, 26);
             panel2.Name = "panel2";
-            panel2.Size = new Size(227, 73);
+            panel2.Size = new Size(225, 71);
             panel2.TabIndex = 2;
             // 
             // cbLayer
             // 
+            cbLayer.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             cbLayer.BackColor = Color.FromArgb(48, 48, 48);
             cbLayer.DropDownHeight = 50;
             cbLayer.DropDownStyle = ComboBoxStyle.DropDownList;
@@ -85,9 +86,9 @@
             cbLayer.ForeColor = Color.White;
             cbLayer.FormattingEnabled = true;
             cbLayer.IntegralHeight = false;
-            cbLayer.Location = new Point(124, 40);
+            cbLayer.Location = new Point(109, 40);
             cbLayer.Name = "cbLayer";
-            cbLayer.Size = new Size(93, 23);
+            cbLayer.Size = new Size(106, 23);
             cbLayer.TabIndex = 3;
             cbLayer.TabStop = false;
             cbLayer.Tag = "Layouts";
@@ -104,7 +105,7 @@
             cbTag.IntegralHeight = false;
             cbTag.Location = new Point(10, 40);
             cbTag.Name = "cbTag";
-            cbTag.Size = new Size(108, 23);
+            cbTag.Size = new Size(93, 23);
             cbTag.TabIndex = 4;
             cbTag.TabStop = false;
             cbTag.Tag = "Layers";
@@ -121,14 +122,14 @@
             // 
             // tbName
             // 
+            tbName.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             tbName.BackColor = Color.FromArgb(48, 48, 48);
             tbName.BorderStyle = BorderStyle.None;
             tbName.Font = new Font("Segoe UI", 12F);
             tbName.ForeColor = Color.White;
-            tbName.Location = new Point(35, 8);
-            tbName.Multiline = true;
+            tbName.Location = new Point(35, 9);
             tbName.Name = "tbName";
-            tbName.Size = new Size(182, 25);
+            tbName.Size = new Size(180, 22);
             tbName.TabIndex = 1;
             // 
             // VariableControl
@@ -136,10 +137,11 @@
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.FromArgb(35, 35, 35);
+            BorderStyle = BorderStyle.FixedSingle;
             Controls.Add(panel2);
             Controls.Add(panel1);
             Name = "VariableControl";
-            Size = new Size(227, 99);
+            Size = new Size(225, 97);
             panel1.ResumeLayout(false);
             panel2.ResumeLayout(false);
             panel2.PerformLayout();

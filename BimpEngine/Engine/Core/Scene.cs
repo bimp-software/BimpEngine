@@ -18,6 +18,7 @@ namespace BimpEngine.Engine.Core
             if (objeto == null)
                 return;
 
+            objeto.Name = GenerarNombre(objeto.Name);
             Objetos.Add(objeto);
 
             if (objeto is CameraObject camera && MainCamera == null)
@@ -64,6 +65,20 @@ namespace BimpEngine.Engine.Core
                 if (objeto.Enabled)
                     objeto.Update();
             }
+        }
+
+        private string GenerarNombre(string nombreBase)
+        {
+            var nombres = Objetos.Select(o => o.Name).ToList();
+
+            if (!nombres.Contains(nombreBase))
+                return nombreBase;
+
+            int contador = 1;
+            while (nombres.Contains($"{nombreBase}.{contador:D3}"))
+                contador++;
+
+            return $"{nombreBase}.{contador:D3}";
         }
     }
 }

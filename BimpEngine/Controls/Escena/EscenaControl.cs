@@ -4,13 +4,6 @@ using BimpEngine.Engine.Editor.Gizmos;
 using BimpEngine.Engine.Rendering;
 using BimpEngine.Engine.World;
 using SharpGL;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
-using System.Windows.Forms;
 
 namespace BimpEngine.Controls.Escena
 {
@@ -64,7 +57,7 @@ namespace BimpEngine.Controls.Escena
         {
             _selection.Select(obj, index);
             OnObjectSelected?.Invoke(obj);
-            Invalidate();
+            glControl.Invalidate();
         }
         #endregion
 
@@ -132,6 +125,22 @@ namespace BimpEngine.Controls.Escena
                     _lastMouse = e.Location;
                     return;
                 }
+
+                // Ray picking por color
+                int index = PickObject(e.Location);
+                if (index >= 0 && index < _scene.Objetos.Count)
+                {
+                    var obj = _scene.Objetos[index];
+                    _selection.Select(obj, index);
+                    OnObjectSelected?.Invoke(obj);
+                }
+                else
+                {
+                    _selection.Select(null, -1);
+                    OnObjectSelected?.Invoke(null);
+                }
+
+                Invalidate();
             }
 
             if (e.Button == MouseButtons.Right)
@@ -157,7 +166,7 @@ namespace BimpEngine.Controls.Escena
                 _camera.Rotate(dx, dy);
 
                 _lastCameraMouse = e.Location;
-                Invalidate();
+                glControl.Invalidate();
                 return;
             }
 
@@ -169,7 +178,7 @@ namespace BimpEngine.Controls.Escena
                 _camera.Pan(dx, dy);
 
                 _lastCameraMouse = e.Location;
-                Invalidate();
+                glControl.Invalidate();
                 return;
             }
 
@@ -183,7 +192,7 @@ namespace BimpEngine.Controls.Escena
                 _lastMouse = e.Location;
 
                 OnObjectChanged?.Invoke(_selection.SelectedObject);
-                Invalidate();
+                glControl.Invalidate();
                 return;
             }
 
@@ -199,13 +208,13 @@ namespace BimpEngine.Controls.Escena
 
             _gizmo.EndDrag();
 
-            Invalidate();
+            glControl.Invalidate();
         }
 
         private void glControl_MouseWheel(object sender, MouseEventArgs e)
         {
             _camera.Zoom(e.Delta);
-            Invalidate();
+            glControl.Invalidate();
         }
         #endregion
 
@@ -215,7 +224,7 @@ namespace BimpEngine.Controls.Escena
         {
             _selection.Select(obj, index);
             OnObjectSelected?.Invoke(obj);
-            Invalidate();
+            glControl.Invalidate();
         }
 
         public Objetos GetSelectedObject()
@@ -223,6 +232,70 @@ namespace BimpEngine.Controls.Escena
             return _selection.SelectedObject;
         }
 
+        public void RefrescarEscena()
+        {
+            glControl.Invalidate();
+        }
+
+        private int PickObject(Point mousePos)
+        {
+            var gl = glControl.OpenGL;
+
+            gl.Clear(OpenGL.GL_COLOR_BUFFER_BIT | OpenGL.GL_DEPTH_BUFFER_BIT);
+            gl.MatrixMode(OpenGL.GL_MODELVIEW);
+            gl.LoadIdentity();
+            _camera.Apply(gl);
+
+            // Dibujar cada objeto con un color único basado en su índice
+            for (int i = 0; i < _scene.Objetos.Count; i++)
+            {
+                var obj = _scene.Objetos[i];
+
+                // Convertir índice a color RGB (índice+1 para evitar el negro del fondo)
+                int id = i + 1;
+                float r = ((id >> 16) & 0xFF) / 255.0f;
+                float g = ((id >> 8) & 0xFF) / 255.0f;
+                float b = ((id) & 0xFF) / 255.0f;
+
+                gl.PushMatrix();
+
+                gl.Translate(obj.Transform.Position.X, obj.Transform.Position.Y, obj.Transform.Position.Z);
+                gl.Rotate(obj.Transform.Rotation.X, 1, 0, 0);
+                gl.Rotate(obj.Transform.Rotation.Y, 0, 1, 0);
+                gl.Rotate(obj.Transform.Rotation.Z, 0, 0, 1);
+                gl.Scale(obj.Transform.Scale.X, obj.Transform.Scale.Y, obj.Transform.Scale.Z);
+
+                gl.Color(r, g, b);
+                gl.Begin(OpenGL.GL_TRIANGLES);
+                if (obj.MeshFilter?.Mesh != null)
+                {
+                    foreach (int idx in obj.MeshFilter.Mesh.Triangles)
+                    {
+                        var v = obj.MeshFilter.Mesh.Vertices[idx];
+                        gl.Vertex(v.vector.X, v.vector.Y, v.vector.Z);
+                    }
+                }
+                gl.End();
+
+                gl.PopMatrix();
+            }
+
+            gl.Flush();
+
+            // Leer el pixel bajo el cursor (Y invertido en OpenGL)
+            int x = mousePos.X;
+            int y = glControl.Height - mousePos.Y;
+
+            byte[] pixel = new byte[3];
+            gl.ReadPixels(x, y, 1, 1, OpenGL.GL_RGB, OpenGL.GL_UNSIGNED_BYTE, pixel);
+
+            int pickedId = (pixel[0] << 16) | (pixel[1] << 8) | pixel[2];
+
+            // Redibujar la escena normal inmediatamente
+            glControl.Invalidate();
+
+            return pickedId - 1; // -1 si fondo (pickedId == 0)
+        }
         #endregion
 
     }

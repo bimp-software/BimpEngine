@@ -35,6 +35,11 @@
             verToolStripMenuItem = new ToolStripMenuItem();
             recursosToolStripMenuItem = new ToolStripMenuItem();
             objetosToolStripMenuItem = new ToolStripMenuItem();
+            crearVacioToolStripMenuItem = new ToolStripMenuItem();
+            dObjetoToolStripMenuItem = new ToolStripMenuItem();
+            tsmCubo = new ToolStripMenuItem();
+            tsmTriangulo = new ToolStripMenuItem();
+            tsmCilindro = new ToolStripMenuItem();
             componentesToolStripMenuItem = new ToolStripMenuItem();
             ventanaToolStripMenuItem = new ToolStripMenuItem();
             extensionesToolStripMenuItem = new ToolStripMenuItem();
@@ -114,10 +119,46 @@
             // 
             // objetosToolStripMenuItem
             // 
+            objetosToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { crearVacioToolStripMenuItem, dObjetoToolStripMenuItem });
             objetosToolStripMenuItem.ForeColor = Color.FromArgb(250, 250, 250);
             objetosToolStripMenuItem.Name = "objetosToolStripMenuItem";
             objetosToolStripMenuItem.Size = new Size(69, 23);
             objetosToolStripMenuItem.Text = "Objetos";
+            // 
+            // crearVacioToolStripMenuItem
+            // 
+            crearVacioToolStripMenuItem.Name = "crearVacioToolStripMenuItem";
+            crearVacioToolStripMenuItem.Size = new Size(180, 24);
+            crearVacioToolStripMenuItem.Text = "Crear Vacio";
+            // 
+            // dObjetoToolStripMenuItem
+            // 
+            dObjetoToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { tsmCubo, tsmTriangulo, tsmCilindro });
+            dObjetoToolStripMenuItem.Name = "dObjetoToolStripMenuItem";
+            dObjetoToolStripMenuItem.Size = new Size(180, 24);
+            dObjetoToolStripMenuItem.Text = "3D Objeto";
+            // 
+            // tsmCubo
+            // 
+            tsmCubo.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            tsmCubo.Name = "tsmCubo";
+            tsmCubo.Size = new Size(180, 24);
+            tsmCubo.Text = "Cubo";
+            tsmCubo.Click += tsmCubo_Click;
+            // 
+            // tsmTriangulo
+            // 
+            tsmTriangulo.Name = "tsmTriangulo";
+            tsmTriangulo.Size = new Size(180, 24);
+            tsmTriangulo.Text = "Triangulo";
+            tsmTriangulo.Click += tsmTriangulo_Click;
+            // 
+            // tsmCilindro
+            // 
+            tsmCilindro.Name = "tsmCilindro";
+            tsmCilindro.Size = new Size(180, 24);
+            tsmCilindro.Text = "Cilindro";
+            tsmCilindro.Click += tsmCilindro_Click;
             // 
             // componentesToolStripMenuItem
             // 
@@ -406,5 +447,10 @@
         private PictureBox pictureBox7;
         private Label lblNombreUsuario;
         private PictureBox pbFotoUsuario;
+        private ToolStripMenuItem crearVacioToolStripMenuItem;
+        private ToolStripMenuItem dObjetoToolStripMenuItem;
+        private ToolStripMenuItem tsmCubo;
+        private ToolStripMenuItem tsmTriangulo;
+        private ToolStripMenuItem tsmCilindro;
     }
 }
