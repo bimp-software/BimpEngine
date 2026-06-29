@@ -1,36 +1,57 @@
+using BimpEngine.Engine.Project;
+using BimpEngine.Vista;
+
 namespace BimpEngine
 {
     internal static class Program
     {
-        /// <summary>
-        ///  The main entry point for the application.
-        /// </summary>
         [STAThread]
         static void Main()
         {
-            // To customize application configuration such as set high DPI settings or default font,
-            // see https://aka.ms/applicationconfiguration.
             ApplicationConfiguration.Initialize();
 
-            Vista.frmBimpEngine frm = new Vista.frmBimpEngine();
-            frm.FormClosing += Frm_FormClosing;
-            frm.FormClosed += Frm_FormClosed;
+            // 1. Show the project launcher (like Unity Hub)
+            string? projectFolder = null;
+            using (var launcher = new frmLauncher())
+            {
+                if (launcher.ShowDialog() != System.Windows.Forms.DialogResult.OK)
+                    return; // user closed launcher without selecting a project
 
-            frm.ShowDialog();
+                projectFolder = launcher.SelectedProjectFolder;
+            }
 
+            if (projectFolder == null) return;
+
+            // 2. Open the selected project
+            try
+            {
+                ProjectManager.OpenProject(projectFolder);
+            }
+            catch (Exception ex)
+            {
+                System.Windows.Forms.MessageBox.Show(
+                    $"No se pudo abrir el proyecto:\n{ex.Message}",
+                    "Error", System.Windows.Forms.MessageBoxButtons.OK,
+                    System.Windows.Forms.MessageBoxIcon.Error);
+                return;
+            }
+
+            // 3. Open the editor and load the project's main scene
+            var editor = new frmBimpEngine();
+            editor.CargarProyecto();
+
+            editor.FormClosing += (s, e) =>
+            {
+                // FormClosing already handled inside frmBimpEngine (unsaved changes prompt)
+            };
+            editor.FormClosed += (s, e) =>
+            {
+                Application.Exit();
+                Application.ExitThread();
+            };
+
+            editor.ShowDialog();
             Application.Run();
-        }
-
-        private static void Frm_FormClosed(object? sender, FormClosedEventArgs e)
-        {
-            Application.Exit();
-            Application.ExitThread();
-        }
-
-        private static void Frm_FormClosing(object? sender, FormClosingEventArgs e)
-        {
-            Application.Exit();
-            Application.ExitThread();
         }
     }
 }

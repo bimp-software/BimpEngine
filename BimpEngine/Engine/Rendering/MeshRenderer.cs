@@ -38,11 +38,10 @@ namespace BimpEngine.Engine.Rendering
 
         private void DrawBlueprint(OpenGL gl, Mesh mesh, bool isSelected)
         {
-            // 1. Caras rellenas con azul oscuro semisólido
             gl.Enable(OpenGL.GL_POLYGON_OFFSET_FILL);
             gl.PolygonOffset(1f, 1f);
 
-            gl.Color(0.05, 0.12, 0.28); // azul muy oscuro
+            gl.Color(0.05, 0.12, 0.28);
 
             gl.Begin(OpenGL.GL_TRIANGLES);
             foreach (int index in mesh.Triangles)
@@ -54,21 +53,34 @@ namespace BimpEngine.Engine.Rendering
 
             gl.Disable(OpenGL.GL_POLYGON_OFFSET_FILL);
 
-            // 2. Aristas en azul claro
             gl.Color(0.3, 0.7, 1.0);
             gl.LineWidth(1.2f);
 
-            gl.PolygonMode(OpenGL.GL_FRONT_AND_BACK, OpenGL.GL_LINE);
-            gl.Begin(OpenGL.GL_TRIANGLES);
-            foreach (int index in mesh.Triangles)
+            if (mesh.Edges != null && mesh.Edges.Count > 0)
             {
-                var v = mesh.Vertices[index];
-                gl.Vertex(v.vector.X, v.vector.Y, v.vector.Z);
+                gl.Begin(OpenGL.GL_LINES);
+                for (int i = 0; i + 1 < mesh.Edges.Count; i += 2)
+                {
+                    var a = mesh.Vertices[mesh.Edges[i]];
+                    var b = mesh.Vertices[mesh.Edges[i + 1]];
+                    gl.Vertex(a.vector.X, a.vector.Y, a.vector.Z);
+                    gl.Vertex(b.vector.X, b.vector.Y, b.vector.Z);
+                }
+                gl.End();
             }
-            gl.End();
-            gl.PolygonMode(OpenGL.GL_FRONT_AND_BACK, OpenGL.GL_FILL);
+            else
+            {
+                gl.PolygonMode(OpenGL.GL_FRONT_AND_BACK, OpenGL.GL_LINE);
+                gl.Begin(OpenGL.GL_TRIANGLES);
+                foreach (int index in mesh.Triangles)
+                {
+                    var v = mesh.Vertices[index];
+                    gl.Vertex(v.vector.X, v.vector.Y, v.vector.Z);
+                }
+                gl.End();
+                gl.PolygonMode(OpenGL.GL_FRONT_AND_BACK, OpenGL.GL_FILL);
+            }
 
-            // 3. Si está seleccionado, bounding box en naranja
             if (isSelected)
                 DrawSelectionBox(gl, mesh);
         }

@@ -77,7 +77,12 @@ namespace BimpEngine.Controls.Herencia
             };
         }
 
-        public void AddObject(Objetos obj, Objetos parent = null)
+        public void Clear()
+        {
+            ListHerencia.Nodes.Clear();
+        }
+
+        public void AddObject(Objetos obj, Objetos parent = null, bool includeChildren = false)
         {
             var node = new TreeNode(obj.Name) { Tag = obj };
 
@@ -88,11 +93,17 @@ namespace BimpEngine.Controls.Herencia
                 {
                     parentNode.Nodes.Add(node);
                     parentNode.Expand();
+                    if (includeChildren)
+                        foreach (var child in obj.Children)
+                            AddObject(child, obj, includeChildren: true);
                     return;
                 }
             }
 
             ListHerencia.Nodes.Add(node);
+            if (includeChildren)
+                foreach (var child in obj.Children)
+                    AddObject(child, obj, includeChildren: true);
         }
 
         public void SelectObject(Objetos obj)
@@ -132,7 +143,7 @@ namespace BimpEngine.Controls.Herencia
 
         private void ListHerencia_ItemDrag(object sender, ItemDragEventArgs e)
         {
-            if(e.Item is TreeNode node)
+            if (e.Item is TreeNode node)
                 ListHerencia.DoDragDrop(node, DragDropEffects.Move);
         }
 

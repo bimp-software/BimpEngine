@@ -1,4 +1,5 @@
 ﻿using BimpEngine.Controls.Inspector.Componentes;
+using BimpEngine.Controls.Inspector.Componentes.Blueprint;
 using BimpEngine.Engine.Core.Interface;
 using BimpEngine.Engine.Entities;
 using BimpEngine.Engine.World;
@@ -16,6 +17,9 @@ namespace BimpEngine.Controls.Inspector
     {
         private Objetos _objetoActual;
         private Button btnAddComponent;
+
+        // Stores extra components added per object (by object Guid)
+        private Dictionary<Guid, List<UserControl>> _componentesPorObjeto = new();
 
         public event Action<Objetos> OnObjectModified;
         public event Action<PrimitiveType> OnCreatePrimitive;
@@ -74,6 +78,7 @@ namespace BimpEngine.Controls.Inspector
             UserControl control = nombre switch
             {
                 "Mueblería" => new FurnitureControl(),
+                "Script (Blueprint)" => new BlueprintControl(),
                 _ => null
             };
 
@@ -81,6 +86,14 @@ namespace BimpEngine.Controls.Inspector
 
             if (control is IInspectorComponent comp)
                 comp.SetObject(_objetoActual);
+
+            // Persist this component so it survives selection changes
+            if (_objetoActual != null)
+            {
+                if (!_componentesPorObjeto.ContainsKey(_objetoActual.Id))
+                    _componentesPorObjeto[_objetoActual.Id] = new List<UserControl>();
+                _componentesPorObjeto[_objetoActual.Id].Add(control);
+            }
 
             AddComponent(control);
         }
@@ -113,6 +126,12 @@ namespace BimpEngine.Controls.Inspector
             flpContenedor.Controls.SetChildIndex(btnAddComponent, flpContenedor.Controls.Count - 1);
         }
 
+        public void RemoveObjectComponents(Objetos obj)
+        {
+            if (obj != null)
+                _componentesPorObjeto.Remove(obj.Id);
+        }
+
         public void ShowObject(Objetos obj)
         {
             _objetoActual = obj;
@@ -127,6 +146,17 @@ namespace BimpEngine.Controls.Inspector
             var transform = new TransformControl();
             transform.SetObject(obj);
             AddComponent(transform);
+
+            // Restore any extra components previously added to this object
+            if (_componentesPorObjeto.TryGetValue(obj.Id, out var extras))
+            {
+                foreach (var extra in extras)
+                {
+                    if (extra is IInspectorComponent comp)
+                        comp.SetObject(obj);
+                    AddComponent(extra);
+                }
+            }
         }
 
         public void RefreshObject(Objetos obj)

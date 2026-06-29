@@ -17,12 +17,13 @@ namespace BimpEngine.Controls.Inspector
         // Registro de componentes: nombre → compatibilidad por tipo
         private readonly List<ComponenteInfo> _todos = new List<ComponenteInfo>
         {
-            new ComponenteInfo("Mueblería",     "Diseño de muebles con cajones, puertas y repisas",  typeof(PrimitiveObject)),
-            new ComponenteInfo("Cámara",        "Controla la vista de la cámara en la escena",       typeof(CameraObject)),
-            new ComponenteInfo("Luz",           "Agrega una fuente de luz al objeto",                null), // null = todos
-            new ComponenteInfo("Colisionador",  "Define el área de colisión del objeto",             null),
-            new ComponenteInfo("RigidBody",     "Aplica física y gravedad al objeto",                null),
-            new ComponenteInfo("Audio",         "Reproduce sonidos desde este objeto",               null),
+            new ComponenteInfo("Mueblería",          "Diseño de muebles con cajones, puertas y repisas",  typeof(PrimitiveObject)),
+            new ComponenteInfo("Script (Blueprint)",  "Editor visual de nodos — lógica sin código",        null),
+            new ComponenteInfo("Cámara",             "Controla la vista de la cámara en la escena",       typeof(CameraObject)),
+            new ComponenteInfo("Luz",                "Agrega una fuente de luz al objeto",                null),
+            new ComponenteInfo("Colisionador",       "Define el área de colisión del objeto",             null),
+            new ComponenteInfo("RigidBody",          "Aplica física y gravedad al objeto",                null),
+            new ComponenteInfo("Audio",              "Reproduce sonidos desde este objeto",               null),
         };
 
         public frmAddComponent(Objetos objeto)

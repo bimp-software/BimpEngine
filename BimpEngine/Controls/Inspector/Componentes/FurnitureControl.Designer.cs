@@ -79,12 +79,11 @@
             // 
             // panel1
             // 
-            panel1.BorderStyle = BorderStyle.FixedSingle;
             panel1.Controls.Add(label1);
             panel1.Dock = DockStyle.Top;
             panel1.Location = new Point(0, 0);
             panel1.Name = "panel1";
-            panel1.Size = new Size(225, 26);
+            panel1.Size = new Size(223, 26);
             panel1.TabIndex = 3;
             // 
             // label1
@@ -96,7 +95,7 @@
             label1.Location = new Point(0, 0);
             label1.Name = "label1";
             label1.Padding = new Padding(5, 0, 0, 0);
-            label1.Size = new Size(103, 24);
+            label1.Size = new Size(103, 26);
             label1.TabIndex = 0;
             label1.Text = "Mueblería";
             label1.TextAlign = ContentAlignment.MiddleLeft;
@@ -133,7 +132,7 @@
             panel2.Dock = DockStyle.Fill;
             panel2.Location = new Point(0, 26);
             panel2.Name = "panel2";
-            panel2.Size = new Size(225, 447);
+            panel2.Size = new Size(223, 445);
             panel2.TabIndex = 4;
             // 
             // btnGenerar
@@ -146,7 +145,7 @@
             btnGenerar.ForeColor = Color.White;
             btnGenerar.Location = new Point(10, 399);
             btnGenerar.Name = "btnGenerar";
-            btnGenerar.Size = new Size(202, 40);
+            btnGenerar.Size = new Size(200, 40);
             btnGenerar.TabIndex = 38;
             btnGenerar.Text = "Generar";
             btnGenerar.UseVisualStyleBackColor = false;
@@ -159,7 +158,7 @@
             btnLimpiar.FlatStyle = FlatStyle.Flat;
             btnLimpiar.Location = new Point(10, 353);
             btnLimpiar.Name = "btnLimpiar";
-            btnLimpiar.Size = new Size(202, 40);
+            btnLimpiar.Size = new Size(200, 40);
             btnLimpiar.TabIndex = 37;
             btnLimpiar.Text = "Limpiar";
             btnLimpiar.UseVisualStyleBackColor = true;
@@ -172,8 +171,9 @@
             nudRepisas.Font = new Font("Segoe UI", 12F);
             nudRepisas.ForeColor = Color.White;
             nudRepisas.Location = new Point(65, 313);
+            nudRepisas.Maximum = new decimal(new int[] { 20, 0, 0, 0 });
             nudRepisas.Name = "nudRepisas";
-            nudRepisas.Size = new Size(143, 25);
+            nudRepisas.Size = new Size(141, 25);
             nudRepisas.TabIndex = 36;
             // 
             // label18
@@ -218,7 +218,7 @@
             panel7.BackColor = Color.FromArgb(80, 80, 80);
             panel7.Location = new Point(12, 275);
             panel7.Name = "panel7";
-            panel7.Size = new Size(200, 2);
+            panel7.Size = new Size(198, 2);
             panel7.TabIndex = 33;
             // 
             // panel6
@@ -281,7 +281,7 @@
             panel4.BackColor = Color.FromArgb(80, 80, 80);
             panel4.Location = new Point(12, 208);
             panel4.Name = "panel4";
-            panel4.Size = new Size(200, 2);
+            panel4.Size = new Size(198, 2);
             panel4.TabIndex = 22;
             // 
             // nudFilasCajones
@@ -292,8 +292,9 @@
             nudFilasCajones.Font = new Font("Segoe UI", 12F);
             nudFilasCajones.ForeColor = Color.White;
             nudFilasCajones.Location = new Point(72, 177);
+            nudFilasCajones.Maximum = new decimal(new int[] { 20, 0, 0, 0 });
             nudFilasCajones.Name = "nudFilasCajones";
-            nudFilasCajones.Size = new Size(136, 25);
+            nudFilasCajones.Size = new Size(134, 25);
             nudFilasCajones.TabIndex = 21;
             // 
             // label13
@@ -313,8 +314,9 @@
             nudCajones.Font = new Font("Segoe UI", 12F);
             nudCajones.ForeColor = Color.White;
             nudCajones.Location = new Point(72, 146);
+            nudCajones.Maximum = new decimal(new int[] { 20, 0, 0, 0 });
             nudCajones.Name = "nudCajones";
-            nudCajones.Size = new Size(136, 25);
+            nudCajones.Size = new Size(134, 25);
             nudCajones.TabIndex = 18;
             // 
             // label11
@@ -332,7 +334,7 @@
             panel3.BackColor = Color.FromArgb(80, 80, 80);
             panel3.Location = new Point(12, 138);
             panel3.Name = "panel3";
-            panel3.Size = new Size(200, 2);
+            panel3.Size = new Size(198, 2);
             panel3.TabIndex = 15;
             // 
             // nudGrosorTabla
@@ -344,8 +346,9 @@
             nudGrosorTabla.Font = new Font("Segoe UI", 12F);
             nudGrosorTabla.ForeColor = Color.White;
             nudGrosorTabla.Location = new Point(96, 107);
+            nudGrosorTabla.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
             nudGrosorTabla.Name = "nudGrosorTabla";
-            nudGrosorTabla.Size = new Size(82, 25);
+            nudGrosorTabla.Size = new Size(80, 25);
             nudGrosorTabla.TabIndex = 14;
             // 
             // label8
@@ -376,8 +379,9 @@
             nudProfundidad.Font = new Font("Segoe UI", 12F);
             nudProfundidad.ForeColor = Color.White;
             nudProfundidad.Location = new Point(65, 76);
+            nudProfundidad.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
             nudProfundidad.Name = "nudProfundidad";
-            nudProfundidad.Size = new Size(113, 25);
+            nudProfundidad.Size = new Size(111, 25);
             nudProfundidad.TabIndex = 11;
             // 
             // label6
@@ -408,8 +412,9 @@
             nudAlto.Font = new Font("Segoe UI", 12F);
             nudAlto.ForeColor = Color.White;
             nudAlto.Location = new Point(65, 45);
+            nudAlto.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
             nudAlto.Name = "nudAlto";
-            nudAlto.Size = new Size(113, 25);
+            nudAlto.Size = new Size(111, 25);
             nudAlto.TabIndex = 8;
             // 
             // label4
@@ -440,8 +445,9 @@
             nudAncho.Font = new Font("Segoe UI", 12F);
             nudAncho.ForeColor = Color.White;
             nudAncho.Location = new Point(65, 14);
+            nudAncho.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
             nudAncho.Name = "nudAncho";
-            nudAncho.Size = new Size(113, 25);
+            nudAncho.Size = new Size(111, 25);
             nudAncho.TabIndex = 5;
             // 
             // label3
@@ -468,11 +474,12 @@
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.FromArgb(35, 35, 35);
+            BorderStyle = BorderStyle.FixedSingle;
             Controls.Add(panel2);
             Controls.Add(panel1);
             ForeColor = Color.White;
             Name = "FurnitureControl";
-            Size = new Size(225, 473);
+            Size = new Size(223, 471);
             panel1.ResumeLayout(false);
             panel2.ResumeLayout(false);
             panel2.PerformLayout();

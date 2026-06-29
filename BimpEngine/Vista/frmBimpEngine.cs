@@ -7,6 +7,7 @@ using BimpEngine.Engine.Editor;
 using BimpEngine.Engine.Editor.Layouts;
 using BimpEngine.Engine.Entities;
 using BimpEngine.Engine.Entities.Primitive;
+using BimpEngine.Engine.Project;
 using Windows.System;
 
 namespace BimpEngine.Vista
@@ -29,12 +30,15 @@ namespace BimpEngine.Vista
 
         #endregion
 
+        private bool _hasUnsavedChanges = false;
+
         public frmBimpEngine()
         {
             InitializeComponent();
             InitializeUser();
-
             InicializarControler();
+            //InicializarMenuArchivo();
+            ActualizarTitulo();
         }
 
         #region Cuenta del usuario
@@ -124,12 +128,14 @@ namespace BimpEngine.Vista
             {
                 hierarchy.RefreshObject(obj);
                 sceneView.RefrescarEscena();
+                MarcarCambio();
             };
 
             inspector.OnChildCreated += (hijo, padre) =>
             {
                 hierarchy.AddObject(hijo, padre);
                 sceneView.RefrescarEscena();
+                MarcarCambio();
             };
 
             hierarchy.OnObjectReparented += (hijo, nuevoPadre) =>
@@ -153,6 +159,7 @@ namespace BimpEngine.Vista
             {
                 obj.Parent?.RemoveChild(obj);
                 sceneView.GetScene().Remove(obj);
+                inspector.RemoveObjectComponents(obj);
                 inspector.ShowObject(null);
                 sceneView.RefrescarEscena();
             };
@@ -205,5 +212,227 @@ namespace BimpEngine.Vista
             sceneView.SetSelection(cilindro, sceneView.GetScene().Objetos.Count - 1);
             inspector.ShowObject(cilindro);
         }
+
+        #region Project System
+
+        //private void InicializarMenuArchivo()
+        //{
+        //    archivoToolStripMenuItem.DropDownItems.Clear();
+
+        //    var tsmGuardar = new ToolStripMenuItem("Guardar Escena\tCtrl+S");
+        //    tsmGuardar.ShortcutKeys = Keys.Control | Keys.S;
+        //    tsmGuardar.Click += (s, e) => GuardarEscena();
+
+        //    var tsmGuardarComo = new ToolStripMenuItem("Guardar Escena como…");
+        //    tsmGuardarComo.Click += (s, e) => GuardarEscenaComo();
+
+        //    var tsmSep1 = new ToolStripSeparator();
+
+        //    var tsmAbrirEscena = new ToolStripMenuItem("Abrir Escena…");
+        //    tsmAbrirEscena.Click += (s, e) => AbrirEscena();
+
+        //    var tsmSep2 = new ToolStripSeparator();
+
+        //    var tsmNuevaEscena = new ToolStripMenuItem("Nueva Escena");
+        //    tsmNuevaEscena.Click += (s, e) => NuevaEscena();
+
+        //    var tsmSep3 = new ToolStripSeparator();
+
+        //    var tsmIrLauncher = new ToolStripMenuItem("Volver al Gestor de Proyectos…");
+        //    tsmIrLauncher.Click += (s, e) => VolverAlLauncher();
+
+        //    var tsmSalir = new ToolStripMenuItem("Salir");
+        //    tsmSalir.Click += (s, e) => Close();
+
+        //    archivoToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[]
+        //    {
+        //        tsmGuardar, tsmGuardarComo, tsmSep1,
+        //        tsmAbrirEscena, tsmSep2,
+        //        tsmNuevaEscena, tsmSep3,
+        //        tsmIrLauncher, tsmSalir
+        //    });
+        //}
+
+        // ── Called by Program.cs after opening a project ──────────────────
+        public void CargarProyecto()
+        {
+            if (!ProjectManager.HasOpenProject) return;
+
+            // Load file tree in the Project panel
+            proyecto.CargarProyecto(ProjectManager.CurrentProjectFolder!);
+            proyecto.OnOpenScene += (scenePath) =>
+            {
+                if (ConfirmarDescartarCambios())
+                    CargarEscenaDesdeArchivo(scenePath);
+            };
+
+            string scenePath = ProjectManager.GetMainScenePath();
+            if (File.Exists(scenePath))
+                CargarEscenaDesdeArchivo(scenePath);
+            ActualizarTitulo();
+        }
+
+        private void GuardarEscena()
+        {
+            if (!ProjectManager.HasOpenProject)
+            { GuardarEscenaComo(); return; }
+
+            try
+            {
+                string path = ProjectManager.GetMainScenePath();
+                SceneSerializer.Save(sceneView.GetScene(), path);
+                ProjectManager.SaveProjectInfo();
+                _hasUnsavedChanges = false;
+                ActualizarTitulo();
+                proyecto.RefrescarArbol();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error al guardar:\n{ex.Message}", "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void GuardarEscenaComo()
+        {
+            if (!ProjectManager.HasOpenProject)
+            {
+                MessageBox.Show("No hay un proyecto abierto. Crea o abre un proyecto primero.",
+                    "Sin proyecto", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            using var dlg = new SaveFileDialog
+            {
+                Title = "Guardar Escena como",
+                InitialDirectory = ProjectManager.GetScenesFolder(),
+                Filter = "Escena BimpEngine (*.bscene)|*.bscene",
+                DefaultExt = "bscene",
+                FileName = sceneView.GetScene().Name
+            };
+            if (dlg.ShowDialog(this) != DialogResult.OK) return;
+
+            try
+            {
+                SceneSerializer.Save(sceneView.GetScene(), dlg.FileName);
+                _hasUnsavedChanges = false;
+                ActualizarTitulo();
+                proyecto.RefrescarArbol();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error al guardar:\n{ex.Message}", "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void AbrirEscena()
+        {
+            if (!ConfirmarDescartarCambios()) return;
+
+            string startDir = ProjectManager.HasOpenProject
+                ? ProjectManager.GetScenesFolder()
+                : Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+
+            using var dlg = new OpenFileDialog
+            {
+                Title = "Abrir Escena",
+                InitialDirectory = startDir,
+                Filter = "Escena BimpEngine (*.bscene)|*.bscene"
+            };
+            if (dlg.ShowDialog(this) != DialogResult.OK) return;
+            CargarEscenaDesdeArchivo(dlg.FileName);
+        }
+
+        private void CargarEscenaDesdeArchivo(string path)
+        {
+            try
+            {
+                var scene = SceneSerializer.Load(path);
+                sceneView.SetScene(scene);
+                hierarchy.Clear();
+                foreach (var obj in scene.Objetos)
+                    hierarchy.AddObject(obj, null, includeChildren: true);
+
+                inspector.ShowObject(null);
+                sceneView.RefrescarEscena();
+                _hasUnsavedChanges = false;
+                ActualizarTitulo();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error al cargar la escena:\n{ex.Message}", "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void NuevaEscena()
+        {
+            if (!ConfirmarDescartarCambios()) return;
+
+            var scene = new Engine.Core.Scene { Name = "Scene" };
+            sceneView.SetScene(scene);
+            hierarchy.Clear();
+            inspector.ShowObject(null);
+            sceneView.RefrescarEscena();
+            _hasUnsavedChanges = false;
+            ActualizarTitulo();
+        }
+
+        private void VolverAlLauncher()
+        {
+            if (!ConfirmarDescartarCambios()) return;
+            ProjectManager.Close();
+            var launcher = new frmLauncher();
+            Hide();
+            if (launcher.ShowDialog() == DialogResult.OK && launcher.SelectedProjectFolder != null)
+            {
+                ProjectManager.OpenProject(launcher.SelectedProjectFolder);
+                CargarProyecto();
+                Show();
+            }
+            else
+            {
+                Close();
+            }
+        }
+
+        private void ActualizarTitulo()
+        {
+            string proyecto = ProjectManager.CurrentProject?.Name ?? "Sin Proyecto";
+            string escena = sceneView?.GetScene()?.Name ?? "Scene";
+            string cambios = _hasUnsavedChanges ? " *" : "";
+            Text = $"BimpEngine — {proyecto} — {escena}{cambios}";
+        }
+
+        private bool ConfirmarDescartarCambios()
+        {
+            if (!_hasUnsavedChanges) return true;
+            var r = MessageBox.Show("Hay cambios sin guardar. ¿Deseas guardar antes de continuar?",
+                "Cambios sin guardar",
+                MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning);
+            if (r == DialogResult.Cancel) return false;
+            if (r == DialogResult.Yes) GuardarEscena();
+            return true;
+        }
+
+        // Mark scene as modified whenever the user changes something
+        public void MarcarCambio()
+        {
+            if (!_hasUnsavedChanges)
+            {
+                _hasUnsavedChanges = true;
+                ActualizarTitulo();
+            }
+        }
+
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            if (!ConfirmarDescartarCambios())
+                e.Cancel = true;
+            base.OnFormClosing(e);
+        }
+
+        #endregion
     }
 }

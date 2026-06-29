@@ -30,7 +30,7 @@ namespace BimpEngine.Controls.Inspector.Componentes
 
             LimpiarHijos();
 
-            // 1 unidad = 1 metro, cubo base mide 2 unidades → dividir por 200
+            // 1 unidad = 1 metro, cubo base mide 2 unidades → dividir por 100
             double ancho = (double)nudAncho.Value / 100.0;
             double alto = (double)nudAlto.Value / 100.0;
             double fondo = (double)nudProfundidad.Value / 100.0;
@@ -50,10 +50,10 @@ namespace BimpEngine.Controls.Inspector.Componentes
                 GenerarCajones(cajones, filas, ancho, alto, fondo, grosor);
 
             if (chkPuertaIzq.Checked)
-                GenerarPuerta("Puerta Izq", -ancho / 4, alto, fondo, grosor, -1);
+                GenerarPuerta("Puerta Izq", -1, ancho, alto, fondo, grosor);
 
             if (chkPuertaDer.Checked)
-                GenerarPuerta("Puerta Der", ancho / 4, alto, fondo, grosor, 1);
+                GenerarPuerta("Puerta Der", 1, ancho, alto, fondo, grosor);
 
             if (chkRepisas.Checked)
                 GenerarRepisas((int)nudRepisas.Value, ancho, alto, fondo, grosor);
@@ -81,22 +81,32 @@ namespace BimpEngine.Controls.Inspector.Componentes
             }
         }
 
-        private void GenerarPuerta(string nombre, double x, double alto, double fondo, double grosor, int lado)
+        private void GenerarPuerta(string nombre, int lado, double ancho, double alto, double fondo, double grosor)
         {
-            double anchoPuerta = (objeto.Transform.Scale.X / 2) - grosor;
-            double z = fondo / 2 + grosor / 2;
-            CrearHijo(nombre, x, 0, z, anchoPuerta, alto - grosor * 2, grosor);
+            // Cada puerta ocupa la mitad del ancho interior, con grosor real de tabla
+            double anchoPuerta = (ancho - grosor * 3) / 2.0; // mitad del interior
+            double altoPuerta = alto - grosor * 2;            // alto interior completo
+            double profPuerta = grosor;                       // grosor real de una tabla
+
+            double x = lado * (anchoPuerta / 2.0 + grosor / 2.0);
+            double y = 0;
+            double z = fondo / 2.0 + profPuerta / 2.0;      // sobresale al frente
+
+            CrearHijo(nombre, x, y, z, anchoPuerta, altoPuerta, profPuerta);
         }
 
         private void GenerarRepisas(int cantidad, double ancho, double alto, double fondo, double grosor)
         {
             double espacioY = (alto - grosor * 2) / (cantidad + 1);
+            // Grosor visual de repisa = al menos el grosor de tabla, mínimo 2 cm
+            double grosorRepisa = System.Math.Max(grosor, 0.02);
+
             for (int i = 1; i <= cantidad; i++)
             {
                 double y = -alto / 2 + grosor + espacioY * i;
                 CrearHijo($"Repisa.{i:D3}", 0, y, 0,
                     ancho - grosor * 2,
-                    grosor,
+                    grosorRepisa,
                     fondo - grosor * 2);
             }
         }

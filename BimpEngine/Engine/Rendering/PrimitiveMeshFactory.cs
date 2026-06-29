@@ -33,6 +33,14 @@ namespace BimpEngine.Engine.Rendering
                 0,3,7, 0,7,4
             });
 
+            // 12 edges of a cube (no diagonals)
+            mesh.Edges.AddRange(new int[]
+            {
+                0,1, 1,2, 2,3, 3,0, // back face
+                4,5, 5,6, 6,7, 7,4, // front face
+                0,4, 1,5, 2,6, 3,7  // connecting edges
+            });
+
             return mesh;
         }
 
@@ -41,11 +49,11 @@ namespace BimpEngine.Engine.Rendering
             Mesh mesh = new Mesh();
 
             double h = size / 2.0;
-            double apex = size * 0.816; 
-            mesh.Vertices.Add(new Vertex(0, -h, h));      
-            mesh.Vertices.Add(new Vertex(-h, -h, -h * 0.5));     
-            mesh.Vertices.Add(new Vertex(h, -h, -h * 0.5));    
-            mesh.Vertices.Add(new Vertex(0, apex - h, 0));         
+            double apex = size * 0.816;
+            mesh.Vertices.Add(new Vertex(0, -h, h));
+            mesh.Vertices.Add(new Vertex(-h, -h, -h * 0.5));
+            mesh.Vertices.Add(new Vertex(h, -h, -h * 0.5));
+            mesh.Vertices.Add(new Vertex(0, apex - h, 0));
 
             mesh.Triangles.AddRange(new int[]
             {

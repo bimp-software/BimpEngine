@@ -28,14 +28,15 @@ namespace BimpEngine.Engine.World
             var gl = glControl.OpenGL;
 
             gl.PushMatrix();
-
             gl.Translate(Transform.Position.X, Transform.Position.Y, Transform.Position.Z);
             gl.Rotate(Transform.Rotation.X, 1, 0, 0);
             gl.Rotate(Transform.Rotation.Y, 0, 1, 0);
             gl.Rotate(Transform.Rotation.Z, 0, 0, 1);
-            gl.Scale(Transform.Scale.X, Transform.Scale.Y, Transform.Scale.Z);
 
+            gl.PushMatrix();
+            gl.Scale(Transform.Scale.X, Transform.Scale.Y, Transform.Scale.Z);
             MeshRenderer.Draw(gl, MeshFilter.Mesh, IsSelected);
+            gl.PopMatrix();
 
             foreach (var child in Children)
                 if (child.Enabled)

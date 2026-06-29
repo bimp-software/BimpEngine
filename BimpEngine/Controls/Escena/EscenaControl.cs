@@ -39,6 +39,8 @@ namespace BimpEngine.Controls.Escena
         public EscenaControl()
         {
             InitializeComponent();
+
+            glControl.MouseWheel += glControl_MouseWheel;
         }
         #endregion
 
