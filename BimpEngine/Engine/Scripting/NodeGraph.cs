@@ -8,6 +8,7 @@ namespace BimpEngine.Engine.Scripting
     {
         public List<ScriptNode> Nodes { get; } = new();
         public List<NodeConnection> Connections { get; } = new();
+        public List<GraphVariable> Variables { get; } = new();
 
         public void AddNode(ScriptNode node) => Nodes.Add(node);
 

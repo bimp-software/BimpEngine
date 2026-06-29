@@ -2,12 +2,14 @@
 using BimpEngine.Controls.Escena;
 using BimpEngine.Controls.Herencia;
 using BimpEngine.Controls.Inspector;
+using BimpEngine.Controls.Inspector.Componentes.Blueprint;
 using BimpEngine.Controls.Proyecto;
 using BimpEngine.Engine.Editor;
 using BimpEngine.Engine.Editor.Layouts;
 using BimpEngine.Engine.Entities;
 using BimpEngine.Engine.Entities.Primitive;
 using BimpEngine.Engine.Project;
+using BimpEngine.Engine.Scripting;
 using Windows.System;
 
 namespace BimpEngine.Vista
@@ -26,8 +28,6 @@ namespace BimpEngine.Vista
         private InspectorControl inspector;
         private ConsolaControl console;
         private ProyectoControl proyecto;
-
-
         #endregion
 
         private bool _hasUnsavedChanges = false;
@@ -172,6 +172,20 @@ namespace BimpEngine.Vista
                 hierarchy.AddObject(clon, clon.Parent);
                 sceneView.SetSelection(clon, sceneView.GetScene().Objetos.Count - 1);
                 inspector.ShowObject(clon);
+            };
+
+            proyecto.OnOpenBlueprint += (path) =>
+            {
+                var graph = new NodeGraph();
+                var editor = new frmBlueprintEditor(graph, obj.Name, sceneView.GetScene().Objetos);
+
+                proyecto.OnOpenBlueprint += (path) =>
+                {
+                    var graph = new NodeGraph();
+                    var editor = new frmBlueprintEditor(graph, Path.GetFileNameWithoutExtension(path),
+                                                         sceneView.GetScene().Objetos);
+                    editor.Show(this);
+                };
             };
 
             editorViews = new Dictionary<string, EditorView>()

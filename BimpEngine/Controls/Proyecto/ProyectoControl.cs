@@ -7,6 +7,7 @@ namespace BimpEngine.Controls.Proyecto
     public partial class ProyectoControl : UserControl
     {
         public event Action<string>? OnOpenScene;
+        public event Action<string>? OnOpenBlueprint;
 
         private string? _rootPath;
 
@@ -15,6 +16,7 @@ namespace BimpEngine.Controls.Proyecto
         private const int ICON_SCENE = 2;
         private const int ICON_FILE = 3;
         private const int ICON_PROJECT = 4;
+        private const int ICON_BLUEPRINT = 5;
 
         public ProyectoControl()
         {
@@ -63,6 +65,12 @@ namespace BimpEngine.Controls.Proyecto
                 g.FillRectangle(new SolidBrush(Color.RoyalBlue), 1, 1, 14, 14);
                 g.DrawString("B", new Font("Segoe UI", 7f, FontStyle.Bold),
                     Brushes.White, 3f, 2f);
+            }));
+            // En BuildIcons() agrega:
+            _icons.Images.Add(DrawIcon((g, r) =>
+            {
+                g.FillRectangle(new SolidBrush(Color.FromArgb(140, 60, 180)), 2, 1, 10, 13);
+                g.DrawString("B", new Font("Segoe UI", 7f, FontStyle.Bold), Brushes.White, 3f, 2f);
             }));
         }
 
@@ -151,6 +159,7 @@ namespace BimpEngine.Controls.Proyecto
                 int icon = ext switch
                 {
                     ".bscene" => ICON_SCENE,
+                    ".bscript" => ICON_BLUEPRINT,
                     _ => ICON_FILE
                 };
 
@@ -184,6 +193,8 @@ namespace BimpEngine.Controls.Proyecto
                 string ext = Path.GetExtension(path).ToLower();
                 if (ext == ProjectManager.SceneExtension)
                     OnOpenScene?.Invoke(path);
+                else if (ext == ".bscript")
+                    OnOpenBlueprint?.Invoke(path);
             }
         }
 
@@ -216,6 +227,7 @@ namespace BimpEngine.Controls.Proyecto
 
                 Add(menu, "Nueva Escena aquí", () => NuevaEscena(folder, node));
                 Add(menu, "Nueva Carpeta aquí", () => NuevaCarpeta(folder, node));
+                Add(menu, "Nuevo Blueprint aquí", () => NuevoBlueprint(folder, node));
                 menu.Items.Add(new ToolStripSeparator());
                 Add(menu, "Mostrar en Explorador…", () => AbrirEnExplorador(folder));
                 menu.Items.Add(new ToolStripSeparator());
@@ -228,6 +240,9 @@ namespace BimpEngine.Controls.Proyecto
 
                 if (ext == ProjectManager.SceneExtension)
                     Add(menu, "Abrir Escena", () => OnOpenScene?.Invoke(file));
+
+                if (ext == ".bscript")
+                    Add(menu, "Abrir Blueprint", () => OnOpenBlueprint?.Invoke(file));
 
                 menu.Items.Add(new ToolStripSeparator());
                 Add(menu, "Renombrar (F2)", () => IniciarRenombrar(node));
@@ -317,6 +332,20 @@ namespace BimpEngine.Controls.Proyecto
             catch (Exception ex) { MessageBox.Show(ex.Message); }
         }
 
+        private void NuevoBlueprint(string folder, TreeNode? parentNode)
+        {
+            string name = Prompt("Nombre del Blueprint:", "MiBlueprint");
+            if (string.IsNullOrWhiteSpace(name)) return;
+
+            string path = Path.Combine(folder, name + ".bscript");
+            if (File.Exists(path)) { MessageBox.Show("Ya existe un blueprint con ese nombre."); return; }
+
+            Directory.CreateDirectory(folder);
+            File.WriteAllText(path, "{}"); // JSON vacío por ahora
+            RefrescarArbol();
+        }
+
+
         private static void AbrirEnExplorador(string path)
         {
             if (Directory.Exists(path))
@@ -350,7 +379,7 @@ namespace BimpEngine.Controls.Proyecto
             item.Click += (s, e) => action();
             menu.Items.Add(item);
         }
-
+  
         private static string Prompt(string message, string defaultValue)
         {
             using var frm = new Form

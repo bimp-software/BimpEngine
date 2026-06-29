@@ -1,27 +1,19 @@
 ﻿using BimpEngine.Engine.Scripting;
+using BimpEngine.Engine.Scripting.Enum;
 using BimpEngine.Engine.Scripting.Nodes;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
+using BimpEngine.Engine.World;
 using System.Drawing.Drawing2D;
-using System.Linq;
-using System.Windows.Forms;
+using System.ComponentModel;
 
 namespace BimpEngine.Controls.Inspector.Componentes.Blueprint
 {
-    /// <summary>
-    /// Full-screen node editor canvas.
-    /// - Drag nodes to reposition them
-    /// - Drag from an output port dot to an input port dot to connect
-    /// - Right-click empty space → add node menu
-    /// - Right-click on node → delete
-    /// - Middle-mouse or Alt+drag → pan
-    /// - Ctrl+scroll → zoom
-    /// </summary>
     public class NodeCanvas : Control
     {
         // ── Graph ─────────────────────────────────────────────────────────
         public NodeGraph Graph { get; private set; } = new();
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public List<Objetos> ObjetosEscena { get; set; } = new List<Objetos>();
+
 
         // ── View transform ────────────────────────────────────────────────
         private PointF _pan = new(0, 0);
@@ -45,6 +37,7 @@ namespace BimpEngine.Controls.Inspector.Componentes.Blueprint
         private const int PortH = 22;
         private const int PortRadius = 6;
         private const int PortMargin = 12;
+
 
         public NodeCanvas()
         {
@@ -419,10 +412,19 @@ namespace BimpEngine.Controls.Inspector.Componentes.Blueprint
                     if (item.Text == cat) { catItem = item as ToolStripMenuItem; break; }
                 if (catItem == null)
                 {
-                    catItem = new ToolStripMenuItem(cat) { ForeColor = Color.LightGray, Font = new Font("Segoe UI", 9f, FontStyle.Bold) };
+                    catItem = new ToolStripMenuItem(cat)
+                    {
+                        ForeColor = Color.LightGray,
+                        Font = new Font("Segoe UI", 9f, FontStyle.Bold),
+                        BackColor = Color.FromArgb(38, 38, 42)
+                    };
                     menu.Items.Add(catItem);
                 }
-                var child = new ToolStripMenuItem(label) { ForeColor = Color.Black };
+                var child = new ToolStripMenuItem(label)
+                {
+                    ForeColor = Color.White,
+                    BackColor = Color.FromArgb(48, 48, 52)
+                };
                 child.Click += (s, e) =>
                 {
                     var node = factory();
@@ -433,27 +435,94 @@ namespace BimpEngine.Controls.Inspector.Componentes.Blueprint
                 catItem.DropDownItems.Add(child);
             }
 
-            // Events
+            // Eventos
             AddItem("🔴 Eventos", "Al Iniciar", () => new OnStartNode());
             AddItem("🔴 Eventos", "Al Hacer Clic", () => new OnClickNode());
             AddItem("🔴 Eventos", "Cada Frame", () => new OnUpdateNode());
-            // Actions
+            AddItem("🔴 Eventos", "Al Presionar Tecla", () => new TeclaPresionadaNode());
+
+            // Acciones
             AddItem("🔵 Acciones", "Mover Objeto", () => new MoverObjetoNode());
             AddItem("🔵 Acciones", "Rotar Objeto", () => new RotarObjetoNode());
             AddItem("🔵 Acciones", "Escalar Objeto", () => new EscalarObjetoNode());
             AddItem("🔵 Acciones", "Imprimir", () => new ImprimirNode());
-            // Conditions
+            AddItem("🔵 Acciones", "Temporizador", () => new TemporizadorNode());
+
+            // Condiciones
             AddItem("🟡 Condiciones", "Si / Sino", () => new SiEntoncesNode());
             AddItem("🟡 Condiciones", "Comparar", () => new CompararNode());
-            // Variables
-            AddItem("🟢 Variables", "Número", () => new NumeroConstanteNode());
-            AddItem("🟢 Variables", "Obtener Variable", () => new ObtenerVariableNode());
-            AddItem("🟢 Variables", "Asignar Variable", () => new SetVariableNode());
-            // Math
+
+            // Matemáticas
             AddItem("🟣 Matemáticas", "Sumar", () => new SumarNode());
             AddItem("🟣 Matemáticas", "Restar", () => new RestarNode());
             AddItem("🟣 Matemáticas", "Multiplicar", () => new MultiplicarNode());
             AddItem("🟣 Matemáticas", "Seno", () => new SinusNode());
+
+            // Variables del grafo
+            if (Graph.Variables.Count > 0)
+            {
+                var catVar = new ToolStripMenuItem("🟢 Mis Variables")
+                {
+                    ForeColor = Color.LightGray,
+                    Font = new Font("Segoe UI", 9f, FontStyle.Bold),
+                    BackColor = Color.FromArgb(38, 38, 42)
+                };
+
+                foreach (var v in Graph.Variables)
+                {
+                    var subVar = new ToolStripMenuItem(v.Nombre)
+                    {
+                        ForeColor = v.Color,
+                        BackColor = Color.FromArgb(48, 48, 52)
+                    };
+
+                    // Submenú: Obtener / Asignar
+                    var itemGet = new ToolStripMenuItem($"🟢 Obtener '{v.Nombre}'")
+                    {
+                        ForeColor = Color.White,
+                        BackColor = Color.FromArgb(48, 48, 52)
+                    };
+                    itemGet.Click += (s, e) =>
+                    {
+                        // Si es tipo Objeto, mostrar picker de escena
+                        if (v.Tipo == VariableType.Objeto || v.Tipo == VariableType.Camera)
+                            MostrarPickerObjeto(v, world, esGet: true);
+                        else
+                        {
+                            var node = new ObtenerVariableNode(v);
+                            node.Position = new Point((int)world.X, (int)world.Y);
+                            Graph.AddNode(node);
+                            Invalidate();
+                        }
+                    };
+
+                    var itemSet = new ToolStripMenuItem($"🔵 Asignar '{v.Nombre}'")
+                    {
+                        ForeColor = Color.White,
+                        BackColor = Color.FromArgb(48, 48, 52)
+                    };
+                    itemSet.Click += (s, e) =>
+                    {
+                        if (v.Tipo == VariableType.Objeto || v.Tipo == VariableType.Camera)
+                            MostrarPickerObjeto(v, world, esGet: false);
+                        else
+                        {
+                            var node = new SetVariableNode(v);
+                            node.Position = new Point((int)world.X, (int)world.Y);
+                            Graph.AddNode(node);
+                            Invalidate();
+                        }
+                    };
+
+                    subVar.DropDownItems.Add(itemGet);
+                    if (v.Tipo != VariableType.Escena)
+                        subVar.DropDownItems.Add(itemSet);
+
+                    catVar.DropDownItems.Add(subVar);
+                }
+
+                menu.Items.Add(catVar);
+            }
 
             menu.Show(this, screen);
         }
@@ -475,6 +544,57 @@ namespace BimpEngine.Controls.Inspector.Componentes.Blueprint
             };
             menu.Items.Add(dup);
             menu.Show(this, screen);
+        }
+
+        private void MostrarPickerObjeto(GraphVariable v, PointF world, bool esGet)
+        {
+            var picker = new ContextMenuStrip();
+            picker.BackColor = Color.FromArgb(38, 38, 42);
+            picker.ForeColor = Color.White;
+
+            var titulo = new ToolStripLabel($"Seleccionar objeto para '{v.Nombre}':")
+            {
+                ForeColor = Color.FromArgb(150, 150, 160),
+                Font = new Font("Segoe UI", 8f, FontStyle.Italic)
+            };
+            picker.Items.Add(titulo);
+            picker.Items.Add(new ToolStripSeparator());
+
+            if (ObjetosEscena.Count == 0)
+            {
+                picker.Items.Add(new ToolStripLabel("(No hay objetos en la escena)")
+                { ForeColor = Color.Gray });
+            }
+            else
+            {
+                foreach (var obj in ObjetosEscena)
+                {
+                    var item = new ToolStripMenuItem($"📦 {obj.Name}")
+                    {
+                        ForeColor = Color.White,
+                        BackColor = Color.FromArgb(48, 48, 52)
+                    };
+                    item.Click += (s, e) =>
+                    {
+                        // Guardar referencia al objeto en la variable
+                        v.ValorDefecto = obj.Name;
+                        v.ReferenciaName = obj.Name;
+
+                        ScriptNode node = esGet
+                            ? new ObtenerVariableNode(v)
+                            : new SetVariableNode(v);
+
+                        node.Position = new Point((int)world.X, (int)world.Y);
+                        node.Title += $" ({obj.Name})";
+                        Graph.AddNode(node);
+                        Invalidate();
+                    };
+                    picker.Items.Add(item);
+                }
+            }
+
+            // Mostrar el picker donde está el mouse
+            picker.Show(this, PointToClient(Cursor.Position));
         }
     }
 }

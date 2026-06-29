@@ -6,39 +6,52 @@ namespace BimpEngine.Engine.Scripting.Nodes
 {
     public class ObtenerVariableNode : ScriptNode
     {
-        private readonly NodePort _nombre, _valor;
-        public ObtenerVariableNode()
+        private readonly NodePort _valor;
+        private readonly object? _valorDefecto;
+
+        public ObtenerVariableNode(GraphVariable? v = null)
         {
-            Title = "Obtener Variable";
+            string nombre = v?.Nombre ?? "miVariable";
+            PortType tipo = v?.PortType ?? PortType.Float;
+
+            Title = $"Obtener {nombre}";
             Category = NodeCategory.Variable;
-            _nombre = AddInput("Nombre", PortType.String, "miVar");
-            _valor = AddOutput("Valor", PortType.Float);
+            _valor = AddOutput(nombre, tipo);
+            _valor.Value = nombre;
+            _valorDefecto = v?.ValorDefecto; // guardar valor del panel
         }
+
         public override NodePort? Execute(ScriptContext ctx)
         {
-            string name = _nombre.Value?.ToString() ?? "miVar";
-            ctx.Variables.TryGetValue(name, out var val);
-            _valor.RuntimeValue = val ?? 0.0;
+            string name = _valor.Value?.ToString() ?? "";
+            if (ctx.Variables.TryGetValue(name, out var val))
+                _valor.RuntimeValue = val;
+            else
+                _valor.RuntimeValue = _valorDefecto;
             return null;
         }
     }
 
     public class SetVariableNode : ScriptNode
     {
-        private readonly NodePort _execIn, _execOut, _nombre, _valor;
-        public SetVariableNode()
+        private readonly NodePort _execIn, _execOut, _valor;
+        private readonly string _nombre;
+
+        public SetVariableNode(GraphVariable? v = null)
         {
-            Title = "Asignar Variable";
+            _nombre = v?.Nombre ?? "miVariable";
+            PortType tipo = v?.PortType ?? PortType.Float;
+
+            Title = $"Asignar {_nombre}";
             Category = NodeCategory.Variable;
             _execIn = AddInput("▶", PortType.Exec);
-            _nombre = AddInput("Nombre", PortType.String, "miVar");
-            _valor = AddInput("Valor", PortType.Float, 0.0);
+            _valor = AddInput(_nombre, tipo);
             _execOut = AddOutput("▶", PortType.Exec);
         }
+
         public override NodePort? Execute(ScriptContext ctx)
         {
-            string name = _nombre.Value?.ToString() ?? "miVar";
-            ctx.Variables[name] = _valor.RuntimeValue ?? _valor.Value;
+            ctx.Variables[_nombre] = _valor.RuntimeValue ?? _valor.Value;
             return _execOut;
         }
     }
