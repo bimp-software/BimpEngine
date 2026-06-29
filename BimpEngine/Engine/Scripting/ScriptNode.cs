@@ -7,7 +7,7 @@ namespace BimpEngine.Engine.Scripting
     public abstract class ScriptNode
     {
         public Guid Id { get; } = Guid.NewGuid();
-        public string Title { get; protected set; } = "Nodo";
+        public string Title { get; set; } = "Nodo";
         public NodeCategory Category { get; protected set; } = NodeCategory.Action;
         public Point Position { get; set; } = new(100, 100);
         public List<NodePort> Ports { get; } = new();

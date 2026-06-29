@@ -177,13 +177,12 @@ namespace BimpEngine.Vista
             proyecto.OnOpenBlueprint += (path) =>
             {
                 var graph = new NodeGraph();
-                var editor = new frmBlueprintEditor(graph, obj.Name, sceneView.GetScene().Objetos);
 
                 proyecto.OnOpenBlueprint += (path) =>
                 {
                     var graph = new NodeGraph();
-                    var editor = new frmBlueprintEditor(graph, Path.GetFileNameWithoutExtension(path),
-                                                         sceneView.GetScene().Objetos);
+                    string nombreBlueprint = System.IO.Path.GetFileNameWithoutExtension(path);
+                    var editor = new frmBlueprintEditor(graph, nombreBlueprint, sceneView.GetScene().Objetos);
                     editor.Show(this);
                 };
             };
