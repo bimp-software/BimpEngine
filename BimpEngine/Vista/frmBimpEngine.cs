@@ -176,15 +176,44 @@ namespace BimpEngine.Vista
 
             proyecto.OnOpenBlueprint += (path) =>
             {
-                var graph = new NodeGraph();
+                NodeGraph graph;
 
-                proyecto.OnOpenBlueprint += (path) =>
+                if (System.IO.File.Exists(path))
                 {
-                    var graph = new NodeGraph();
-                    string nombreBlueprint = System.IO.Path.GetFileNameWithoutExtension(path);
-                    var editor = new frmBlueprintEditor(graph, nombreBlueprint, sceneView.GetScene().Objetos);
-                    editor.Show(this);
+                    try
+                    {
+                        string json = System.IO.File.ReadAllText(path);
+                        graph = System.Text.Json.JsonSerializer.Deserialize<NodeGraph>(json) ?? new NodeGraph();
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Error al cargar el Blueprint: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        graph = new NodeGraph();
+                    }
+                }
+                else
+                {
+                    graph = new NodeGraph();
+                }
+
+                string nombreBlueprint = System.IO.Path.GetFileNameWithoutExtension(path);
+                var editor = new frmBlueprintEditor(graph, nombreBlueprint, path, sceneView.GetScene().Objetos);
+                editor.FormClosing += (s, e) =>
+                {
+                    try
+                    {
+                        var opciones = new System.Text.Json.JsonSerializerOptions { WriteIndented = true };
+                        string jsonGuardar = System.Text.Json.JsonSerializer.Serialize(graph, opciones);
+
+                        System.IO.File.WriteAllText(path, jsonGuardar);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"No se pudo guardar el archivo: {ex.Message}", "Error de Guardado", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
                 };
+
+                editor.Show(this);
             };
 
             editorViews = new Dictionary<string, EditorView>()

@@ -81,7 +81,19 @@ namespace BimpEngine.Controls.Inspector.Componentes.Blueprint
         {
             if (_editorWin == null || _editorWin.IsDisposed)
             {
-                _editorWin = new frmBlueprintEditor(_graph, _objeto?.Name ?? "Objeto");
+                string nombreObjeto = _objeto?.Name ?? "Objeto";
+
+                string filePath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Scripts", $"{nombreObjeto}.json");
+
+                string? directorio = System.IO.Path.GetDirectoryName(filePath);
+                if (!string.IsNullOrEmpty(directorio))
+                {
+                    System.IO.Directory.CreateDirectory(directorio);
+                }
+
+                List<Objetos>? objetosEscena = null;
+
+                _editorWin = new frmBlueprintEditor(_graph, nombreObjeto, filePath, objetosEscena);
                 _editorWin.OnGraphChanged += () => { UpdateInfo(); };
                 _editorWin.Show(FindForm());
             }

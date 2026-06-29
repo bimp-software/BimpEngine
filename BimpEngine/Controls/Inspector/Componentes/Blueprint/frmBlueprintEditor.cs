@@ -10,15 +10,18 @@ namespace BimpEngine.Controls.Inspector.Componentes.Blueprint
 {
     public class frmBlueprintEditor : Form
     {
+        private readonly string _filePath;
+
         public event Action? OnGraphChanged;
 
         private readonly NodeCanvas _canvas;
         private readonly NodeGraph _graph;
         private FlowLayoutPanel _listaVariables;
 
-        public frmBlueprintEditor(NodeGraph graph, string objectName, List<Objetos>? objetosEscena = null)
+        public frmBlueprintEditor(NodeGraph graph, string objectName,string filePath, List<Objetos>? objetosEscena = null)
         {
             _graph = graph;
+            _filePath = filePath;
 
             Text = $"Script — {objectName}";
             Size = new Size(1200, 700);
@@ -37,6 +40,9 @@ namespace BimpEngine.Controls.Inspector.Componentes.Blueprint
                 Dock = DockStyle.Top
             };
 
+            var btnSave = new ToolStripButton("💾  Guardar") { ForeColor = Color.LightGreen };
+            btnSave.Click += (s, e) => GuardarGrafo();
+
             var btnClear = new ToolStripButton("🗑  Limpiar todo") { ForeColor = Color.Salmon };
             btnClear.Click += (s, e) =>
             {
@@ -50,11 +56,13 @@ namespace BimpEngine.Controls.Inspector.Componentes.Blueprint
                 }
             };
 
-            var btnHelp = new ToolStripButton("❓  Ayuda") { ForeColor = Color.White };
+            var btnHelp = new ToolStripButton("Ayuda") { ForeColor = Color.White };
             btnHelp.Click += (s, e) => MostrarAyuda();
 
             toolbar.Items.AddRange(new ToolStripItem[]
             {
+                btnSave,
+                new ToolStripSeparator(),
                 btnClear,
                 new ToolStripSeparator(),
                 btnHelp,
@@ -299,6 +307,27 @@ namespace BimpEngine.Controls.Inspector.Componentes.Blueprint
             public VariableType Tipo { get; }
             public VariableTipoItem(VariableType tipo) => Tipo = tipo;
             public override string ToString() => new GraphVariable { Tipo = Tipo }.NombreTipo;
+        }
+
+        private void GuardarGrafo()
+        {
+            try
+            {
+                var opciones = new System.Text.Json.JsonSerializerOptions { WriteIndented = true };
+                string json = System.Text.Json.JsonSerializer.Serialize(_graph, opciones);
+                System.IO.File.WriteAllText(_filePath, json);
+
+                // Pequeño feedback visual en la barra de título
+                string tituloOriginal = Text;
+                Text = "✓ Guardado correctamente";
+                var t = new System.Windows.Forms.Timer { Interval = 1500 };
+                t.Tick += (s, e) => { Text = tituloOriginal; t.Stop(); t.Dispose(); };
+                t.Start();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error al guardar: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
     }
 }

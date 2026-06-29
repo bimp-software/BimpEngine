@@ -10,7 +10,8 @@ namespace BimpEngine
         {
             ApplicationConfiguration.Initialize();
 
-            // 1. Show the project launcher (like Unity Hub)
+            BimpEngine.Engine.Core.EngineSettings.Load();
+
             string? projectFolder = null;
             using (var launcher = new frmLauncher())
             {
