@@ -31,6 +31,18 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmBimpEngine));
             msMenuPrincipal = new MenuStrip();
             archivoToolStripMenuItem = new ToolStripMenuItem();
+            btnNuevaScena = new ToolStripMenuItem();
+            btnAbrirScena = new ToolStripMenuItem();
+            toolStripMenuItem3 = new ToolStripMenuItem();
+            toolStripSeparator2 = new ToolStripSeparator();
+            btnGuardar = new ToolStripMenuItem();
+            btnGuardarComo = new ToolStripMenuItem();
+            toolStripSeparator1 = new ToolStripSeparator();
+            btnConfiguracion = new ToolStripMenuItem();
+            btnConstruirCorrer = new ToolStripMenuItem();
+            toolStripSeparator3 = new ToolStripSeparator();
+            btnIrLauncher = new ToolStripMenuItem();
+            toolStripMenuItem8 = new ToolStripMenuItem();
             editarToolStripMenuItem = new ToolStripMenuItem();
             verToolStripMenuItem = new ToolStripMenuItem();
             recursosToolStripMenuItem = new ToolStripMenuItem();
@@ -40,6 +52,17 @@
             tsmCubo = new ToolStripMenuItem();
             tsmTriangulo = new ToolStripMenuItem();
             tsmCilindro = new ToolStripMenuItem();
+            dObjetosToolStripMenuItem = new ToolStripMenuItem();
+            tsmiCuadrado = new ToolStripMenuItem();
+            rectanguloToolStripMenuItem = new ToolStripMenuItem();
+            circuloToolStripMenuItem = new ToolStripMenuItem();
+            trianguloToolStripMenuItem = new ToolStripMenuItem();
+            diamanteToolStripMenuItem = new ToolStripMenuItem();
+            pentagonoToolStripMenuItem = new ToolStripMenuItem();
+            hexagonoToolStripMenuItem = new ToolStripMenuItem();
+            estrellaToolStripMenuItem = new ToolStripMenuItem();
+            flechaToolStripMenuItem = new ToolStripMenuItem();
+            lineaToolStripMenuItem = new ToolStripMenuItem();
             componentesToolStripMenuItem = new ToolStripMenuItem();
             ventanaToolStripMenuItem = new ToolStripMenuItem();
             extensionesToolStripMenuItem = new ToolStripMenuItem();
@@ -61,18 +84,7 @@
             pictureBox1 = new PictureBox();
             pictureBox2 = new PictureBox();
             pnlContenedor = new Panel();
-            btnGuardar = new ToolStripMenuItem();
-            btnGuardarComo = new ToolStripMenuItem();
-            toolStripSeparator1 = new ToolStripSeparator();
-            btnNuevaScena = new ToolStripMenuItem();
-            btnAbrirScena = new ToolStripMenuItem();
-            toolStripSeparator2 = new ToolStripSeparator();
-            toolStripMenuItem3 = new ToolStripMenuItem();
-            btnConfiguracion = new ToolStripMenuItem();
-            btnConstruirCorrer = new ToolStripMenuItem();
-            btnIrLauncher = new ToolStripMenuItem();
-            toolStripMenuItem8 = new ToolStripMenuItem();
-            toolStripSeparator3 = new ToolStripSeparator();
+            tsmiConfiguracionProyecto = new ToolStripMenuItem();
             msMenuPrincipal.SuspendLayout();
             panel1.SuspendLayout();
             flpComenzar.SuspendLayout();
@@ -109,8 +121,80 @@
             archivoToolStripMenuItem.Size = new Size(67, 23);
             archivoToolStripMenuItem.Text = "&Archivo";
             // 
+            // btnNuevaScena
+            // 
+            btnNuevaScena.Name = "btnNuevaScena";
+            btnNuevaScena.Size = new Size(256, 24);
+            btnNuevaScena.Text = "Nueva Escena";
+            // 
+            // btnAbrirScena
+            // 
+            btnAbrirScena.Name = "btnAbrirScena";
+            btnAbrirScena.Size = new Size(256, 24);
+            btnAbrirScena.Text = "Abrir Escena";
+            // 
+            // toolStripMenuItem3
+            // 
+            toolStripMenuItem3.Name = "toolStripMenuItem3";
+            toolStripMenuItem3.Size = new Size(256, 24);
+            toolStripMenuItem3.Text = "Abrir Escenas Recientes";
+            // 
+            // toolStripSeparator2
+            // 
+            toolStripSeparator2.Name = "toolStripSeparator2";
+            toolStripSeparator2.Size = new Size(253, 6);
+            // 
+            // btnGuardar
+            // 
+            btnGuardar.Name = "btnGuardar";
+            btnGuardar.Size = new Size(256, 24);
+            btnGuardar.Text = "Guardar";
+            btnGuardar.Click += btnGuardar_Click;
+            // 
+            // btnGuardarComo
+            // 
+            btnGuardarComo.Name = "btnGuardarComo";
+            btnGuardarComo.Size = new Size(256, 24);
+            btnGuardarComo.Text = "Guardar Como";
+            btnGuardarComo.Click += btnGuardarComo_Click;
+            // 
+            // toolStripSeparator1
+            // 
+            toolStripSeparator1.Name = "toolStripSeparator1";
+            toolStripSeparator1.Size = new Size(253, 6);
+            // 
+            // btnConfiguracion
+            // 
+            btnConfiguracion.Name = "btnConfiguracion";
+            btnConfiguracion.Size = new Size(256, 24);
+            btnConfiguracion.Text = "Configuración";
+            // 
+            // btnConstruirCorrer
+            // 
+            btnConstruirCorrer.Name = "btnConstruirCorrer";
+            btnConstruirCorrer.Size = new Size(256, 24);
+            btnConstruirCorrer.Text = "Construir y correr";
+            // 
+            // toolStripSeparator3
+            // 
+            toolStripSeparator3.Name = "toolStripSeparator3";
+            toolStripSeparator3.Size = new Size(253, 6);
+            // 
+            // btnIrLauncher
+            // 
+            btnIrLauncher.Name = "btnIrLauncher";
+            btnIrLauncher.Size = new Size(256, 24);
+            btnIrLauncher.Text = "Volver al gestor de proyectos";
+            // 
+            // toolStripMenuItem8
+            // 
+            toolStripMenuItem8.Name = "toolStripMenuItem8";
+            toolStripMenuItem8.Size = new Size(256, 24);
+            toolStripMenuItem8.Text = "Salir";
+            // 
             // editarToolStripMenuItem
             // 
+            editarToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { tsmiConfiguracionProyecto });
             editarToolStripMenuItem.ForeColor = Color.FromArgb(250, 250, 250);
             editarToolStripMenuItem.Name = "editarToolStripMenuItem";
             editarToolStripMenuItem.Size = new Size(56, 23);
@@ -132,7 +216,7 @@
             // 
             // objetosToolStripMenuItem
             // 
-            objetosToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { crearVacioToolStripMenuItem, dObjetoToolStripMenuItem });
+            objetosToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { crearVacioToolStripMenuItem, dObjetoToolStripMenuItem, dObjetosToolStripMenuItem });
             objetosToolStripMenuItem.ForeColor = Color.FromArgb(250, 250, 250);
             objetosToolStripMenuItem.Name = "objetosToolStripMenuItem";
             objetosToolStripMenuItem.Size = new Size(69, 23);
@@ -141,14 +225,14 @@
             // crearVacioToolStripMenuItem
             // 
             crearVacioToolStripMenuItem.Name = "crearVacioToolStripMenuItem";
-            crearVacioToolStripMenuItem.Size = new Size(147, 24);
+            crearVacioToolStripMenuItem.Size = new Size(180, 24);
             crearVacioToolStripMenuItem.Text = "Crear Vacio";
             // 
             // dObjetoToolStripMenuItem
             // 
             dObjetoToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { tsmCubo, tsmTriangulo, tsmCilindro });
             dObjetoToolStripMenuItem.Name = "dObjetoToolStripMenuItem";
-            dObjetoToolStripMenuItem.Size = new Size(147, 24);
+            dObjetoToolStripMenuItem.Size = new Size(180, 24);
             dObjetoToolStripMenuItem.Text = "3D Objeto";
             // 
             // tsmCubo
@@ -172,6 +256,74 @@
             tsmCilindro.Size = new Size(134, 24);
             tsmCilindro.Text = "Cilindro";
             tsmCilindro.Click += tsmCilindro_Click;
+            // 
+            // dObjetosToolStripMenuItem
+            // 
+            dObjetosToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { tsmiCuadrado, rectanguloToolStripMenuItem, circuloToolStripMenuItem, trianguloToolStripMenuItem, diamanteToolStripMenuItem, pentagonoToolStripMenuItem, hexagonoToolStripMenuItem, estrellaToolStripMenuItem, flechaToolStripMenuItem, lineaToolStripMenuItem });
+            dObjetosToolStripMenuItem.Name = "dObjetosToolStripMenuItem";
+            dObjetosToolStripMenuItem.Size = new Size(180, 24);
+            dObjetosToolStripMenuItem.Text = "2D Objetos";
+            // 
+            // tsmiCuadrado
+            // 
+            tsmiCuadrado.Name = "tsmiCuadrado";
+            tsmiCuadrado.Size = new Size(146, 24);
+            tsmiCuadrado.Text = "Cuadrado";
+            tsmiCuadrado.Click += tsmiCuadrado_Click;
+            // 
+            // rectanguloToolStripMenuItem
+            // 
+            rectanguloToolStripMenuItem.Name = "rectanguloToolStripMenuItem";
+            rectanguloToolStripMenuItem.Size = new Size(146, 24);
+            rectanguloToolStripMenuItem.Text = "Rectangulo";
+            // 
+            // circuloToolStripMenuItem
+            // 
+            circuloToolStripMenuItem.Name = "circuloToolStripMenuItem";
+            circuloToolStripMenuItem.Size = new Size(146, 24);
+            circuloToolStripMenuItem.Text = "Circulo";
+            // 
+            // trianguloToolStripMenuItem
+            // 
+            trianguloToolStripMenuItem.Name = "trianguloToolStripMenuItem";
+            trianguloToolStripMenuItem.Size = new Size(146, 24);
+            trianguloToolStripMenuItem.Text = "Triangulo";
+            // 
+            // diamanteToolStripMenuItem
+            // 
+            diamanteToolStripMenuItem.Name = "diamanteToolStripMenuItem";
+            diamanteToolStripMenuItem.Size = new Size(146, 24);
+            diamanteToolStripMenuItem.Text = "Diamante";
+            // 
+            // pentagonoToolStripMenuItem
+            // 
+            pentagonoToolStripMenuItem.Name = "pentagonoToolStripMenuItem";
+            pentagonoToolStripMenuItem.Size = new Size(146, 24);
+            pentagonoToolStripMenuItem.Text = "Pentagono";
+            // 
+            // hexagonoToolStripMenuItem
+            // 
+            hexagonoToolStripMenuItem.Name = "hexagonoToolStripMenuItem";
+            hexagonoToolStripMenuItem.Size = new Size(146, 24);
+            hexagonoToolStripMenuItem.Text = "Hexagono";
+            // 
+            // estrellaToolStripMenuItem
+            // 
+            estrellaToolStripMenuItem.Name = "estrellaToolStripMenuItem";
+            estrellaToolStripMenuItem.Size = new Size(146, 24);
+            estrellaToolStripMenuItem.Text = "Estrella";
+            // 
+            // flechaToolStripMenuItem
+            // 
+            flechaToolStripMenuItem.Name = "flechaToolStripMenuItem";
+            flechaToolStripMenuItem.Size = new Size(146, 24);
+            flechaToolStripMenuItem.Text = "Flecha";
+            // 
+            // lineaToolStripMenuItem
+            // 
+            lineaToolStripMenuItem.Name = "lineaToolStripMenuItem";
+            lineaToolStripMenuItem.Size = new Size(146, 24);
+            lineaToolStripMenuItem.Text = "Linea";
             // 
             // componentesToolStripMenuItem
             // 
@@ -397,74 +549,12 @@
             pnlContenedor.Size = new Size(1201, 666);
             pnlContenedor.TabIndex = 4;
             // 
-            // btnGuardar
+            // tsmiConfiguracionProyecto
             // 
-            btnGuardar.Name = "btnGuardar";
-            btnGuardar.Size = new Size(256, 24);
-            btnGuardar.Text = "Guardar";
-            // 
-            // btnGuardarComo
-            // 
-            btnGuardarComo.Name = "btnGuardarComo";
-            btnGuardarComo.Size = new Size(256, 24);
-            btnGuardarComo.Text = "Guardar Como";
-            // 
-            // toolStripSeparator1
-            // 
-            toolStripSeparator1.Name = "toolStripSeparator1";
-            toolStripSeparator1.Size = new Size(253, 6);
-            // 
-            // btnNuevaScena
-            // 
-            btnNuevaScena.Name = "btnNuevaScena";
-            btnNuevaScena.Size = new Size(256, 24);
-            btnNuevaScena.Text = "Nueva Escena";
-            // 
-            // btnAbrirScena
-            // 
-            btnAbrirScena.Name = "btnAbrirScena";
-            btnAbrirScena.Size = new Size(256, 24);
-            btnAbrirScena.Text = "Abrir Escena";
-            // 
-            // toolStripSeparator2
-            // 
-            toolStripSeparator2.Name = "toolStripSeparator2";
-            toolStripSeparator2.Size = new Size(253, 6);
-            // 
-            // toolStripMenuItem3
-            // 
-            toolStripMenuItem3.Name = "toolStripMenuItem3";
-            toolStripMenuItem3.Size = new Size(256, 24);
-            toolStripMenuItem3.Text = "Abrir Escenas Recientes";
-            // 
-            // btnConfiguracion
-            // 
-            btnConfiguracion.Name = "btnConfiguracion";
-            btnConfiguracion.Size = new Size(256, 24);
-            btnConfiguracion.Text = "Configuración";
-            // 
-            // btnConstruirCorrer
-            // 
-            btnConstruirCorrer.Name = "btnConstruirCorrer";
-            btnConstruirCorrer.Size = new Size(256, 24);
-            btnConstruirCorrer.Text = "Construir y correr";
-            // 
-            // btnIrLauncher
-            // 
-            btnIrLauncher.Name = "btnIrLauncher";
-            btnIrLauncher.Size = new Size(256, 24);
-            btnIrLauncher.Text = "Volver al gestor de proyectos";
-            // 
-            // toolStripMenuItem8
-            // 
-            toolStripMenuItem8.Name = "toolStripMenuItem8";
-            toolStripMenuItem8.Size = new Size(256, 24);
-            toolStripMenuItem8.Text = "Salir";
-            // 
-            // toolStripSeparator3
-            // 
-            toolStripSeparator3.Name = "toolStripSeparator3";
-            toolStripSeparator3.Size = new Size(253, 6);
+            tsmiConfiguracionProyecto.Name = "tsmiConfiguracionProyecto";
+            tsmiConfiguracionProyecto.Size = new Size(243, 24);
+            tsmiConfiguracionProyecto.Text = "Configuracion del proyecto";
+            tsmiConfiguracionProyecto.Click += tsmiConfiguracionProyecto_Click;
             // 
             // frmBimpEngine
             // 
@@ -546,5 +636,17 @@
         private ToolStripMenuItem btnIrLauncher;
         private ToolStripMenuItem toolStripMenuItem8;
         private ToolStripSeparator toolStripSeparator3;
+        private ToolStripMenuItem dObjetosToolStripMenuItem;
+        private ToolStripMenuItem tsmiCuadrado;
+        private ToolStripMenuItem rectanguloToolStripMenuItem;
+        private ToolStripMenuItem circuloToolStripMenuItem;
+        private ToolStripMenuItem trianguloToolStripMenuItem;
+        private ToolStripMenuItem diamanteToolStripMenuItem;
+        private ToolStripMenuItem pentagonoToolStripMenuItem;
+        private ToolStripMenuItem hexagonoToolStripMenuItem;
+        private ToolStripMenuItem estrellaToolStripMenuItem;
+        private ToolStripMenuItem flechaToolStripMenuItem;
+        private ToolStripMenuItem lineaToolStripMenuItem;
+        private ToolStripMenuItem tsmiConfiguracionProyecto;
     }
 }

@@ -5,6 +5,9 @@ namespace BimpEngine.Engine.Rendering
     public class Vertex
     {
         public Vector3 vector = new Vector3();
+        public Vector3 normal = new Vector3();
+        public float U = 0f;
+        public float V = 0f;
 
         public Vertex() 
         {
@@ -26,6 +29,9 @@ namespace BimpEngine.Engine.Rendering
             vector.X = A.vector.X;
             vector.Y = A.vector.Y;
             vector.Z = A.vector.Z;
+            normal = A.normal;
+            U = A.U;
+            V = A.V;
         }
 
         ~Vertex() { }

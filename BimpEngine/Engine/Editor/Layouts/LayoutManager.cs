@@ -13,6 +13,13 @@ namespace BimpEngine.Engine.Editor.Layouts
             _container = container;
         }
 
+        public static IEditorLayout GetLayoutByName(string name) => name switch
+        {
+            "Coding" => new CodingLayout(),
+            "LevelDesigner" => new LevelDesignerLayout(),
+            _ => new DefaultLayout()
+        };
+
         public void SetLayout(
             IEditorLayout layout,
             Dictionary<string, EditorView> views)

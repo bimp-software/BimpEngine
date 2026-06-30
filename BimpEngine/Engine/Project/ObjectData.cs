@@ -10,6 +10,7 @@ namespace BimpEngine.Engine.Project
         public Guid Id { get; set; } = Guid.NewGuid();
         public string Name { get; set; } = "GameObject";
         public string PrimitiveType { get; set; } = "Cube";
+        public bool Is2D { get; set; } = false;
         public bool Enabled { get; set; } = true;
         public string Tag { get; set; } = "Untagged";
         public int Layer { get; set; } = 0;

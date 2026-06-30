@@ -11,6 +11,9 @@ namespace BimpEngine.Controls.Herencia
         public event Action<Objetos> OnObjectDeleted;
         public event Action<Objetos> OnObjectDuplicated;
 
+        public event Action<Objetos> OnCrearMolde;
+        public event Action<Objetos> OnAplicarCambiosAlMolde;
+
         private ContextMenuStrip contextMenu;
         private Objetos _objetoContextMenu;
 
@@ -52,11 +55,17 @@ namespace BimpEngine.Controls.Herencia
             var itemSubir = new ToolStripMenuItem("Subir");
             var itemBajar = new ToolStripMenuItem("Bajar");
 
+            // ── Nuevos ítems de Molde ────────────────────────────────────────────
+            var itemCrearMolde = new ToolStripMenuItem("Crear Molde…");
+            var itemAplicarMolde = new ToolStripMenuItem("Aplicar cambios al Molde");
+
             itemDuplicar.Click += (s, e) => DuplicarObjeto();
             itemRenombrar.Click += (s, e) => RenombrarObjeto();
             itemEliminar.Click += (s, e) => EliminarObjeto();
             itemSubir.Click += (s, e) => MoverArriba();
             itemBajar.Click += (s, e) => MoverAbajo();
+            itemCrearMolde.Click += (s, e) => { if (_objetoContextMenu != null) OnCrearMolde?.Invoke(_objetoContextMenu); };
+            itemAplicarMolde.Click += (s, e) => { if (_objetoContextMenu != null) OnAplicarCambiosAlMolde?.Invoke(_objetoContextMenu); };
 
             contextMenu.Items.Add(itemDuplicar);
             contextMenu.Items.Add(itemRenombrar);
@@ -64,7 +73,15 @@ namespace BimpEngine.Controls.Herencia
             contextMenu.Items.Add(itemSubir);
             contextMenu.Items.Add(itemBajar);
             contextMenu.Items.Add(new ToolStripSeparator());
+            contextMenu.Items.Add(itemCrearMolde);
+            contextMenu.Items.Add(itemAplicarMolde);
+            contextMenu.Items.Add(new ToolStripSeparator());
             contextMenu.Items.Add(itemEliminar);
+
+            contextMenu.Opening += (s, e) =>
+            {
+                itemAplicarMolde.Visible = _objetoContextMenu?.Molde?.EsInstanciaDeMolde == true;
+            };
 
             ListHerencia.NodeMouseClick += (s, e) =>
             {
@@ -85,6 +102,9 @@ namespace BimpEngine.Controls.Herencia
         public void AddObject(Objetos obj, Objetos parent = null, bool includeChildren = false)
         {
             var node = new TreeNode(obj.Name) { Tag = obj };
+
+            if (obj.Molde?.EsInstanciaDeMolde == true)
+                node.ForeColor = Color.FromArgb(110, 170, 255);
 
             if (parent != null)
             {
@@ -125,6 +145,9 @@ namespace BimpEngine.Controls.Herencia
                 if (node.Tag == obj)
                 {
                     node.Text = obj.Name;
+                    node.ForeColor = obj.Molde?.EsInstanciaDeMolde == true
+                        ? Color.FromArgb(110, 170, 255)
+                        : ListHerencia.ForeColor;
                     break;
                 }
             }

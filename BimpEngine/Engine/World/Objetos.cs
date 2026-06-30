@@ -20,12 +20,15 @@ namespace BimpEngine.Engine.World
         public bool IsSelected { get; set; }
         public Objetos Parent { get; set; } = null;
         public List<Objetos> Children { get; } = new List<Objetos>();
+        public MoldeLink? Molde { get; set; } = null;
 
         protected Objetos() { }
         public virtual void Update() { }
         public virtual void Draw(OpenGLControl glControl)
         {
             var gl = glControl.OpenGL;
+
+            CargarTexturasSiFaltan(gl);
 
             gl.PushMatrix();
             gl.Translate(Transform.Position.X, Transform.Position.Y, Transform.Position.Z);
@@ -43,6 +46,20 @@ namespace BimpEngine.Engine.World
                     child.Draw(glControl);
 
             gl.PopMatrix();
+        }
+
+        private void CargarTexturasSiFaltan(OpenGL gl)
+        {
+            if (MeshRenderer.Material.HasTexture && MeshRenderer.Material.TextureId == 0)
+            {
+                MeshRenderer.Material.TextureId = TextureManager.GetOrLoad(gl, MeshRenderer.Material.TexturePath);
+
+                foreach (var mat in MeshRenderer.Materials)
+                {
+                    if(mat.HasTexture && mat.TextureId == 0)
+                        mat.TextureId = TextureManager.GetOrLoad(gl, mat.TexturePath);
+                }
+            }
         }
 
         public virtual Objetos Clone()

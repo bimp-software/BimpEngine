@@ -4,12 +4,14 @@ using BimpEngine.Controls.Herencia;
 using BimpEngine.Controls.Inspector;
 using BimpEngine.Controls.Inspector.Componentes.Blueprint;
 using BimpEngine.Controls.Proyecto;
+using BimpEngine.Engine.Core;
 using BimpEngine.Engine.Editor;
 using BimpEngine.Engine.Editor.Layouts;
 using BimpEngine.Engine.Entities;
 using BimpEngine.Engine.Entities.Primitive;
 using BimpEngine.Engine.Project;
 using BimpEngine.Engine.Scripting;
+using BimpEngine.Engine.World;
 using Windows.System;
 
 namespace BimpEngine.Vista
@@ -31,6 +33,7 @@ namespace BimpEngine.Vista
         #endregion
 
         private bool _hasUnsavedChanges = false;
+        private string? _currentScenePath = null;
 
         public frmBimpEngine()
         {
@@ -144,15 +147,12 @@ namespace BimpEngine.Vista
                 sceneView.GetScene().Objetos.Remove(hijo);
 
                 if (nuevoPadre != null)
-                {
                     nuevoPadre.AddChild(hijo);
-                }
                 else
-                {
                     sceneView.GetScene().Add(hijo);
-                }
 
                 sceneView.RefrescarEscena();
+                MarcarCambio();
             };
 
             hierarchy.OnObjectDeleted += (obj) =>
@@ -162,6 +162,7 @@ namespace BimpEngine.Vista
                 inspector.RemoveObjectComponents(obj);
                 inspector.ShowObject(null);
                 sceneView.RefrescarEscena();
+                MarcarCambio();
             };
 
             hierarchy.OnObjectDuplicated += (obj) =>
@@ -172,6 +173,7 @@ namespace BimpEngine.Vista
                 hierarchy.AddObject(clon, clon.Parent);
                 sceneView.SetSelection(clon, sceneView.GetScene().Objetos.Count - 1);
                 inspector.ShowObject(clon);
+                MarcarCambio(); // ← agregar
             };
 
             proyecto.OnOpenBlueprint += (path) =>
@@ -216,6 +218,28 @@ namespace BimpEngine.Vista
                 editor.Show(this);
             };
 
+            hierarchy.OnCrearMolde += (obj) => CrearMoldeDesdeObjeto(obj);
+            hierarchy.OnAplicarCambiosAlMolde += (obj) =>
+            {
+                try
+                {
+                    Engine.Project.MoldeSerializer.AplicarCambios(obj);
+                    MessageBox.Show($"Cambios aplicados al Molde de '{obj.Name}'.",
+                        "Molde actualizado", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            };
+
+            proyecto.OnOpenScene += (scenePath) =>
+            {
+                if (ConfirmarDescartarCambios())
+                    CargarEscenaDesdeArchivo(scenePath);
+            };
+            proyecto.OnInstanciarMolde += (path) => InstanciarMoldeEnEscena(path);
+
             editorViews = new Dictionary<string, EditorView>()
             {
                 { "Hierarchy", new EditorView("Hierarchy", hierarchy) },
@@ -225,7 +249,8 @@ namespace BimpEngine.Vista
                 { "Project",   new EditorView("Project",   proyecto) }
             };
 
-            layoutManager.SetLayout(new DefaultLayout(), editorViews);
+            var layout = LayoutManager.GetLayoutByName(EngineSettings.Current.LayoutDefecto);
+            layoutManager.SetLayout(layout, editorViews);
         }
 
         private void tsmCubo_Click(object sender, EventArgs e)
@@ -296,21 +321,32 @@ namespace BimpEngine.Vista
         //}
 
         // ── Called by Program.cs after opening a project ──────────────────
+
         public void CargarProyecto()
         {
             if (!ProjectManager.HasOpenProject) return;
 
-            // Load file tree in the Project panel
             proyecto.CargarProyecto(ProjectManager.CurrentProjectFolder!);
-            proyecto.OnOpenScene += (scenePath) =>
-            {
-                if (ConfirmarDescartarCambios())
-                    CargarEscenaDesdeArchivo(scenePath);
-            };
 
             string scenePath = ProjectManager.GetMainScenePath();
             if (File.Exists(scenePath))
                 CargarEscenaDesdeArchivo(scenePath);
+
+            ActualizarTitulo();
+        }
+
+        private void AplicarModoProyecto()
+        {
+            var modo = Engine.Project.ProjectManager.CurrentMode;
+            sceneView.SetMode(modo);
+
+            // Cambiar el layout por defecto según el modo
+            // (opcional: podés asignar un layout 2D diferente si lo tenés)
+            // layoutManager.SetLayout(modo == ProjectMode.Mode2D
+            //     ? new Layout2D()
+            //     : new DefaultLayout(), editorViews);
+
+            // Actualizar badge en la barra de título
             ActualizarTitulo();
         }
 
@@ -319,10 +355,15 @@ namespace BimpEngine.Vista
             if (!ProjectManager.HasOpenProject)
             { GuardarEscenaComo(); return; }
 
+            if (_currentScenePath == null)
+            {
+                GuardarEscenaComo();
+                return;
+            }
+
             try
             {
-                string path = ProjectManager.GetMainScenePath();
-                SceneSerializer.Save(sceneView.GetScene(), path);
+                SceneSerializer.Save(sceneView.GetScene(), _currentScenePath);
                 ProjectManager.SaveProjectInfo();
                 _hasUnsavedChanges = false;
                 ActualizarTitulo();
@@ -356,7 +397,10 @@ namespace BimpEngine.Vista
 
             try
             {
+                sceneView.GetScene().Name = Path.GetFileNameWithoutExtension(dlg.FileName);
+
                 SceneSerializer.Save(sceneView.GetScene(), dlg.FileName);
+                _currentScenePath = dlg.FileName;
                 _hasUnsavedChanges = false;
                 ActualizarTitulo();
                 proyecto.RefrescarArbol();
@@ -397,7 +441,13 @@ namespace BimpEngine.Vista
                     hierarchy.AddObject(obj, null, includeChildren: true);
 
                 inspector.ShowObject(null);
+
+                // Re-aplicar el modo del proyecto (2D/3D) a la nueva escena cargada
+                sceneView.SetMode(ProjectManager.CurrentMode);
+
                 sceneView.RefrescarEscena();
+
+                _currentScenePath = path;
                 _hasUnsavedChanges = false;
                 ActualizarTitulo();
             }
@@ -414,10 +464,13 @@ namespace BimpEngine.Vista
 
             var scene = new Engine.Core.Scene { Name = "Scene" };
             sceneView.SetScene(scene);
+            sceneView.SetMode(ProjectManager.CurrentMode); // respeta 2D/3D del proyecto
             hierarchy.Clear();
             inspector.ShowObject(null);
             sceneView.RefrescarEscena();
-            _hasUnsavedChanges = false;
+
+            _currentScenePath = null;   // sin archivo todavía → al Guardar pedirá ubicación
+            _hasUnsavedChanges = true;  // una escena nueva ya cuenta como "sin guardar"
             ActualizarTitulo();
         }
 
@@ -442,9 +495,14 @@ namespace BimpEngine.Vista
         private void ActualizarTitulo()
         {
             string proyecto = ProjectManager.CurrentProject?.Name ?? "Sin Proyecto";
-            string escena = sceneView?.GetScene()?.Name ?? "Scene";
+            string escena = _currentScenePath != null
+                ? Path.GetFileNameWithoutExtension(_currentScenePath)
+                : sceneView?.GetScene()?.Name ?? "Untitled";
             string cambios = _hasUnsavedChanges ? " *" : "";
-            Text = $"BimpEngine — {proyecto} — {escena}{cambios}";
+            string modo = ProjectManager.CurrentMode == Engine.Project.Enum.ProjectMode.Mode2D
+                ? " [2D]" : " [3D]";
+
+            Text = $"BimpEngine — {proyecto}{modo} — {escena}{cambios}";
         }
 
         private bool ConfirmarDescartarCambios()
@@ -458,7 +516,6 @@ namespace BimpEngine.Vista
             return true;
         }
 
-        // Mark scene as modified whenever the user changes something
         public void MarcarCambio()
         {
             if (!_hasUnsavedChanges)
@@ -476,5 +533,87 @@ namespace BimpEngine.Vista
         }
 
         #endregion
+
+        private void btnGuardar_Click(object sender, EventArgs e)
+        {
+            GuardarEscena();
+        }
+
+        private void btnGuardarComo_Click(object sender, EventArgs e)
+        {
+            GuardarEscenaComo();
+        }
+
+        #region 2D
+        private void tsmiCuadrado_Click(object sender, EventArgs e)
+        {
+            var obj = PrimitiveFactory2D.Create(PrimitiveType2D.Square);
+            sceneView.GetScene().Add(obj);
+            hierarchy.AddObject(obj);
+        }
+
+        #endregion
+
+        private void CrearMoldeDesdeObjeto(Objetos objeto)
+        {
+            if (!ProjectManager.HasOpenProject)
+            {
+                MessageBox.Show("Abre un proyecto antes de crear un Molde.",
+                    "Sin proyecto", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            string moldesFolder = Path.Combine(ProjectManager.CurrentProjectFolder!, "Moldes");
+            Directory.CreateDirectory(moldesFolder);
+
+            using var dlg = new SaveFileDialog
+            {
+                Title = "Crear Molde",
+                InitialDirectory = moldesFolder,
+                Filter = "Molde BimpEngine (*.bmold)|*.bmold",
+                DefaultExt = "bmold",
+                FileName = objeto.Name
+            };
+            if (dlg.ShowDialog(this) != DialogResult.OK) return;
+
+            try
+            {
+                Engine.Project.MoldeSerializer.Crear(objeto, dlg.FileName);
+                hierarchy.RefreshObject(objeto); // repinta el nodo en azul
+                proyecto.RefrescarArbol();
+                MarcarCambio();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error al crear el Molde:\n{ex.Message}", "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void InstanciarMoldeEnEscena(string moldeFilePath)
+        {
+            try
+            {
+                var instancia = Engine.Project.MoldeSerializer.Instanciar(moldeFilePath);
+                sceneView.GetScene().Add(instancia);
+                hierarchy.AddObject(instancia, null, includeChildren: true);
+                sceneView.SetSelection(instancia, sceneView.GetScene().Objetos.Count - 1);
+                sceneView.RefrescarEscena();
+                MarcarCambio();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error al instanciar el Molde:\n{ex.Message}", "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void tsmiConfiguracionProyecto_Click(object sender, EventArgs e)
+        {
+            using var frm = new frmTagsAndLayers();
+            frm.ShowDialog(this);
+
+            inspector?.RefrescarTagsYLayers();
+        }
     }
 }

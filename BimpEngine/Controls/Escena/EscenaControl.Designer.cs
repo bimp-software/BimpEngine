@@ -112,6 +112,7 @@
             glControl.OpenGLInitialized += glControl_OpenGLInitialized;
             glControl.OpenGLDraw += glControl_OpenGLDraw;
             glControl.Resized += glControl_Resized;
+            glControl.KeyDown += glControl_KeyDown;
             glControl.MouseDown += glControl_MouseDown;
             glControl.MouseMove += glControl_MouseMove;
             glControl.MouseUp += glControl_MouseUp;

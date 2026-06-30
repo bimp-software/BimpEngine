@@ -8,6 +8,8 @@ namespace BimpEngine.Controls.Proyecto
     {
         public event Action<string>? OnOpenScene;
         public event Action<string>? OnOpenBlueprint;
+        public event Action<string>? OnInstanciarMolde;
+        public event Action<string>? OnImportModelRequested;
 
         private string? _rootPath;
 
@@ -17,6 +19,7 @@ namespace BimpEngine.Controls.Proyecto
         private const int ICON_FILE = 3;
         private const int ICON_PROJECT = 4;
         private const int ICON_BLUEPRINT = 5;
+        private const int ICON_MOLDE = 6;
 
         public ProyectoControl()
         {
@@ -71,6 +74,13 @@ namespace BimpEngine.Controls.Proyecto
             {
                 g.FillRectangle(new SolidBrush(Color.FromArgb(140, 60, 180)), 2, 1, 10, 13);
                 g.DrawString("B", new Font("Segoe UI", 7f, FontStyle.Bold), Brushes.White, 3f, 2f);
+            }));
+            _icons.Images.Add(DrawIcon((g, r) =>
+            {
+                g.FillRectangle(new SolidBrush(Color.FromArgb(110, 170, 255)), 2, 1, 10, 13);
+                g.FillRectangle(new SolidBrush(Color.FromArgb(160, 200, 255)), 4, 4, 6, 1);
+                g.FillRectangle(new SolidBrush(Color.FromArgb(160, 200, 255)), 4, 7, 6, 1);
+                g.FillRectangle(new SolidBrush(Color.FromArgb(160, 200, 255)), 4, 10, 4, 1);
             }));
         }
 
@@ -153,13 +163,14 @@ namespace BimpEngine.Controls.Proyecto
             foreach (var file in Directory.GetFiles(folder))
             {
                 string ext = Path.GetExtension(file).ToLower();
-                if (ext == ProjectManager.ProjectExtension) continue; // hide .bimp
+                if (ext == ProjectManager.ProjectExtension) continue;
                 if (Path.GetFileName(file).StartsWith(".")) continue;
 
                 int icon = ext switch
                 {
                     ".bscene" => ICON_SCENE,
                     ".bscript" => ICON_BLUEPRINT,
+                    ".bmold" => ICON_MOLDE,   
                     _ => ICON_FILE
                 };
 
@@ -195,6 +206,8 @@ namespace BimpEngine.Controls.Proyecto
                     OnOpenScene?.Invoke(path);
                 else if (ext == ".bscript")
                     OnOpenBlueprint?.Invoke(path);
+                else if (ext == ".bmold")
+                    OnInstanciarMolde?.Invoke(path); 
             }
         }
 
@@ -227,6 +240,8 @@ namespace BimpEngine.Controls.Proyecto
 
                 Add(menu, "Nueva Escena aquí", () => NuevaEscena(folder, node));
                 Add(menu, "Nueva Carpeta aquí", () => NuevaCarpeta(folder, node));
+                Add(menu, "Importar Modelo (FBX,OBJ)...", () => ImportarModeloDialog(folder));
+                menu.Items.Add(new ToolStripSeparator());
                 Add(menu, "Nuevo Blueprint aquí", () => NuevoBlueprint(folder, node));
                 menu.Items.Add(new ToolStripSeparator());
                 Add(menu, "Mostrar en Explorador…", () => AbrirEnExplorador(folder));
@@ -244,6 +259,9 @@ namespace BimpEngine.Controls.Proyecto
                 if (ext == ".bscript")
                     Add(menu, "Abrir Blueprint", () => OnOpenBlueprint?.Invoke(file));
 
+                if (ext == ".bmold")
+                    Add(menu, "Instanciar en la Escena", () => OnInstanciarMolde?.Invoke(file));
+
                 menu.Items.Add(new ToolStripSeparator());
                 Add(menu, "Renombrar (F2)", () => IniciarRenombrar(node));
                 Add(menu, "Eliminar (Del)", () => EliminarNodo(node));
@@ -256,6 +274,7 @@ namespace BimpEngine.Controls.Proyecto
                 if (_rootPath != null)
                 {
                     Add(menu, "Nueva Escena", () => NuevaEscena(_rootPath + "/Scenes", null));
+                    Add(menu, "Importar Modelo (FBX/OBJ)…", () => ImportarModeloDialog(_rootPath + "/Models"));
                     Add(menu, "Actualizar (F5)", () => RefrescarArbol());
                     menu.Items.Add(new ToolStripSeparator());
                     Add(menu, "Mostrar en Explorador…", () => AbrirEnExplorador(_rootPath));
@@ -264,6 +283,50 @@ namespace BimpEngine.Controls.Proyecto
 
             if (menu.Items.Count > 0)
                 menu.Show(_tree, e.Location);
+        }
+
+        private static bool EsModelo3D(string ext) => ext is ".fbx" or ".obj" or ".dae" or ".gltf" or ".glb" or ".3ds" or ".stl";
+
+        private void ImportarModeloDialog(string carpetaDestino)
+        {
+            using var dialog = new OpenFileDialog
+            {
+                Title = "Importar Modelo 3D",
+                Filter = "Modelos 3D (*.fbx;*.obj;*.dae;*.gltf;*.glb;*.3ds;*.stl)|*.fbx;*.obj;*.dae;*.gltf;*.glb;*.3ds;*.stl|Todos los archivos|*.*"
+            };
+
+            if (dialog.ShowDialog() != DialogResult.OK) return;
+
+            try
+            {
+                Directory.CreateDirectory(carpetaDestino);
+
+                string nombreArchivo = Path.GetFileName(dialog.FileName);
+                string destino = Path.Combine(carpetaDestino, nombreArchivo);
+
+                if (!File.Exists(destino))
+                    File.Copy(dialog.FileName, destino);
+
+                // Copiar también texturas que estén en la misma carpeta de origen
+                string carpetaOrigen = Path.GetDirectoryName(dialog.FileName)!;
+                foreach (var ext in new[] { "*.png", "*.jpg", "*.jpeg", "*.bmp", "*.tga" })
+                {
+                    foreach (var tex in Directory.GetFiles(carpetaOrigen, ext))
+                    {
+                        string texDestino = Path.Combine(carpetaDestino, Path.GetFileName(tex));
+                        if (!File.Exists(texDestino))
+                            File.Copy(tex, texDestino);
+                    }
+                }
+
+                RefrescarArbol();
+                OnImportModelRequested?.Invoke(destino);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"No se pudo importar el modelo:\n{ex.Message}",
+                    "Error de importación", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void NuevaEscena(string folder, TreeNode? parentNode)

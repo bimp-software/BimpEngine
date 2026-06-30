@@ -5,35 +5,58 @@ namespace BimpEngine.Engine.Rendering
     public class MeshRenderer
     {
         public Material Material { get; set; } = new Material();
+        public List<Material> Materials { get; set; } = new List<Material>();
 
         public void Draw(OpenGL gl, Mesh mesh, bool isSelected = false)
         {
             if (mesh == null) return;
 
             if (Material.BlueprintMode)
+            {
                 DrawBlueprint(gl, mesh, isSelected);
-            else
-                DrawSolid(gl, mesh, isSelected);
+                return;
+            }
+
+            if (mesh.IsImported && mesh.SubMeshes.Count > 0 && Materials.Count > 0)
+            {
+                DrawImported(gl, mesh, isSelected);
+                return;
+            }
+
+            DrawSolid(gl, mesh, isSelected);
         }
 
         private void DrawSolid(OpenGL gl, Mesh mesh, bool isSelected)
         {
-            gl.Color(
-                Material.Color.R / 255.0,
-                Material.Color.G / 255.0,
-                Material.Color.B / 255.0
-            );
+            bool tex = Material.HasTexture && Material.TextureId != 0;
 
+            if (tex)
+            {
+                gl.Enable(OpenGL.GL_TEXTURE_2D);
+                gl.BindTexture(OpenGL.GL_TEXTURE_2D, Material.TextureId);
+                gl.Color(1.0,1.0,1.0);
+            }
+            else
+            {
+                gl.Color(Material.Color.R / 255.0,Material.Color.G / 255.0, Material.Color.B / 255.0);
+            }
             gl.Begin(OpenGL.GL_TRIANGLES);
             foreach (int index in mesh.Triangles)
             {
                 var v = mesh.Vertices[index];
+                if (tex) gl.TexCoord(v.U, v.V);
+                gl.Normal(v.normal.X, v.normal.Y, v.normal.Z);
                 gl.Vertex(v.vector.X, v.vector.Y, v.vector.Z);
             }
             gl.End();
 
-            if (isSelected)
-                DrawSelectionBox(gl, mesh);
+            if (tex)
+            {
+                gl.BindTexture(OpenGL.GL_TEXTURE_2D, 0);
+                gl.Disable(OpenGL.GL_TEXTURE_2D);
+            }
+
+            if (isSelected) DrawSelectionBox(gl, mesh);
         }
 
         private void DrawBlueprint(OpenGL gl, Mesh mesh, bool isSelected)
@@ -121,6 +144,44 @@ namespace BimpEngine.Engine.Rendering
             gl.Vertex(maxX, minY, maxZ); gl.Vertex(maxX, maxY, maxZ);
             gl.Vertex(minX, minY, maxZ); gl.Vertex(minX, maxY, maxZ);
             gl.End();
+        }
+
+        private void DrawImported(OpenGL gl, Mesh mesh, bool IsSelected)
+        {
+            foreach (var sub in mesh.SubMeshes)
+            {
+                var mat = sub.MaterialIndex < Materials.Count ? Materials[sub.MaterialIndex] : Material;
+                bool tex = mat.HasTexture && mat.TextureId != 0;
+
+                if (tex)
+                {
+                    gl.Enable(OpenGL.GL_TEXTURE_2D);
+                    gl.BindTexture(OpenGL.GL_TEXTURE_2D, mat.TextureId);
+                    gl.Color(1.0, 1.0, 1.0);
+                }
+                else
+                {
+                    gl.Color(mat.Color.R / 255.0, mat.Color.G / 255.0, mat.Color.B / 255.0);
+                }
+
+                gl.Begin(OpenGL.GL_TRIANGLES);
+                foreach (int index in sub.Triangles)
+                {
+                    var v = mesh.Vertices[index];
+                    if (tex) gl.TexCoord(v.U, v.V);
+                    gl.Normal(v.normal.X, v.normal.Y, v.normal.Z);
+                    gl.Vertex(v.vector.X, v.vector.Y, v.vector.Z);
+                }
+                gl.End();
+
+                if (tex)
+                {
+                    gl.BindTexture(OpenGL.GL_TEXTURE_2D,0);
+                    gl.Disable(OpenGL.GL_TEXTURE_2D);
+                }
+            }
+
+            if (IsSelected) DrawSelectionBox(gl, mesh); 
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BimpEngine.Engine.Project;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.Json;
@@ -10,8 +11,30 @@ namespace BimpEngine.Engine.Core
         public string Idioma { get; set; } = "es-ES";
         public string Tema { get; set; } = "Dark";
         public bool CargarUltimoProyectoAlIniciar { get; set; } = true;
-        public List<string> ProyectosRecientes { get; set; } = new List<string>();
-        public string LayoutDefecto { get; set; } = "DefaultLayoutData";
+        public List<RecentProject> ProyectosRecientes { get; set; } = new();
+
+        public string LayoutDefecto { get; set; } = "Default";
+
+        public bool MostrarGrilla { get; set; } = true;
+        public float TamañoCeldaGrilla { get; set; } = 1.0f;
+        public bool SnapEnabled { get; set; } = false;
+        public float SnapTraslacion { get; set; } = 0.25f;
+        public float SnapRotacion { get; set; } = 15.0f;
+        public float SnapEscala { get; set; } = 0.1f;
+
+        public float SensibilidadCamara { get; set; } = 0.5f;
+        public float VelocidadCamara { get; set; } = 10.0f;
+        public float CampoDivision { get; set; } = 60.0f;
+
+        public EditorKeybinds Atajos { get; set; } = new();
+
+        public bool MostrarMensajes { get; set; } = true;
+        public bool MostrarAdvertencias { get; set; } = true;
+        public bool MostrarErrores { get; set; } = true;
+        public bool LimpiarConsolaAlPlay { get; set; } = true;
+
+        public bool AutoguardadoHabilitado { get; set; } = true;
+        public int IntervaloAutoguardadoMinutos { get; set; } = 5;
 
         private static readonly string FolderPath = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),

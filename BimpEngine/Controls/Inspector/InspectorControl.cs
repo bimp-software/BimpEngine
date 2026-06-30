@@ -18,7 +18,6 @@ namespace BimpEngine.Controls.Inspector
         private Objetos _objetoActual;
         private Button btnAddComponent;
 
-        // Stores extra components added per object (by object Guid)
         private Dictionary<Guid, List<UserControl>> _componentesPorObjeto = new();
 
         public event Action<Objetos> OnObjectModified;
@@ -38,7 +37,6 @@ namespace BimpEngine.Controls.Inspector
             flpContenedor.WrapContents = false;
             flpContenedor.AutoScroll = true;
 
-            // Botón creado por código
             btnAddComponent = new Button
             {
                 Text = "Agregar Componente",
@@ -87,7 +85,6 @@ namespace BimpEngine.Controls.Inspector
             if (control is IInspectorComponent comp)
                 comp.SetObject(_objetoActual);
 
-            // Persist this component so it survives selection changes
             if (_objetoActual != null)
             {
                 if (!_componentesPorObjeto.ContainsKey(_objetoActual.Id))
@@ -147,7 +144,6 @@ namespace BimpEngine.Controls.Inspector
             transform.SetObject(obj);
             AddComponent(transform);
 
-            // Restore any extra components previously added to this object
             if (_componentesPorObjeto.TryGetValue(obj.Id, out var extras))
             {
                 foreach (var extra in extras)
@@ -168,6 +164,13 @@ namespace BimpEngine.Controls.Inspector
                 if (c is IInspectorComponent comp)
                     comp.Refresh(obj);
             }
+        }
+
+        public void RefrescarTagsYLayers()
+        {
+            foreach (Control c in flpContenedor.Controls)
+                if (c is VariableControl vc)
+                    vc.CargarTagsYLayers();
         }
     }
 }

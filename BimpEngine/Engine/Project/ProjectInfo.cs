@@ -1,6 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using BimpEngine.Engine.Project.Enum;
+using System.Text.Json.Serialization;
 
 namespace BimpEngine.Engine.Project
 {
@@ -14,5 +13,7 @@ namespace BimpEngine.Engine.Project
 
         /// <summary>Relative path to the main scene file inside the project folder.</summary>
         public string MainScene { get; set; } = "Scenes/Main.bscene";
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        public ProjectMode Mode { get; set; } = ProjectMode.Mode3D;
     }
 }

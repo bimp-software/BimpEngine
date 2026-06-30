@@ -1,4 +1,5 @@
 ﻿using BimpEngine.Engine.Core.Interface;
+using BimpEngine.Engine.Project;
 using BimpEngine.Engine.World;
 using System;
 using System.Collections.Generic;
@@ -17,6 +18,7 @@ namespace BimpEngine.Controls.Inspector.Componentes
         private string _nombreAnterior;
 
         public event Action<Objetos> OnObjectModified;
+        private bool _cargando;
 
         public VariableControl()
         {
@@ -24,7 +26,7 @@ namespace BimpEngine.Controls.Inspector.Componentes
 
             tbName.TextChanged += (s, e) =>
             {
-                if (objeto == null) return;
+                if (_cargando || objeto == null) return;
 
                 if (string.IsNullOrWhiteSpace(tbName.Text))
                     return;
@@ -55,24 +57,75 @@ namespace BimpEngine.Controls.Inspector.Componentes
                 objeto.Enabled = cbEnabled.Checked;
                 OnObjectModified?.Invoke(objeto);
             };
+
+            cbTag.SelectedIndexChanged += (s, e) =>
+            {
+                if (_cargando || objeto == null) return;
+                if (cbTag.SelectedItem is string tag)
+                    objeto.Tag = tag;
+                OnObjectModified?.Invoke(objeto);
+            };
+
+            cbLayer.SelectedIndexChanged += (s, e) =>
+            {
+                if (_cargando || objeto == null) return;
+                if (cbLayer.SelectedItem is LayerEntry entry)
+                    objeto.Layer = entry.Index;
+                OnObjectModified?.Invoke(objeto);
+            };
         }
 
         public void SetObject(Objetos obj)
         {
             objeto = obj;
-            tbName.Text = objeto.Name;
+            _cargando = true;
+
+            tbName.Text = obj.Name;
             _nombreAnterior = obj.Name;
-            cbTag.Text = objeto.Tag;
-            cbLayer.SelectedItem = objeto.Layer;
-            cbEnabled.Checked = objeto.Enabled;
-            Refresh(objeto);
+            cbEnabled.Checked = obj.Enabled;
+
+            CargarTagsYLayers();
+
+            cbTag.SelectedItem = obj.Tag;
+            if (cbTag.SelectedIndex < 0) cbTag.SelectedIndex = 0;
+
+            foreach (LayerEntry l in cbLayer.Items)
+            {
+                if (l.Index == obj.Layer)
+                {
+                    cbLayer.SelectedItem = l;
+                    break;
+                }
+            }
+            if (cbLayer.SelectedIndex < 0) cbLayer.SelectedIndex = 0;
+
+            _cargando = false;
         }
 
         public void Refresh(Objetos obj)
         {
             if (obj == null) return;
+            _cargando = true;
             tbName.Text = obj.Name;
             cbEnabled.Checked = obj.Enabled;
+            _cargando = false;
+        }
+
+        public void CargarTagsYLayers()
+        {
+            _cargando = true;
+
+            cbTag.Items.Clear();
+            foreach (var t in TagLayerManager.Current.AllTags)
+                cbTag.Items.Add(t);
+
+            cbLayer.Items.Clear();
+            foreach (var l in TagLayerManager.Current.AllLayers)
+                cbLayer.Items.Add(l);
+
+            cbLayer.DisplayMember = "Name";
+
+            _cargando = false;
         }
     }
 }
