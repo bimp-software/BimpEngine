@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AssimpNet" Version="4.1.0" />
     <PackageReference Include="DockPanelSuite" Version="3.1.1" />
     <PackageReference Include="OpenTK" Version="4.9.4" />
     <PackageReference Include="OpenTK.Core" Version="4.9.4" />
@@ -21,9 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Engine\Assets\" />
     <Folder Include="Engine\Input\" />
-    <Folder Include="Engine\Utilities\" />
   </ItemGroup>
 
   <ItemGroup>
