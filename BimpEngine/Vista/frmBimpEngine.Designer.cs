@@ -91,6 +91,10 @@
             pictureBox1 = new PictureBox();
             pictureBox2 = new PictureBox();
             pnlContenedor = new Panel();
+            tsmiCanvas = new ToolStripMenuItem();
+            tsmiButton = new ToolStripMenuItem();
+            tsmiText = new ToolStripMenuItem();
+            tsmiImage = new ToolStripMenuItem();
             msMenuPrincipal.SuspendLayout();
             panel1.SuspendLayout();
             flpComenzar.SuspendLayout();
@@ -245,14 +249,14 @@
             // crearVacioToolStripMenuItem
             // 
             crearVacioToolStripMenuItem.Name = "crearVacioToolStripMenuItem";
-            crearVacioToolStripMenuItem.Size = new Size(148, 24);
+            crearVacioToolStripMenuItem.Size = new Size(180, 24);
             crearVacioToolStripMenuItem.Text = "Crear Vacio";
             // 
             // dObjetoToolStripMenuItem
             // 
             dObjetoToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { tsmCubo, tsmTriangulo, tsmCilindro, tsmCono, tsmPlano, tsmCirculo });
             dObjetoToolStripMenuItem.Name = "dObjetoToolStripMenuItem";
-            dObjetoToolStripMenuItem.Size = new Size(148, 24);
+            dObjetoToolStripMenuItem.Size = new Size(180, 24);
             dObjetoToolStripMenuItem.Text = "3D Objeto";
             // 
             // tsmCubo
@@ -302,7 +306,7 @@
             // 
             dObjetosToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { tsmiCuadrado, rectanguloToolStripMenuItem, circuloToolStripMenuItem, trianguloToolStripMenuItem, diamanteToolStripMenuItem, pentagonoToolStripMenuItem, hexagonoToolStripMenuItem, estrellaToolStripMenuItem, flechaToolStripMenuItem, lineaToolStripMenuItem });
             dObjetosToolStripMenuItem.Name = "dObjetosToolStripMenuItem";
-            dObjetosToolStripMenuItem.Size = new Size(148, 24);
+            dObjetosToolStripMenuItem.Size = new Size(180, 24);
             dObjetosToolStripMenuItem.Text = "2D Objetos";
             // 
             // tsmiCuadrado
@@ -369,12 +373,13 @@
             // toolStripSeparator4
             // 
             toolStripSeparator4.Name = "toolStripSeparator4";
-            toolStripSeparator4.Size = new Size(145, 6);
+            toolStripSeparator4.Size = new Size(177, 6);
             // 
             // toolStripMenuItem1
             // 
+            toolStripMenuItem1.DropDownItems.AddRange(new ToolStripItem[] { tsmiCanvas, tsmiButton, tsmiText, tsmiImage });
             toolStripMenuItem1.Name = "toolStripMenuItem1";
-            toolStripMenuItem1.Size = new Size(148, 24);
+            toolStripMenuItem1.Size = new Size(180, 24);
             toolStripMenuItem1.Text = "UI";
             // 
             // componentesToolStripMenuItem
@@ -601,6 +606,31 @@
             pnlContenedor.Size = new Size(1201, 666);
             pnlContenedor.TabIndex = 4;
             // 
+            // tsmiCanvas
+            // 
+            tsmiCanvas.Name = "tsmiCanvas";
+            tsmiCanvas.Size = new Size(180, 24);
+            tsmiCanvas.Text = "Canvas";
+            tsmiCanvas.Click += tsmiCanvas_Click;
+            // 
+            // tsmiButton
+            // 
+            tsmiButton.Name = "tsmiButton";
+            tsmiButton.Size = new Size(180, 24);
+            tsmiButton.Text = "Boton";
+            // 
+            // tsmiText
+            // 
+            tsmiText.Name = "tsmiText";
+            tsmiText.Size = new Size(180, 24);
+            tsmiText.Text = "Texto";
+            // 
+            // tsmiImage
+            // 
+            tsmiImage.Name = "tsmiImage";
+            tsmiImage.Size = new Size(180, 24);
+            tsmiImage.Text = "Imagen";
+            // 
             // frmBimpEngine
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -699,5 +729,9 @@
         private ToolStripSeparator toolStripSeparator4;
         private ToolStripMenuItem toolStripMenuItem1;
         private ToolStripMenuItem tsmiPreferencias;
+        private ToolStripMenuItem tsmiCanvas;
+        private ToolStripMenuItem tsmiButton;
+        private ToolStripMenuItem tsmiText;
+        private ToolStripMenuItem tsmiImage;
     }
 }

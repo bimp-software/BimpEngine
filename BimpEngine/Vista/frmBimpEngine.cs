@@ -257,8 +257,6 @@ namespace BimpEngine.Vista
             layoutManager.SetLayout(layout, editorViews);
         }
 
-
-
         #region Project System
 
         //private void InicializarMenuArchivo()
@@ -736,5 +734,10 @@ namespace BimpEngine.Vista
         }
 
         #endregion
+
+        private void tsmiCanvas_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("El Canvas es un objeto especial que sirve como contenedor para elementos de UI. Puedes crear un Canvas desde el menú 'Crear > UI > Canvas'.", "Información", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
     }
 }

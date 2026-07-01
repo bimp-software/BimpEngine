@@ -1,13 +1,19 @@
-﻿using SharpGL;
+﻿using BimpEngine.Engine.World;
+using SharpGL;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace BimpEngine.Engine.UI
 {
-    public class Canvas
+    public class Canvas : Objetos
     {
         public List<UIElement> Elements { get; } = new List<UIElement>();
+
+        public Canvas()
+        {
+            Name = "Canvas";
+        }
 
         public void Add(UIElement element)
         {
