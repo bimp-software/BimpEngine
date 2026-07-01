@@ -301,7 +301,6 @@ namespace BimpEngine.Controls.Inspector.Componentes.Blueprint
                 "Ayuda", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
-        // Helper para mostrar nombre bonito en el ComboBox
         private class VariableTipoItem
         {
             public VariableType Tipo { get; }
@@ -313,11 +312,9 @@ namespace BimpEngine.Controls.Inspector.Componentes.Blueprint
         {
             try
             {
-                var opciones = new System.Text.Json.JsonSerializerOptions { WriteIndented = true };
-                string json = System.Text.Json.JsonSerializer.Serialize(_graph, opciones);
+                string json = BimpEngine.Engine.Project.NodeGraphSerializer.Serialize(_graph);
                 System.IO.File.WriteAllText(_filePath, json);
 
-                // Pequeño feedback visual en la barra de título
                 string tituloOriginal = Text;
                 Text = "✓ Guardado correctamente";
                 var t = new System.Windows.Forms.Timer { Interval = 1500 };

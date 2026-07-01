@@ -1,8 +1,9 @@
-﻿using BimpEngine.Engine.Entities;
-using BimpEngine.Engine.Core;
-using BimpEngine.Engine.Rendering;
-using SharpGL;
+﻿using BimpEngine.Engine.Core;
+using BimpEngine.Engine.Entities;
 using BimpEngine.Engine.Math;
+using BimpEngine.Engine.Rendering;
+using BimpEngine.Engine.Scripting;
+using SharpGL;
 
 namespace BimpEngine.Engine.World
 {
@@ -21,6 +22,8 @@ namespace BimpEngine.Engine.World
         public Objetos Parent { get; set; } = null;
         public List<Objetos> Children { get; } = new List<Objetos>();
         public MoldeLink? Molde { get; set; } = null;
+
+        public NodeGraph Script { get; set; } = new NodeGraph();
 
         protected Objetos() { }
         public virtual void Update() { }

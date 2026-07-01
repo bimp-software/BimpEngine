@@ -11,6 +11,7 @@ using BimpEngine.Engine.Entities;
 using BimpEngine.Engine.Entities.Primitive;
 using BimpEngine.Engine.Project;
 using BimpEngine.Engine.Scripting;
+using BimpEngine.Engine.Utilities;
 using BimpEngine.Engine.World;
 using Windows.System;
 
@@ -105,6 +106,8 @@ namespace BimpEngine.Vista
                 inspector.ShowObject(obj);
                 hierarchy.SelectObject(obj);
             };
+
+            sceneView.OnModelDropped += (path) => ImportarModeloEnEscena(path);
 
             sceneView.OnObjectChanged += (obj) =>
             {
@@ -253,32 +256,7 @@ namespace BimpEngine.Vista
             layoutManager.SetLayout(layout, editorViews);
         }
 
-        private void tsmCubo_Click(object sender, EventArgs e)
-        {
-            var cubo = new Cube();
-            sceneView.GetScene().Add(cubo);
-            hierarchy.AddObject(cubo);
-            sceneView.SetSelection(cubo, sceneView.GetScene().Objetos.Count - 1);
-            inspector.ShowObject(cubo);
-        }
-
-        private void tsmTriangulo_Click(object sender, EventArgs e)
-        {
-            var triangulo = new Triangle();
-            sceneView.GetScene().Add(triangulo);
-            hierarchy.AddObject(triangulo);
-            sceneView.SetSelection(triangulo, sceneView.GetScene().Objetos.Count - 1);
-            inspector.ShowObject(triangulo);
-        }
-
-        private void tsmCilindro_Click(object sender, EventArgs e)
-        {
-            var cilindro = new Cylinder();
-            sceneView.GetScene().Add(cilindro);
-            hierarchy.AddObject(cilindro);
-            sceneView.SetSelection(cilindro, sceneView.GetScene().Objetos.Count - 1);
-            inspector.ShowObject(cilindro);
-        }
+        
 
         #region Project System
 
@@ -326,12 +304,37 @@ namespace BimpEngine.Vista
         {
             if (!ProjectManager.HasOpenProject) return;
 
+            // Load file tree in the Project panel
             proyecto.CargarProyecto(ProjectManager.CurrentProjectFolder!);
+            proyecto.OnOpenScene += (scenePath) =>
+            {
+                if (ConfirmarDescartarCambios())
+                    CargarEscenaDesdeArchivo(scenePath);
+            };
+            proyecto.OnImportModelRequested += (modelPath) => ImportarModeloEnEscena(modelPath);
+
+            proyecto.OnOpenBlueprint += (path) =>
+            {
+                NodeGraph graph;
+                try
+                {
+                    string json = File.Exists(path) ? File.ReadAllText(path) : "{}";
+                    graph = BimpEngine.Engine.Project.NodeGraphSerializer.Deserialize(json);
+                }
+                catch { graph = new NodeGraph(); }
+
+                var editor = new BimpEngine.Controls.Inspector.Componentes.Blueprint.frmBlueprintEditor(
+                    graph,
+                    Path.GetFileNameWithoutExtension(path),
+                    path,
+                    sceneView.GetScene().Objetos);
+
+                editor.Show(this);
+            };
 
             string scenePath = ProjectManager.GetMainScenePath();
             if (File.Exists(scenePath))
                 CargarEscenaDesdeArchivo(scenePath);
-
             ActualizarTitulo();
         }
 
@@ -355,15 +358,10 @@ namespace BimpEngine.Vista
             if (!ProjectManager.HasOpenProject)
             { GuardarEscenaComo(); return; }
 
-            if (_currentScenePath == null)
-            {
-                GuardarEscenaComo();
-                return;
-            }
-
             try
             {
-                SceneSerializer.Save(sceneView.GetScene(), _currentScenePath);
+                string path = ProjectManager.GetMainScenePath();
+                SceneSerializer.Save(sceneView.GetScene(), path);
                 ProjectManager.SaveProjectInfo();
                 _hasUnsavedChanges = false;
                 ActualizarTitulo();
@@ -397,10 +395,7 @@ namespace BimpEngine.Vista
 
             try
             {
-                sceneView.GetScene().Name = Path.GetFileNameWithoutExtension(dlg.FileName);
-
                 SceneSerializer.Save(sceneView.GetScene(), dlg.FileName);
-                _currentScenePath = dlg.FileName;
                 _hasUnsavedChanges = false;
                 ActualizarTitulo();
                 proyecto.RefrescarArbol();
@@ -608,6 +603,34 @@ namespace BimpEngine.Vista
             }
         }
 
+        private void ImportarModeloEnEscena(string path)
+        {
+            try
+            {
+                Cursor = Cursors.WaitCursor;
+
+                var imported = BimpEngine.Engine.Assets.ModelImporter.Import(path);
+                var modelo = new ModelObject(imported);
+
+                sceneView.GetScene().Add(modelo);
+                hierarchy.AddObject(modelo);
+                sceneView.SetSelection(modelo, sceneView.GetScene().Objetos.Count - 1);
+                inspector.ShowObject(modelo);
+                sceneView.RefrescarEscena();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    $"No se pudo importar el modelo:\n\n{ex.Message}",
+                    "Error al importar modelo",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                Cursor = Cursors.Default;
+            }
+        }
+
         private void tsmiConfiguracionProyecto_Click(object sender, EventArgs e)
         {
             using var frm = new frmTagsAndLayers();
@@ -615,5 +638,61 @@ namespace BimpEngine.Vista
 
             inspector?.RefrescarTagsYLayers();
         }
+
+        #region Primitives 3D
+        private void tsmCubo_Click(object sender, EventArgs e)
+        {
+            var cubo = new Cube();
+            sceneView.GetScene().Add(cubo);
+            hierarchy.AddObject(cubo);
+            sceneView.SetSelection(cubo, sceneView.GetScene().Objetos.Count - 1);
+            inspector.ShowObject(cubo);
+        }
+
+        private void tsmTriangulo_Click(object sender, EventArgs e)
+        {
+            var triangulo = new Triangle();
+            sceneView.GetScene().Add(triangulo);
+            hierarchy.AddObject(triangulo);
+            sceneView.SetSelection(triangulo, sceneView.GetScene().Objetos.Count - 1);
+            inspector.ShowObject(triangulo);
+        }
+
+        private void tsmCilindro_Click(object sender, EventArgs e)
+        {
+            var cilindro = new Cylinder();
+            sceneView.GetScene().Add(cilindro);
+            hierarchy.AddObject(cilindro);
+            sceneView.SetSelection(cilindro, sceneView.GetScene().Objetos.Count - 1);
+            inspector.ShowObject(cilindro);
+        }
+
+        private void tsmCono_Click(object sender, EventArgs e)
+        {
+            var cono = new Cone();
+            sceneView.GetScene().Add(cono);
+            hierarchy.AddObject(cono);
+            sceneView.SetSelection(cono, sceneView.GetScene().Objetos.Count - 1);
+            inspector.ShowObject(cono);
+        }
+
+        private void tsmPlano_Click(object sender, EventArgs e)
+        {
+            var plano = new Plane();
+            sceneView.GetScene().Add(plano);
+            hierarchy.AddObject(plano);
+            sceneView.SetSelection(plano, sceneView.GetScene().Objetos.Count - 1);
+            inspector.ShowObject(plano);
+        }
+
+        private void tsmCirculo_Click(object sender, EventArgs e)
+        {
+            var circulo = new Circle();
+            sceneView.GetScene().Add(circulo);
+            hierarchy.AddObject(circulo);
+            sceneView.SetSelection(circulo, sceneView.GetScene().Objetos.Count - 1);
+            inspector.ShowObject(circulo);
+        }
+        #endregion
     }
 }

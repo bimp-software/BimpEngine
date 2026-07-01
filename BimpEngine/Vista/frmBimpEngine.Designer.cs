@@ -44,6 +44,7 @@
             btnIrLauncher = new ToolStripMenuItem();
             toolStripMenuItem8 = new ToolStripMenuItem();
             editarToolStripMenuItem = new ToolStripMenuItem();
+            tsmiConfiguracionProyecto = new ToolStripMenuItem();
             verToolStripMenuItem = new ToolStripMenuItem();
             recursosToolStripMenuItem = new ToolStripMenuItem();
             objetosToolStripMenuItem = new ToolStripMenuItem();
@@ -52,6 +53,9 @@
             tsmCubo = new ToolStripMenuItem();
             tsmTriangulo = new ToolStripMenuItem();
             tsmCilindro = new ToolStripMenuItem();
+            tsmCono = new ToolStripMenuItem();
+            tsmPlano = new ToolStripMenuItem();
+            tsmCirculo = new ToolStripMenuItem();
             dObjetosToolStripMenuItem = new ToolStripMenuItem();
             tsmiCuadrado = new ToolStripMenuItem();
             rectanguloToolStripMenuItem = new ToolStripMenuItem();
@@ -84,7 +88,8 @@
             pictureBox1 = new PictureBox();
             pictureBox2 = new PictureBox();
             pnlContenedor = new Panel();
-            tsmiConfiguracionProyecto = new ToolStripMenuItem();
+            toolStripSeparator4 = new ToolStripSeparator();
+            toolStripMenuItem1 = new ToolStripMenuItem();
             msMenuPrincipal.SuspendLayout();
             panel1.SuspendLayout();
             flpComenzar.SuspendLayout();
@@ -200,6 +205,13 @@
             editarToolStripMenuItem.Size = new Size(56, 23);
             editarToolStripMenuItem.Text = "Edi&tar";
             // 
+            // tsmiConfiguracionProyecto
+            // 
+            tsmiConfiguracionProyecto.Name = "tsmiConfiguracionProyecto";
+            tsmiConfiguracionProyecto.Size = new Size(243, 24);
+            tsmiConfiguracionProyecto.Text = "Configuracion del proyecto";
+            tsmiConfiguracionProyecto.Click += tsmiConfiguracionProyecto_Click;
+            // 
             // verToolStripMenuItem
             // 
             verToolStripMenuItem.ForeColor = Color.FromArgb(250, 250, 250);
@@ -216,7 +228,7 @@
             // 
             // objetosToolStripMenuItem
             // 
-            objetosToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { crearVacioToolStripMenuItem, dObjetoToolStripMenuItem, dObjetosToolStripMenuItem });
+            objetosToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { crearVacioToolStripMenuItem, dObjetoToolStripMenuItem, dObjetosToolStripMenuItem, toolStripSeparator4, toolStripMenuItem1 });
             objetosToolStripMenuItem.ForeColor = Color.FromArgb(250, 250, 250);
             objetosToolStripMenuItem.Name = "objetosToolStripMenuItem";
             objetosToolStripMenuItem.Size = new Size(69, 23);
@@ -230,7 +242,7 @@
             // 
             // dObjetoToolStripMenuItem
             // 
-            dObjetoToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { tsmCubo, tsmTriangulo, tsmCilindro });
+            dObjetoToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { tsmCubo, tsmTriangulo, tsmCilindro, tsmCono, tsmPlano, tsmCirculo });
             dObjetoToolStripMenuItem.Name = "dObjetoToolStripMenuItem";
             dObjetoToolStripMenuItem.Size = new Size(180, 24);
             dObjetoToolStripMenuItem.Text = "3D Objeto";
@@ -239,23 +251,44 @@
             // 
             tsmCubo.DisplayStyle = ToolStripItemDisplayStyle.Text;
             tsmCubo.Name = "tsmCubo";
-            tsmCubo.Size = new Size(134, 24);
+            tsmCubo.Size = new Size(180, 24);
             tsmCubo.Text = "Cubo";
             tsmCubo.Click += tsmCubo_Click;
             // 
             // tsmTriangulo
             // 
             tsmTriangulo.Name = "tsmTriangulo";
-            tsmTriangulo.Size = new Size(134, 24);
+            tsmTriangulo.Size = new Size(180, 24);
             tsmTriangulo.Text = "Triangulo";
             tsmTriangulo.Click += tsmTriangulo_Click;
             // 
             // tsmCilindro
             // 
             tsmCilindro.Name = "tsmCilindro";
-            tsmCilindro.Size = new Size(134, 24);
+            tsmCilindro.Size = new Size(180, 24);
             tsmCilindro.Text = "Cilindro";
             tsmCilindro.Click += tsmCilindro_Click;
+            // 
+            // tsmCono
+            // 
+            tsmCono.Name = "tsmCono";
+            tsmCono.Size = new Size(180, 24);
+            tsmCono.Text = "Cono";
+            tsmCono.Click += tsmCono_Click;
+            // 
+            // tsmPlano
+            // 
+            tsmPlano.Name = "tsmPlano";
+            tsmPlano.Size = new Size(180, 24);
+            tsmPlano.Text = "Plano";
+            tsmPlano.Click += tsmPlano_Click;
+            // 
+            // tsmCirculo
+            // 
+            tsmCirculo.Name = "tsmCirculo";
+            tsmCirculo.Size = new Size(180, 24);
+            tsmCirculo.Text = "Circulo";
+            tsmCirculo.Click += tsmCirculo_Click;
             // 
             // dObjetosToolStripMenuItem
             // 
@@ -549,12 +582,16 @@
             pnlContenedor.Size = new Size(1201, 666);
             pnlContenedor.TabIndex = 4;
             // 
-            // tsmiConfiguracionProyecto
+            // toolStripSeparator4
             // 
-            tsmiConfiguracionProyecto.Name = "tsmiConfiguracionProyecto";
-            tsmiConfiguracionProyecto.Size = new Size(243, 24);
-            tsmiConfiguracionProyecto.Text = "Configuracion del proyecto";
-            tsmiConfiguracionProyecto.Click += tsmiConfiguracionProyecto_Click;
+            toolStripSeparator4.Name = "toolStripSeparator4";
+            toolStripSeparator4.Size = new Size(177, 6);
+            // 
+            // toolStripMenuItem1
+            // 
+            toolStripMenuItem1.Name = "toolStripMenuItem1";
+            toolStripMenuItem1.Size = new Size(180, 24);
+            toolStripMenuItem1.Text = "UI";
             // 
             // frmBimpEngine
             // 
@@ -648,5 +685,10 @@
         private ToolStripMenuItem flechaToolStripMenuItem;
         private ToolStripMenuItem lineaToolStripMenuItem;
         private ToolStripMenuItem tsmiConfiguracionProyecto;
+        private ToolStripMenuItem tsmCono;
+        private ToolStripMenuItem tsmPlano;
+        private ToolStripMenuItem tsmCirculo;
+        private ToolStripSeparator toolStripSeparator4;
+        private ToolStripMenuItem toolStripMenuItem1;
     }
 }

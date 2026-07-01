@@ -27,6 +27,8 @@ namespace BimpEngine.Controls.Proyecto
             BuildIcons();
             _tree.ImageList = _icons;
             _tree.DrawMode = TreeViewDrawMode.OwnerDrawText;
+
+            _tree.AllowDrop = false;
         }
 
         private void BuildIcons()
@@ -170,7 +172,7 @@ namespace BimpEngine.Controls.Proyecto
                 {
                     ".bscene" => ICON_SCENE,
                     ".bscript" => ICON_BLUEPRINT,
-                    ".bmold" => ICON_MOLDE,   
+                    ".bmold" => ICON_MOLDE,
                     _ => ICON_FILE
                 };
 
@@ -207,7 +209,7 @@ namespace BimpEngine.Controls.Proyecto
                 else if (ext == ".bscript")
                     OnOpenBlueprint?.Invoke(path);
                 else if (ext == ".bmold")
-                    OnInstanciarMolde?.Invoke(path); 
+                    OnInstanciarMolde?.Invoke(path);
             }
         }
 
@@ -442,7 +444,7 @@ namespace BimpEngine.Controls.Proyecto
             item.Click += (s, e) => action();
             menu.Items.Add(item);
         }
-  
+
         private static string Prompt(string message, string defaultValue)
         {
             using var frm = new Form
@@ -481,6 +483,16 @@ namespace BimpEngine.Controls.Proyecto
             frm.AcceptButton = btn;
             tb.SelectAll();
             return frm.ShowDialog() == DialogResult.OK ? tb.Text.Trim() : "";
+        }
+
+        private void _tree_ItemDrag(object sender, ItemDragEventArgs e)
+        {
+            if (e.Item is TreeNode node && node.Tag is string path && File.Exists(path))
+            {
+                string tex = Path.GetExtension(path).ToLower();
+                if (EsModelo3D(tex))
+                    DoDragDrop(path, DragDropEffects.Copy);
+            }
         }
     }
 }

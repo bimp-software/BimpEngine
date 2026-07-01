@@ -48,6 +48,7 @@ namespace BimpEngine.Controls.Escena
         #region Events
         public event Action<Objetos> OnObjectSelected;
         public event Action<Objetos> OnObjectChanged;
+        public event Action<string> OnModelDropped;
         #endregion
 
         #region Constructor
@@ -171,6 +172,7 @@ namespace BimpEngine.Controls.Escena
             {
                 _camera2D.Apply(gl, w, h);
             }
+            gl.Viewport(0,0,glControl.Width, glControl.Height);
         }
 
         #endregion
@@ -407,7 +409,7 @@ namespace BimpEngine.Controls.Escena
             }
             if (_panningCamera)
             {
-                glControl.Cursor = Cursors.SizeAll; 
+                glControl.Cursor = Cursors.SizeAll;
                 return;
             }
 
@@ -417,8 +419,8 @@ namespace BimpEngine.Controls.Escena
             {
                 glControl.Cursor = _gizmo.Mode switch
                 {
-                    GizmoMode.Move => Cursors.SizeAll,  
-                    GizmoMode.Rotate => Cursors.Hand,  
+                    GizmoMode.Move => Cursors.SizeAll,
+                    GizmoMode.Rotate => Cursors.Hand,
                     GizmoMode.Scale => Cursors.SizeNWSE,
                     _ => Cursors.Default
                 };
@@ -426,6 +428,20 @@ namespace BimpEngine.Controls.Escena
             }
 
             glControl.Cursor = Cursors.Default;
+        }
+
+        private void glControl_DragEnter(object sender, DragEventArgs e)
+        {
+            if (e.Data?.GetDataPresent(DataFormats.StringFormat) == true)
+                e.Effect = DragDropEffects.Copy;
+            else
+                e.Effect = DragDropEffects.None;
+        }
+
+        private void glControl_DragDrop(object sender, DragEventArgs e)
+        {
+            if (e.Data?.GetData(DataFormats.StringFormat) is string path)
+                OnModelDropped?.Invoke(path);
         }
     }
 }

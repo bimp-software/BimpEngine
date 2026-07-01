@@ -97,6 +97,7 @@
             // 
             // glControl
             // 
+            glControl.AllowDrop = true;
             glControl.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             glControl.AutoSize = true;
             glControl.DrawFPS = true;
@@ -112,6 +113,8 @@
             glControl.OpenGLInitialized += glControl_OpenGLInitialized;
             glControl.OpenGLDraw += glControl_OpenGLDraw;
             glControl.Resized += glControl_Resized;
+            glControl.DragDrop += glControl_DragDrop;
+            glControl.DragEnter += glControl_DragEnter;
             glControl.KeyDown += glControl_KeyDown;
             glControl.MouseDown += glControl_MouseDown;
             glControl.MouseMove += glControl_MouseMove;

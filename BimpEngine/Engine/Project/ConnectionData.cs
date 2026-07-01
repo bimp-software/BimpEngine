@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace BimpEngine.Engine.Scripting
+namespace BimpEngine.Engine.Project
 {
-    public class NodeConnection
+    public class ConnectionData
     {
-        public Guid Id { get; set; } = Guid.NewGuid();
+        public Guid Id { get; set; }
         public Guid FromNodeId { get; set; }
         public Guid FromPortId { get; set; }
         public Guid ToNodeId { get; set; }

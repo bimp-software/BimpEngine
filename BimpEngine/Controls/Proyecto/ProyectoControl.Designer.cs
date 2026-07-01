@@ -138,6 +138,7 @@
             _tree.TabIndex = 0;
             _tree.BeforeExpand += _tree_BeforeExpand;
             _tree.DrawNode += _tree_DrawNode;
+            _tree.ItemDrag += _tree_ItemDrag;
             _tree.DoubleClick += _tree_DoubleClick;
             _tree.KeyDown += _tree_KeyDown;
             _tree.MouseUp += _tree_MouseUp;

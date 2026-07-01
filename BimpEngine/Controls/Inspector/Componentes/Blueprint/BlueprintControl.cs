@@ -8,11 +8,6 @@ using System.Windows.Forms;
 
 namespace BimpEngine.Controls.Inspector.Componentes.Blueprint
 {
-    /// <summary>
-    /// Inspector component that opens the visual scripting editor for an object.
-    /// Shows a compact summary in the inspector; clicking "Editar Script" opens
-    /// a full-screen floating editor window.
-    /// </summary>
     public class BlueprintControl : UserControl, IInspectorComponent
     {
         private Objetos? _objeto;
@@ -61,12 +56,14 @@ namespace BimpEngine.Controls.Inspector.Componentes.Blueprint
         public void SetObject(Objetos obj)
         {
             _objeto = obj;
+            _graph = obj.Script;
             UpdateInfo();
         }
 
         public void Refresh(Objetos obj)
         {
             _objeto = obj;
+            _graph = obj.Script;
             UpdateInfo();
         }
 
@@ -81,20 +78,11 @@ namespace BimpEngine.Controls.Inspector.Componentes.Blueprint
         {
             if (_editorWin == null || _editorWin.IsDisposed)
             {
-                string nombreObjeto = _objeto?.Name ?? "Objeto";
-
-                string filePath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Scripts", $"{nombreObjeto}.json");
-
-                string? directorio = System.IO.Path.GetDirectoryName(filePath);
-                if (!string.IsNullOrEmpty(directorio))
-                {
-                    System.IO.Directory.CreateDirectory(directorio);
-                }
-
-                List<Objetos>? objetosEscena = null;
-
-                _editorWin = new frmBlueprintEditor(_graph, nombreObjeto, filePath, objetosEscena);
-                _editorWin.OnGraphChanged += () => { UpdateInfo(); };
+                _editorWin = new frmBlueprintEditor(
+                    _graph,
+                    _objeto?.Name ?? "Objeto",
+                    string.Empty);
+                _editorWin.OnGraphChanged += () => UpdateInfo();
                 _editorWin.Show(FindForm());
             }
             else
