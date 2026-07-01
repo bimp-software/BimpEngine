@@ -22,7 +22,7 @@ namespace BimpEngine.Engine.Rendering
                 {
                     if (ShowErrorsInConsole)
                     {
-                        Debug.Console.Error($"Error dibujando '{obj.Name}': {ex.Message}","Renderer");
+                        Debug.Console.LogError($"Error dibujando '{obj.Name}': {ex.Message}","Renderer");
                     }
                 }
             }

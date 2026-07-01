@@ -1,4 +1,5 @@
-﻿using BimpEngine.Engine.Project;
+﻿using BimpEngine.Engine.Input;
+using BimpEngine.Engine.Project;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -14,6 +15,8 @@ namespace BimpEngine.Engine.Core
         public List<RecentProject> ProyectosRecientes { get; set; } = new();
 
         public string LayoutDefecto { get; set; } = "Default";
+
+        public List<KeyBinding> InputBindings { get; set; } = new List<KeyBinding>();
 
         public bool MostrarGrilla { get; set; } = true;
         public float TamañoCeldaGrilla { get; set; } = 1.0f;
@@ -59,6 +62,7 @@ namespace BimpEngine.Engine.Core
                 {
                     // Si no existe, creamos el archivo con los valores por defecto
                     Current = new EngineSettings();
+                    Current.EstablecerControlesPorDefecto();
                     Current.Save();
                 }
             }
@@ -86,8 +90,35 @@ namespace BimpEngine.Engine.Core
             }
             catch (Exception ex)
             {
-                System.Windows.Forms.MessageBox.Show($"No se pudo guardar la configuración del motor: {ex.Message}");
+                MessageBox.Show($"No se pudo guardar la configuración del motor: {ex.Message}");
             }
+        }
+
+        public void EstablecerControlesPorDefecto()
+        {
+            InputBindings = new List<KeyBinding>
+            {
+                new KeyBinding { Accion = "Mover_Adante", Descripcion = "Mover hacia adelante", Categoria = "Juego", Tecla = Keys.W.ToString() },
+                new KeyBinding { Accion = "Mover_Atras", Descripcion = "Mover hacia atrás", Categoria = "Juego", Tecla = Keys.S.ToString() },
+                new KeyBinding { Accion = "Mover_Izquierda", Descripcion = "Mover a la izquierda", Categoria = "Juego", Tecla = Keys.A.ToString() },
+                new KeyBinding { Accion = "Mover_Derecha", Descripcion = "Mover a la derecha", Categoria = "Juego", Tecla = Keys.D.ToString() },
+                new KeyBinding { Accion = "Juego_Saltar", Descripcion = "Saltar", Categoria = "Juego", Tecla = Keys.Space.ToString() },
+                new KeyBinding { Accion = "Juego_Disparar", Descripcion = "Acción / Disparar", Categoria = "Juego", Tecla = Keys.F.ToString() },
+
+                // ATAJOS DEL EDITOR
+                new KeyBinding { Accion = "Editor_Guardar", Descripcion = "Guardar cambios", Categoria = "Editor", Tecla = Keys.S.ToString() }, // Se evalúa junto con Ctrl
+                new KeyBinding { Accion = "Editor_Compilar", Descripcion = "Compilar Scripts", Categoria = "Editor", Tecla = Keys.F5.ToString() }
+            };
+        }
+
+        public bool ValidarTecla(string nombreAccion, Keys teclaPresionada)
+        {
+            var binding = InputBindings.Find(b => b.Accion == nombreAccion);
+            if (binding != null && Enum.TryParse<Keys>(binding.Tecla, out var key))
+            {
+                return key == teclaPresionada;
+            }
+            return false;
         }
     }
 }

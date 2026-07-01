@@ -45,6 +45,7 @@
             toolStripMenuItem8 = new ToolStripMenuItem();
             editarToolStripMenuItem = new ToolStripMenuItem();
             tsmiConfiguracionProyecto = new ToolStripMenuItem();
+            tsmiPreferencias = new ToolStripMenuItem();
             verToolStripMenuItem = new ToolStripMenuItem();
             recursosToolStripMenuItem = new ToolStripMenuItem();
             objetosToolStripMenuItem = new ToolStripMenuItem();
@@ -67,6 +68,8 @@
             estrellaToolStripMenuItem = new ToolStripMenuItem();
             flechaToolStripMenuItem = new ToolStripMenuItem();
             lineaToolStripMenuItem = new ToolStripMenuItem();
+            toolStripSeparator4 = new ToolStripSeparator();
+            toolStripMenuItem1 = new ToolStripMenuItem();
             componentesToolStripMenuItem = new ToolStripMenuItem();
             ventanaToolStripMenuItem = new ToolStripMenuItem();
             extensionesToolStripMenuItem = new ToolStripMenuItem();
@@ -88,8 +91,6 @@
             pictureBox1 = new PictureBox();
             pictureBox2 = new PictureBox();
             pnlContenedor = new Panel();
-            toolStripSeparator4 = new ToolStripSeparator();
-            toolStripMenuItem1 = new ToolStripMenuItem();
             msMenuPrincipal.SuspendLayout();
             panel1.SuspendLayout();
             flpComenzar.SuspendLayout();
@@ -199,7 +200,7 @@
             // 
             // editarToolStripMenuItem
             // 
-            editarToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { tsmiConfiguracionProyecto });
+            editarToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { tsmiConfiguracionProyecto, tsmiPreferencias });
             editarToolStripMenuItem.ForeColor = Color.FromArgb(250, 250, 250);
             editarToolStripMenuItem.Name = "editarToolStripMenuItem";
             editarToolStripMenuItem.Size = new Size(56, 23);
@@ -211,6 +212,13 @@
             tsmiConfiguracionProyecto.Size = new Size(243, 24);
             tsmiConfiguracionProyecto.Text = "Configuracion del proyecto";
             tsmiConfiguracionProyecto.Click += tsmiConfiguracionProyecto_Click;
+            // 
+            // tsmiPreferencias
+            // 
+            tsmiPreferencias.Name = "tsmiPreferencias";
+            tsmiPreferencias.Size = new Size(243, 24);
+            tsmiPreferencias.Text = "Preferencias";
+            tsmiPreferencias.Click += tsmiPreferencias_Click;
             // 
             // verToolStripMenuItem
             // 
@@ -237,56 +245,56 @@
             // crearVacioToolStripMenuItem
             // 
             crearVacioToolStripMenuItem.Name = "crearVacioToolStripMenuItem";
-            crearVacioToolStripMenuItem.Size = new Size(180, 24);
+            crearVacioToolStripMenuItem.Size = new Size(148, 24);
             crearVacioToolStripMenuItem.Text = "Crear Vacio";
             // 
             // dObjetoToolStripMenuItem
             // 
             dObjetoToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { tsmCubo, tsmTriangulo, tsmCilindro, tsmCono, tsmPlano, tsmCirculo });
             dObjetoToolStripMenuItem.Name = "dObjetoToolStripMenuItem";
-            dObjetoToolStripMenuItem.Size = new Size(180, 24);
+            dObjetoToolStripMenuItem.Size = new Size(148, 24);
             dObjetoToolStripMenuItem.Text = "3D Objeto";
             // 
             // tsmCubo
             // 
             tsmCubo.DisplayStyle = ToolStripItemDisplayStyle.Text;
             tsmCubo.Name = "tsmCubo";
-            tsmCubo.Size = new Size(180, 24);
+            tsmCubo.Size = new Size(134, 24);
             tsmCubo.Text = "Cubo";
             tsmCubo.Click += tsmCubo_Click;
             // 
             // tsmTriangulo
             // 
             tsmTriangulo.Name = "tsmTriangulo";
-            tsmTriangulo.Size = new Size(180, 24);
+            tsmTriangulo.Size = new Size(134, 24);
             tsmTriangulo.Text = "Triangulo";
             tsmTriangulo.Click += tsmTriangulo_Click;
             // 
             // tsmCilindro
             // 
             tsmCilindro.Name = "tsmCilindro";
-            tsmCilindro.Size = new Size(180, 24);
+            tsmCilindro.Size = new Size(134, 24);
             tsmCilindro.Text = "Cilindro";
             tsmCilindro.Click += tsmCilindro_Click;
             // 
             // tsmCono
             // 
             tsmCono.Name = "tsmCono";
-            tsmCono.Size = new Size(180, 24);
+            tsmCono.Size = new Size(134, 24);
             tsmCono.Text = "Cono";
             tsmCono.Click += tsmCono_Click;
             // 
             // tsmPlano
             // 
             tsmPlano.Name = "tsmPlano";
-            tsmPlano.Size = new Size(180, 24);
+            tsmPlano.Size = new Size(134, 24);
             tsmPlano.Text = "Plano";
             tsmPlano.Click += tsmPlano_Click;
             // 
             // tsmCirculo
             // 
             tsmCirculo.Name = "tsmCirculo";
-            tsmCirculo.Size = new Size(180, 24);
+            tsmCirculo.Size = new Size(134, 24);
             tsmCirculo.Text = "Circulo";
             tsmCirculo.Click += tsmCirculo_Click;
             // 
@@ -294,7 +302,7 @@
             // 
             dObjetosToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { tsmiCuadrado, rectanguloToolStripMenuItem, circuloToolStripMenuItem, trianguloToolStripMenuItem, diamanteToolStripMenuItem, pentagonoToolStripMenuItem, hexagonoToolStripMenuItem, estrellaToolStripMenuItem, flechaToolStripMenuItem, lineaToolStripMenuItem });
             dObjetosToolStripMenuItem.Name = "dObjetosToolStripMenuItem";
-            dObjetosToolStripMenuItem.Size = new Size(180, 24);
+            dObjetosToolStripMenuItem.Size = new Size(148, 24);
             dObjetosToolStripMenuItem.Text = "2D Objetos";
             // 
             // tsmiCuadrado
@@ -357,6 +365,17 @@
             lineaToolStripMenuItem.Name = "lineaToolStripMenuItem";
             lineaToolStripMenuItem.Size = new Size(146, 24);
             lineaToolStripMenuItem.Text = "Linea";
+            // 
+            // toolStripSeparator4
+            // 
+            toolStripSeparator4.Name = "toolStripSeparator4";
+            toolStripSeparator4.Size = new Size(145, 6);
+            // 
+            // toolStripMenuItem1
+            // 
+            toolStripMenuItem1.Name = "toolStripMenuItem1";
+            toolStripMenuItem1.Size = new Size(148, 24);
+            toolStripMenuItem1.Text = "UI";
             // 
             // componentesToolStripMenuItem
             // 
@@ -582,17 +601,6 @@
             pnlContenedor.Size = new Size(1201, 666);
             pnlContenedor.TabIndex = 4;
             // 
-            // toolStripSeparator4
-            // 
-            toolStripSeparator4.Name = "toolStripSeparator4";
-            toolStripSeparator4.Size = new Size(177, 6);
-            // 
-            // toolStripMenuItem1
-            // 
-            toolStripMenuItem1.Name = "toolStripMenuItem1";
-            toolStripMenuItem1.Size = new Size(180, 24);
-            toolStripMenuItem1.Text = "UI";
-            // 
             // frmBimpEngine
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -690,5 +698,6 @@
         private ToolStripMenuItem tsmCirculo;
         private ToolStripSeparator toolStripSeparator4;
         private ToolStripMenuItem toolStripMenuItem1;
+        private ToolStripMenuItem tsmiPreferencias;
     }
 }

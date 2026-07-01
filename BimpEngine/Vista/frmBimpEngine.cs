@@ -3,6 +3,7 @@ using BimpEngine.Controls.Escena;
 using BimpEngine.Controls.Herencia;
 using BimpEngine.Controls.Inspector;
 using BimpEngine.Controls.Inspector.Componentes.Blueprint;
+using BimpEngine.Controls.Preferencias;
 using BimpEngine.Controls.Proyecto;
 using BimpEngine.Engine.Core;
 using BimpEngine.Engine.Editor;
@@ -41,8 +42,8 @@ namespace BimpEngine.Vista
             InitializeComponent();
             InitializeUser();
             InicializarControler();
-            //InicializarMenuArchivo();
             ActualizarTitulo();
+            RefrescarInterfazDelMotor();
         }
 
         #region Cuenta del usuario
@@ -256,7 +257,7 @@ namespace BimpEngine.Vista
             layoutManager.SetLayout(layout, editorViews);
         }
 
-        
+
 
         #region Project System
 
@@ -693,6 +694,47 @@ namespace BimpEngine.Vista
             sceneView.SetSelection(circulo, sceneView.GetScene().Objetos.Count - 1);
             inspector.ShowObject(circulo);
         }
+        #endregion
+
+        #region Editar
+
+        private void RefrescarInterfazDelMotor()
+        {
+            // 1. Aplicar el idioma seleccionado a los menús principales
+            if (BimpEngine.Engine.Core.EngineSettings.Current.Idioma == "es-ES")
+            {
+                archivoToolStripMenuItem.Text = "&Archivo";
+                editarToolStripMenuItem.Text = "&Editar";
+                tsmiPreferencias.Text = "&Preferencias";
+                // ... añade aquí el resto de tus controles en español
+            }
+            else if (BimpEngine.Engine.Core.EngineSettings.Current.Idioma == "en-US")
+            {
+                archivoToolStripMenuItem.Text = "&File";
+                editarToolStripMenuItem.Text = "&Edit";
+                tsmiPreferencias.Text = "&Preferences";
+                // ... añade aquí el resto de tus controles en inglés
+            }
+
+            // 2. Aplicar cambios de apariencia si implementas temas
+            if (BimpEngine.Engine.Core.EngineSettings.Current.Tema == "Dark")
+            {
+                this.BackColor = Color.FromArgb(22, 22, 25);
+                this.ForeColor = Color.White;
+            }
+
+            // 3. Forzar a toda la ventana y sus hijos a redibujarse
+            this.Invalidate(true);
+        }
+        private void tsmiPreferencias_Click(object sender, EventArgs e)
+        {
+            using var frm = new frmPreferences();
+            if (frm.ShowDialog() == DialogResult.OK)
+            {
+                RefrescarInterfazDelMotor();
+            }
+        }
+
         #endregion
     }
 }

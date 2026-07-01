@@ -33,7 +33,7 @@
             panel2 = new Panel();
             panel4 = new Panel();
             pictureBox2 = new PictureBox();
-            tbBuscarHerencia = new TextBox();
+            tbBuscarError = new TextBox();
             pictureBox1 = new PictureBox();
             panel3 = new Panel();
             lvConsola = new ListView();
@@ -72,7 +72,7 @@
             // 
             panel4.BackColor = Color.FromArgb(40, 40, 40);
             panel4.Controls.Add(pictureBox2);
-            panel4.Controls.Add(tbBuscarHerencia);
+            panel4.Controls.Add(tbBuscarError);
             panel4.Dock = DockStyle.Fill;
             panel4.Location = new Point(0, 0);
             panel4.Name = "panel4";
@@ -89,17 +89,18 @@
             pictureBox2.TabIndex = 5;
             pictureBox2.TabStop = false;
             // 
-            // tbBuscarHerencia
+            // tbBuscarError
             // 
-            tbBuscarHerencia.BackColor = Color.FromArgb(48, 48, 48);
-            tbBuscarHerencia.BorderStyle = BorderStyle.None;
-            tbBuscarHerencia.Font = new Font("Segoe UI", 12F);
-            tbBuscarHerencia.ForeColor = Color.White;
-            tbBuscarHerencia.Location = new Point(37, 5);
-            tbBuscarHerencia.Multiline = true;
-            tbBuscarHerencia.Name = "tbBuscarHerencia";
-            tbBuscarHerencia.Size = new Size(590, 21);
-            tbBuscarHerencia.TabIndex = 4;
+            tbBuscarError.BackColor = Color.FromArgb(48, 48, 48);
+            tbBuscarError.BorderStyle = BorderStyle.None;
+            tbBuscarError.Font = new Font("Segoe UI", 12F);
+            tbBuscarError.ForeColor = Color.White;
+            tbBuscarError.Location = new Point(37, 5);
+            tbBuscarError.Multiline = true;
+            tbBuscarError.Name = "tbBuscarError";
+            tbBuscarError.Size = new Size(590, 21);
+            tbBuscarError.TabIndex = 4;
+            tbBuscarError.TextChanged += tbBuscarError_TextChanged;
             // 
             // pictureBox1
             // 
@@ -187,7 +188,7 @@
         private Panel panel3;
         private Panel panel4;
         private PictureBox pictureBox2;
-        private TextBox tbBuscarHerencia;
+        private TextBox tbBuscarError;
         private ListView lvConsola;
         private ColumnHeader columnHeader1;
         private ColumnHeader columnHeader2;
