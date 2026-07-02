@@ -77,6 +77,7 @@ namespace BimpEngine.Controls.Inspector
             {
                 "Mueblería" => new FurnitureControl(),
                 "Script (Blueprint)" => new BlueprintControl(),
+                "Colisionador" => new BoxColliderControl(),
                 _ => null
             };
 
@@ -89,6 +90,7 @@ namespace BimpEngine.Controls.Inspector
             {
                 if (!_componentesPorObjeto.ContainsKey(_objetoActual.Id))
                     _componentesPorObjeto[_objetoActual.Id] = new List<UserControl>();
+
                 _componentesPorObjeto[_objetoActual.Id].Add(control);
             }
 
@@ -117,8 +119,12 @@ namespace BimpEngine.Controls.Inspector
             if (control is FurnitureControl fc)
                 fc.OnChildCreated += (hijo, padre) => OnChildCreated?.Invoke(hijo, padre);
 
+            if (control is BoxColliderControl bc)
+                bc.OnObjectModified += (obj) => OnObjectModified?.Invoke(obj);
+
             int w = flpContenedor.ClientSize.Width - 6;
             control.Width = w;
+
             flpContenedor.Controls.Add(control);
             flpContenedor.Controls.SetChildIndex(btnAddComponent, flpContenedor.Controls.Count - 1);
         }

@@ -1,3 +1,4 @@
+using BimpEngine.Engine.Core;
 using BimpEngine.Engine.Project;
 using BimpEngine.Vista;
 
@@ -8,22 +9,21 @@ namespace BimpEngine
         [STAThread]
         static void Main()
         {
-            ApplicationConfiguration.Initialize();
+            EngineSettings.Load();
 
-            BimpEngine.Engine.Core.EngineSettings.Load();
+            ApplicationConfiguration.Initialize();
 
             string? projectFolder = null;
             using (var launcher = new frmLauncher())
             {
                 if (launcher.ShowDialog() != System.Windows.Forms.DialogResult.OK)
-                    return; // user closed launcher without selecting a project
+                    return; 
 
                 projectFolder = launcher.SelectedProjectFolder;
             }
 
             if (projectFolder == null) return;
 
-            // 2. Open the selected project
             try
             {
                 ProjectManager.OpenProject(projectFolder);
@@ -37,13 +37,13 @@ namespace BimpEngine
                 return;
             }
 
-            // 3. Open the editor and load the project's main scene
             var editor = new frmBimpEngine();
             editor.CargarProyecto();
 
             editor.FormClosing += (s, e) =>
             {
-                // FormClosing already handled inside frmBimpEngine (unsaved changes prompt)
+                Application.Exit();
+                Application.ExitThread();
             };
             editor.FormClosed += (s, e) =>
             {

@@ -115,7 +115,9 @@
             glControl.Resized += glControl_Resized;
             glControl.DragDrop += glControl_DragDrop;
             glControl.DragEnter += glControl_DragEnter;
+            glControl.Paint += glControl_Paint;
             glControl.KeyDown += glControl_KeyDown;
+            glControl.KeyUp += glControl_KeyUp;
             glControl.MouseDown += glControl_MouseDown;
             glControl.MouseMove += glControl_MouseMove;
             glControl.MouseUp += glControl_MouseUp;

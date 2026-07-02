@@ -1,4 +1,6 @@
-﻿using BimpEngine.Engine.World;
+﻿using BimpEngine.Engine.Editor;
+using BimpEngine.Engine.Entities;
+using BimpEngine.Engine.World;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace BimpEngine.Controls.Herencia
@@ -17,9 +19,14 @@ namespace BimpEngine.Controls.Herencia
         private ContextMenuStrip contextMenu;
         private Objetos _objetoContextMenu;
 
+        private TreeNode _editorCameraNode;
+        private EditorCamera _editorCamera;
+
         public HerenciaControl()
         {
             InitializeComponent();
+
+            ConfigurarImageList();
 
             ListHerencia.AfterSelect += (s, e) =>
             {
@@ -101,10 +108,18 @@ namespace BimpEngine.Controls.Herencia
 
         public void AddObject(Objetos obj, Objetos parent = null, bool includeChildren = false)
         {
-            var node = new TreeNode(obj.Name) { Tag = obj };
+            int iconIndex = obj switch
+            {
+                CameraObject => 1,
+                _ => 0
+            };
 
-            if (obj.Molde?.EsInstanciaDeMolde == true)
-                node.ForeColor = Color.FromArgb(110, 170, 255);
+            var node = new TreeNode(obj.Name)
+            {
+                Tag = obj,
+                ImageIndex = iconIndex,
+                SelectedImageIndex = iconIndex
+            };
 
             if (parent != null)
             {
@@ -322,5 +337,61 @@ namespace BimpEngine.Controls.Herencia
             ListHerencia.SelectedNode = node;
         }
 
+        private Bitmap DibujarIcono(Color color, string texto)
+        {
+            var bmp = new Bitmap(16, 16);
+            using var g = Graphics.FromImage(bmp);
+            g.Clear(Color.Transparent);
+            g.FillEllipse(new SolidBrush(color), 2, 2, 12, 12);
+            return bmp;
+        }
+
+        private void ConfigurarImageList()
+        {
+            var il = new ImageList { ImageSize = new Size(16, 16) };
+
+            // 0 = objeto genérico (cubo gris)
+            il.Images.Add(DibujarIcono(Color.FromArgb(160, 160, 160), "□"));
+            // 1 = cámara (amarillo)
+            il.Images.Add(DibujarIcono(Color.FromArgb(255, 220, 60), "📷"));
+            // 2 = luz (naranja)
+            il.Images.Add(DibujarIcono(Color.FromArgb(255, 160, 40), "☀"));
+            // 3 = editor camera (azul claro)
+            il.Images.Add(DibujarIcono(Color.FromArgb(100, 200, 255), "🎥"));
+
+            ListHerencia.ImageList = il;
+        }
+
+        public void SetEditorCamera(EditorCamera camera)
+        {
+            _editorCamera = camera;
+
+            _editorCameraNode = new TreeNode(FormatEditorCameraLabel())
+            {
+                ImageIndex = 3,
+                SelectedImageIndex = 3,
+                ForeColor = Color.FromArgb(100, 200, 255),
+                Tag = null // no es un Objetos
+            };
+
+            ListHerencia.Nodes.Insert(0, _editorCameraNode);
+
+        }
+
+        public void RefreshEditorCamera()
+        {
+            if (_editorCameraNode == null || _editorCamera == null) return;
+            _editorCameraNode.Text = FormatEditorCameraLabel();
+        }
+
+        private string FormatEditorCameraLabel() =>
+           _editorCamera == null
+               ? "EditorCamera"
+               : $"EditorCamera   " +
+                 $"X:{_editorCamera.EyeX:F1}  " +
+                 $"Y:{_editorCamera.EyeY:F1}  " +
+                 $"Z:{_editorCamera.EyeZ:F1}  " +
+                 $"Yaw:{_editorCamera.Yaw:F0}°  " +
+                 $"Pitch:{_editorCamera.Pitch:F0}°";
     }
 }

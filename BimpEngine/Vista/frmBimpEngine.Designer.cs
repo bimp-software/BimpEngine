@@ -59,7 +59,7 @@
             tsmCirculo = new ToolStripMenuItem();
             dObjetosToolStripMenuItem = new ToolStripMenuItem();
             tsmiCuadrado = new ToolStripMenuItem();
-            rectanguloToolStripMenuItem = new ToolStripMenuItem();
+            tsmiRectagulo = new ToolStripMenuItem();
             circuloToolStripMenuItem = new ToolStripMenuItem();
             trianguloToolStripMenuItem = new ToolStripMenuItem();
             diamanteToolStripMenuItem = new ToolStripMenuItem();
@@ -70,10 +70,22 @@
             lineaToolStripMenuItem = new ToolStripMenuItem();
             toolStripSeparator4 = new ToolStripSeparator();
             toolStripMenuItem1 = new ToolStripMenuItem();
+            tsmiCanvas = new ToolStripMenuItem();
+            tsmiButton = new ToolStripMenuItem();
+            tsmiText = new ToolStripMenuItem();
+            tsmiImage = new ToolStripMenuItem();
             componentesToolStripMenuItem = new ToolStripMenuItem();
             ventanaToolStripMenuItem = new ToolStripMenuItem();
             extensionesToolStripMenuItem = new ToolStripMenuItem();
             ayudaToolStripMenuItem = new ToolStripMenuItem();
+            verAyudaToolStripMenuItem = new ToolStripMenuItem();
+            introducciónToolStripMenuItem = new ToolStripMenuItem();
+            sugerenciasYTrucosToolStripMenuItem = new ToolStripMenuItem();
+            novedadesToolStripMenuItem = new ToolStripMenuItem();
+            toolStripSeparator5 = new ToolStripSeparator();
+            enviarComentarioToolStripMenuItem = new ToolStripMenuItem();
+            toolStripSeparator6 = new ToolStripSeparator();
+            soporteTecnicoToolStripMenuItem = new ToolStripMenuItem();
             panel1 = new Panel();
             flpComenzar = new FlowLayoutPanel();
             pictureBox3 = new PictureBox();
@@ -91,10 +103,8 @@
             pictureBox1 = new PictureBox();
             pictureBox2 = new PictureBox();
             pnlContenedor = new Panel();
-            tsmiCanvas = new ToolStripMenuItem();
-            tsmiButton = new ToolStripMenuItem();
-            tsmiText = new ToolStripMenuItem();
-            tsmiImage = new ToolStripMenuItem();
+            toolStripSeparator7 = new ToolStripSeparator();
+            toolStripMenuItem2 = new ToolStripMenuItem();
             msMenuPrincipal.SuspendLayout();
             panel1.SuspendLayout();
             flpComenzar.SuspendLayout();
@@ -204,7 +214,7 @@
             // 
             // editarToolStripMenuItem
             // 
-            editarToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { tsmiConfiguracionProyecto, tsmiPreferencias });
+            editarToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { toolStripMenuItem2, toolStripSeparator7, tsmiConfiguracionProyecto, tsmiPreferencias });
             editarToolStripMenuItem.ForeColor = Color.FromArgb(250, 250, 250);
             editarToolStripMenuItem.Name = "editarToolStripMenuItem";
             editarToolStripMenuItem.Size = new Size(56, 23);
@@ -304,7 +314,7 @@
             // 
             // dObjetosToolStripMenuItem
             // 
-            dObjetosToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { tsmiCuadrado, rectanguloToolStripMenuItem, circuloToolStripMenuItem, trianguloToolStripMenuItem, diamanteToolStripMenuItem, pentagonoToolStripMenuItem, hexagonoToolStripMenuItem, estrellaToolStripMenuItem, flechaToolStripMenuItem, lineaToolStripMenuItem });
+            dObjetosToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { tsmiCuadrado, tsmiRectagulo, circuloToolStripMenuItem, trianguloToolStripMenuItem, diamanteToolStripMenuItem, pentagonoToolStripMenuItem, hexagonoToolStripMenuItem, estrellaToolStripMenuItem, flechaToolStripMenuItem, lineaToolStripMenuItem });
             dObjetosToolStripMenuItem.Name = "dObjetosToolStripMenuItem";
             dObjetosToolStripMenuItem.Size = new Size(180, 24);
             dObjetosToolStripMenuItem.Text = "2D Objetos";
@@ -312,62 +322,63 @@
             // tsmiCuadrado
             // 
             tsmiCuadrado.Name = "tsmiCuadrado";
-            tsmiCuadrado.Size = new Size(146, 24);
+            tsmiCuadrado.Size = new Size(180, 24);
             tsmiCuadrado.Text = "Cuadrado";
             tsmiCuadrado.Click += tsmiCuadrado_Click;
             // 
-            // rectanguloToolStripMenuItem
+            // tsmiRectagulo
             // 
-            rectanguloToolStripMenuItem.Name = "rectanguloToolStripMenuItem";
-            rectanguloToolStripMenuItem.Size = new Size(146, 24);
-            rectanguloToolStripMenuItem.Text = "Rectangulo";
+            tsmiRectagulo.Name = "tsmiRectagulo";
+            tsmiRectagulo.Size = new Size(180, 24);
+            tsmiRectagulo.Text = "Rectangulo";
+            tsmiRectagulo.Click += tsmiRectagulo_Click;
             // 
             // circuloToolStripMenuItem
             // 
             circuloToolStripMenuItem.Name = "circuloToolStripMenuItem";
-            circuloToolStripMenuItem.Size = new Size(146, 24);
+            circuloToolStripMenuItem.Size = new Size(180, 24);
             circuloToolStripMenuItem.Text = "Circulo";
             // 
             // trianguloToolStripMenuItem
             // 
             trianguloToolStripMenuItem.Name = "trianguloToolStripMenuItem";
-            trianguloToolStripMenuItem.Size = new Size(146, 24);
+            trianguloToolStripMenuItem.Size = new Size(180, 24);
             trianguloToolStripMenuItem.Text = "Triangulo";
             // 
             // diamanteToolStripMenuItem
             // 
             diamanteToolStripMenuItem.Name = "diamanteToolStripMenuItem";
-            diamanteToolStripMenuItem.Size = new Size(146, 24);
+            diamanteToolStripMenuItem.Size = new Size(180, 24);
             diamanteToolStripMenuItem.Text = "Diamante";
             // 
             // pentagonoToolStripMenuItem
             // 
             pentagonoToolStripMenuItem.Name = "pentagonoToolStripMenuItem";
-            pentagonoToolStripMenuItem.Size = new Size(146, 24);
+            pentagonoToolStripMenuItem.Size = new Size(180, 24);
             pentagonoToolStripMenuItem.Text = "Pentagono";
             // 
             // hexagonoToolStripMenuItem
             // 
             hexagonoToolStripMenuItem.Name = "hexagonoToolStripMenuItem";
-            hexagonoToolStripMenuItem.Size = new Size(146, 24);
+            hexagonoToolStripMenuItem.Size = new Size(180, 24);
             hexagonoToolStripMenuItem.Text = "Hexagono";
             // 
             // estrellaToolStripMenuItem
             // 
             estrellaToolStripMenuItem.Name = "estrellaToolStripMenuItem";
-            estrellaToolStripMenuItem.Size = new Size(146, 24);
+            estrellaToolStripMenuItem.Size = new Size(180, 24);
             estrellaToolStripMenuItem.Text = "Estrella";
             // 
             // flechaToolStripMenuItem
             // 
             flechaToolStripMenuItem.Name = "flechaToolStripMenuItem";
-            flechaToolStripMenuItem.Size = new Size(146, 24);
+            flechaToolStripMenuItem.Size = new Size(180, 24);
             flechaToolStripMenuItem.Text = "Flecha";
             // 
             // lineaToolStripMenuItem
             // 
             lineaToolStripMenuItem.Name = "lineaToolStripMenuItem";
-            lineaToolStripMenuItem.Size = new Size(146, 24);
+            lineaToolStripMenuItem.Size = new Size(180, 24);
             lineaToolStripMenuItem.Text = "Linea";
             // 
             // toolStripSeparator4
@@ -381,6 +392,31 @@
             toolStripMenuItem1.Name = "toolStripMenuItem1";
             toolStripMenuItem1.Size = new Size(180, 24);
             toolStripMenuItem1.Text = "UI";
+            // 
+            // tsmiCanvas
+            // 
+            tsmiCanvas.Name = "tsmiCanvas";
+            tsmiCanvas.Size = new Size(124, 24);
+            tsmiCanvas.Text = "Canvas";
+            tsmiCanvas.Click += tsmiCanvas_Click;
+            // 
+            // tsmiButton
+            // 
+            tsmiButton.Name = "tsmiButton";
+            tsmiButton.Size = new Size(124, 24);
+            tsmiButton.Text = "Boton";
+            // 
+            // tsmiText
+            // 
+            tsmiText.Name = "tsmiText";
+            tsmiText.Size = new Size(124, 24);
+            tsmiText.Text = "Texto";
+            // 
+            // tsmiImage
+            // 
+            tsmiImage.Name = "tsmiImage";
+            tsmiImage.Size = new Size(124, 24);
+            tsmiImage.Text = "Imagen";
             // 
             // componentesToolStripMenuItem
             // 
@@ -405,10 +441,63 @@
             // 
             // ayudaToolStripMenuItem
             // 
+            ayudaToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { verAyudaToolStripMenuItem, introducciónToolStripMenuItem, sugerenciasYTrucosToolStripMenuItem, novedadesToolStripMenuItem, toolStripSeparator5, enviarComentarioToolStripMenuItem, toolStripSeparator6, soporteTecnicoToolStripMenuItem });
             ayudaToolStripMenuItem.ForeColor = Color.FromArgb(250, 250, 250);
             ayudaToolStripMenuItem.Name = "ayudaToolStripMenuItem";
             ayudaToolStripMenuItem.Size = new Size(60, 23);
             ayudaToolStripMenuItem.Text = "Ayuda";
+            // 
+            // verAyudaToolStripMenuItem
+            // 
+            verAyudaToolStripMenuItem.Image = (Image)resources.GetObject("verAyudaToolStripMenuItem.Image");
+            verAyudaToolStripMenuItem.ImageAlign = ContentAlignment.MiddleLeft;
+            verAyudaToolStripMenuItem.Name = "verAyudaToolStripMenuItem";
+            verAyudaToolStripMenuItem.ShortcutKeyDisplayString = "";
+            verAyudaToolStripMenuItem.ShortcutKeys = Keys.Control | Keys.F1;
+            verAyudaToolStripMenuItem.Size = new Size(203, 24);
+            verAyudaToolStripMenuItem.Tag = "Ver Ayuda";
+            verAyudaToolStripMenuItem.Text = "Ver Ayuda";
+            verAyudaToolStripMenuItem.ToolTipText = "Documentación";
+            // 
+            // introducciónToolStripMenuItem
+            // 
+            introducciónToolStripMenuItem.Name = "introducciónToolStripMenuItem";
+            introducciónToolStripMenuItem.Size = new Size(203, 24);
+            introducciónToolStripMenuItem.Text = "Introducción";
+            // 
+            // sugerenciasYTrucosToolStripMenuItem
+            // 
+            sugerenciasYTrucosToolStripMenuItem.Name = "sugerenciasYTrucosToolStripMenuItem";
+            sugerenciasYTrucosToolStripMenuItem.Size = new Size(203, 24);
+            sugerenciasYTrucosToolStripMenuItem.Text = "Sugerencias y trucos";
+            // 
+            // novedadesToolStripMenuItem
+            // 
+            novedadesToolStripMenuItem.Name = "novedadesToolStripMenuItem";
+            novedadesToolStripMenuItem.Size = new Size(203, 24);
+            novedadesToolStripMenuItem.Text = "Novedades";
+            // 
+            // toolStripSeparator5
+            // 
+            toolStripSeparator5.Name = "toolStripSeparator5";
+            toolStripSeparator5.Size = new Size(200, 6);
+            // 
+            // enviarComentarioToolStripMenuItem
+            // 
+            enviarComentarioToolStripMenuItem.Name = "enviarComentarioToolStripMenuItem";
+            enviarComentarioToolStripMenuItem.Size = new Size(203, 24);
+            enviarComentarioToolStripMenuItem.Text = "Enviar Comentario";
+            // 
+            // toolStripSeparator6
+            // 
+            toolStripSeparator6.Name = "toolStripSeparator6";
+            toolStripSeparator6.Size = new Size(200, 6);
+            // 
+            // soporteTecnicoToolStripMenuItem
+            // 
+            soporteTecnicoToolStripMenuItem.Name = "soporteTecnicoToolStripMenuItem";
+            soporteTecnicoToolStripMenuItem.Size = new Size(203, 24);
+            soporteTecnicoToolStripMenuItem.Text = "Soporte Tecnico";
             // 
             // panel1
             // 
@@ -606,30 +695,16 @@
             pnlContenedor.Size = new Size(1201, 666);
             pnlContenedor.TabIndex = 4;
             // 
-            // tsmiCanvas
+            // toolStripSeparator7
             // 
-            tsmiCanvas.Name = "tsmiCanvas";
-            tsmiCanvas.Size = new Size(180, 24);
-            tsmiCanvas.Text = "Canvas";
-            tsmiCanvas.Click += tsmiCanvas_Click;
+            toolStripSeparator7.Name = "toolStripSeparator7";
+            toolStripSeparator7.Size = new Size(240, 6);
             // 
-            // tsmiButton
+            // toolStripMenuItem2
             // 
-            tsmiButton.Name = "tsmiButton";
-            tsmiButton.Size = new Size(180, 24);
-            tsmiButton.Text = "Boton";
-            // 
-            // tsmiText
-            // 
-            tsmiText.Name = "tsmiText";
-            tsmiText.Size = new Size(180, 24);
-            tsmiText.Text = "Texto";
-            // 
-            // tsmiImage
-            // 
-            tsmiImage.Name = "tsmiImage";
-            tsmiImage.Size = new Size(180, 24);
-            tsmiImage.Text = "Imagen";
+            toolStripMenuItem2.Name = "toolStripMenuItem2";
+            toolStripMenuItem2.Size = new Size(243, 24);
+            toolStripMenuItem2.Text = "Ir a";
             // 
             // frmBimpEngine
             // 
@@ -713,7 +788,7 @@
         private ToolStripSeparator toolStripSeparator3;
         private ToolStripMenuItem dObjetosToolStripMenuItem;
         private ToolStripMenuItem tsmiCuadrado;
-        private ToolStripMenuItem rectanguloToolStripMenuItem;
+        private ToolStripMenuItem tsmiRectagulo;
         private ToolStripMenuItem circuloToolStripMenuItem;
         private ToolStripMenuItem trianguloToolStripMenuItem;
         private ToolStripMenuItem diamanteToolStripMenuItem;
@@ -733,5 +808,15 @@
         private ToolStripMenuItem tsmiButton;
         private ToolStripMenuItem tsmiText;
         private ToolStripMenuItem tsmiImage;
+        private ToolStripMenuItem verAyudaToolStripMenuItem;
+        private ToolStripMenuItem introducciónToolStripMenuItem;
+        private ToolStripMenuItem sugerenciasYTrucosToolStripMenuItem;
+        private ToolStripMenuItem novedadesToolStripMenuItem;
+        private ToolStripSeparator toolStripSeparator5;
+        private ToolStripMenuItem enviarComentarioToolStripMenuItem;
+        private ToolStripSeparator toolStripSeparator6;
+        private ToolStripMenuItem soporteTecnicoToolStripMenuItem;
+        private ToolStripMenuItem toolStripMenuItem2;
+        private ToolStripSeparator toolStripSeparator7;
     }
 }

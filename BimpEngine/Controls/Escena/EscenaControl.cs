@@ -1,10 +1,13 @@
 ﻿using BimpEngine.Engine.Core;
 using BimpEngine.Engine.Editor;
 using BimpEngine.Engine.Editor.Gizmos;
+using BimpEngine.Engine.Input;
+using BimpEngine.Engine.Physics;
 using BimpEngine.Engine.Project;
 using BimpEngine.Engine.Project.Enum;
 using BimpEngine.Engine.Rendering;
 using BimpEngine.Engine.World;
+using OpenTK.Graphics.OpenGL;
 using SharpGL;
 
 namespace BimpEngine.Controls.Escena
@@ -22,9 +25,14 @@ namespace BimpEngine.Controls.Escena
 
         private Scene _scene = new Scene();
         private Renderer _renderer = new Renderer();
+        private CollisionDrawer _collisionDrawer = new CollisionDrawer();
+        private CollisionRenderer _collisionRenderer = new CollisionRenderer();
 
         private SelectionManager _selection = new SelectionManager();
         private GizmoManager _gizmo = new GizmoManager();
+        private OrientationGizmo _orientationGizmo = new OrientationGizmo();
+
+        public EditorCamera GetEditorCamera() => _camera3D;
         #endregion
 
         #region Input State
@@ -49,6 +57,7 @@ namespace BimpEngine.Controls.Escena
         public event Action<Objetos> OnObjectSelected;
         public event Action<Objetos> OnObjectChanged;
         public event Action<string> OnModelDropped;
+        public event Action<EditorCamera> OnCameraChanged;
         #endregion
 
         #region Constructor
@@ -130,7 +139,8 @@ namespace BimpEngine.Controls.Escena
             {
                 Draw2D(gl);
             }
-
+            _orientationGizmo.Draw(glControl, _camera3D);
+            OnCameraChanged?.Invoke(_camera3D);
             gl.Flush();
         }
 
@@ -142,6 +152,8 @@ namespace BimpEngine.Controls.Escena
 
             _grid3D.Draw(glControl, _camera3D.TargetX, _camera3D.TargetZ);
             _renderer.DrawScene(glControl, _scene);
+            _collisionDrawer.Draw(glControl, _selection.SelectedObject);
+            _collisionRenderer.Draw(glControl, _selection.SelectedObject);
             _gizmo.Draw(glControl, _selection.SelectedObject);
         }
 
@@ -151,6 +163,8 @@ namespace BimpEngine.Controls.Escena
 
             _grid2D.Draw(gl, _camera2D, glControl.Width, glControl.Height);
             _renderer.DrawScene(glControl, _scene);
+            _collisionDrawer.Draw(glControl, _selection.SelectedObject);
+            _collisionRenderer.Draw(glControl, _selection.SelectedObject);
             _gizmo.Draw(glControl, _selection.SelectedObject);
         }
 
@@ -172,7 +186,7 @@ namespace BimpEngine.Controls.Escena
             {
                 _camera2D.Apply(gl, w, h);
             }
-            gl.Viewport(0,0,glControl.Width, glControl.Height);
+            gl.Viewport(0, 0, glControl.Width, glControl.Height);
         }
 
         #endregion
@@ -392,12 +406,16 @@ namespace BimpEngine.Controls.Escena
 
         private void glControl_KeyDown(object sender, KeyEventArgs e)
         {
-            switch (e.KeyCode)
-            {
-                case Keys.W: SetGizmoMode(GizmoMode.Move); break;
-                case Keys.E: SetGizmoMode(GizmoMode.Rotate); break;
-                case Keys.R: SetGizmoMode(GizmoMode.Scale); break;
-            }
+            InputManager.KeyDown(e.KeyCode);
+
+            if (e.KeyCode.ToString() == EngineSettings.Current.GetKey("editor_move"))
+                SetGizmoMode(GizmoMode.Move);
+
+            if (e.KeyCode.ToString() == EngineSettings.Current.GetKey("editor_rotate"))
+                SetGizmoMode(GizmoMode.Rotate);
+
+            if (e.KeyCode.ToString() == EngineSettings.Current.GetKey("editor_scale"))
+                SetGizmoMode(GizmoMode.Scale);
         }
 
         private void ActualizarCursor()
@@ -442,6 +460,16 @@ namespace BimpEngine.Controls.Escena
         {
             if (e.Data?.GetData(DataFormats.StringFormat) is string path)
                 OnModelDropped?.Invoke(path);
+        }
+
+        private void glControl_Paint(object sender, PaintEventArgs e)
+        {
+            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+        }
+
+        private void glControl_KeyUp(object sender, KeyEventArgs e)
+        {
+            InputManager.KeyUp(e.KeyCode);
         }
     }
 }

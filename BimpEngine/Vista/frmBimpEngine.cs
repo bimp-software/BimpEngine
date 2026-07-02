@@ -101,6 +101,13 @@ namespace BimpEngine.Vista
             inspector = new InspectorControl();
             console = new ConsolaControl();
             proyecto = new ProyectoControl();
+            
+            hierarchy.SetEditorCamera(sceneView.GetEditorCamera());
+
+            sceneView.OnCameraChanged += (cam) =>
+            {
+                hierarchy.RefreshEditorCamera();
+            };
 
             sceneView.OnObjectSelected += (obj) =>
             {
@@ -121,6 +128,7 @@ namespace BimpEngine.Vista
                 sceneView.SetSelection(obj, index);
                 inspector.ShowObject(obj);
             };
+
 
             inspector.OnCreatePrimitive += (tipo) =>
             {
@@ -538,15 +546,7 @@ namespace BimpEngine.Vista
             GuardarEscenaComo();
         }
 
-        #region 2D
-        private void tsmiCuadrado_Click(object sender, EventArgs e)
-        {
-            var obj = PrimitiveFactory2D.Create(PrimitiveType2D.Square);
-            sceneView.GetScene().Add(obj);
-            hierarchy.AddObject(obj);
-        }
-
-        #endregion
+       
 
         private void CrearMoldeDesdeObjeto(Objetos objeto)
         {
@@ -739,5 +739,24 @@ namespace BimpEngine.Vista
         {
             MessageBox.Show("El Canvas es un objeto especial que sirve como contenedor para elementos de UI. Puedes crear un Canvas desde el menú 'Crear > UI > Canvas'.", "Información", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
+
+        #region 2D
+        private void tsmiCuadrado_Click(object sender, EventArgs e)
+        {
+            var obj = PrimitiveFactory2D.Create(PrimitiveType2D.Square);
+            sceneView.GetScene().Add(obj);
+            hierarchy.AddObject(obj);
+        }
+
+
+        private void tsmiRectagulo_Click(object sender, EventArgs e)
+        {
+            var obj = PrimitiveFactory2D.Create(PrimitiveType2D.Rectangle);
+            sceneView.GetScene().Add(obj);
+            hierarchy.AddObject(obj);
+        }
+
+        #endregion
+
     }
 }

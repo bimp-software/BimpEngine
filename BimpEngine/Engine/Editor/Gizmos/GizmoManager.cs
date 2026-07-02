@@ -1,6 +1,5 @@
 ﻿using BimpEngine.Engine.World;
 using SharpGL;
-using System;
 
 namespace BimpEngine.Engine.Editor.Gizmos
 {
@@ -10,9 +9,16 @@ namespace BimpEngine.Engine.Editor.Gizmos
         public GizmoMode Mode { get; set; } = GizmoMode.Move;
         public GizmoAxis HoverAxis { get; private set; } = GizmoAxis.None;
         public GizmoAxis ActiveAxis { get; private set; } = GizmoAxis.None;
-
-        private const double Size = 3.0;
         private const double HoverDistance = 14.0;
+
+        private double GetGizmoSize(Objetos obj)
+        {
+            double maxScale = System.Math.Max(
+                obj.Transform.Scale.X, 
+                System.Math.Max(obj.Transform.Scale.Y, obj.Transform.Scale.Z));
+
+            return System.Math.Max(3.0, maxScale + 1.5);
+        }
 
         public void Draw(OpenGLControl glControl, Objetos selectedObject)
         {
@@ -39,18 +45,19 @@ namespace BimpEngine.Engine.Editor.Gizmos
         {
             var gl = glControl.OpenGL;
             var pos = obj.Transform.Position;
+            var Size = GetGizmoSize(obj);
 
             gl.PushMatrix();
             gl.Translate(pos.X, pos.Y, pos.Z);
 
-            DrawArrow(gl, GizmoAxis.X);
-            DrawArrow(gl, GizmoAxis.Y);
-            if (!Is2D) DrawArrow(gl, GizmoAxis.Z);
+            DrawArrow(gl, GizmoAxis.X, Size);
+            DrawArrow(gl, GizmoAxis.Y, Size);
+            if (!Is2D) DrawArrow(gl, GizmoAxis.Z, Size);
 
             gl.PopMatrix();
         }
 
-        private void DrawArrow(OpenGL gl, GizmoAxis axis)
+        private void DrawArrow(OpenGL gl, GizmoAxis axis, double Size)
         {
             SetAxisColor(gl, axis);
             gl.LineWidth(4);
@@ -62,10 +69,10 @@ namespace BimpEngine.Engine.Editor.Gizmos
             if (axis == GizmoAxis.Z) gl.Vertex(0, 0, Size);
             gl.End();
 
-            DrawArrowCone(gl, axis);
+            DrawArrowCone(gl, axis, Size);
         }
 
-        private void DrawArrowCone(OpenGL gl, GizmoAxis axis)
+        private void DrawArrowCone(OpenGL gl, GizmoAxis axis, double Size)
         {
             gl.PushMatrix();
 
@@ -115,15 +122,16 @@ namespace BimpEngine.Engine.Editor.Gizmos
         {
             var gl = glControl.OpenGL;
             var pos = obj.Transform.Position;
+            double Size = GetGizmoSize(obj);
 
             gl.PushMatrix();
             gl.Translate(pos.X, pos.Y, pos.Z);
             gl.LineWidth(4);
 
             gl.Begin(OpenGL.GL_LINES);
-            DrawAxis(gl, GizmoAxis.X, 1, 0, 0);
-            DrawAxis(gl, GizmoAxis.Y, 0, 1, 0);
-            if (!Is2D) DrawAxis(gl, GizmoAxis.Z, 0, 0, 1);
+            DrawAxis(gl, GizmoAxis.X, 1, 0, 0, Size);
+            DrawAxis(gl, GizmoAxis.Y, 0, 1, 0, Size);
+            if (!Is2D) DrawAxis(gl, GizmoAxis.Z, 0, 0, 1, Size);
             gl.End();
 
             DrawScaleBox(gl, Size, 0, 0, GizmoAxis.X);
@@ -133,7 +141,7 @@ namespace BimpEngine.Engine.Editor.Gizmos
             gl.PopMatrix();
         }
 
-        private void DrawAxis(OpenGL gl, GizmoAxis axis, double x, double y, double z)
+        private void DrawAxis(OpenGL gl, GizmoAxis axis, double x, double y, double z, double Size)
         {
             SetAxisColor(gl, axis);
             gl.Vertex(0, 0, 0);
@@ -211,6 +219,7 @@ namespace BimpEngine.Engine.Editor.Gizmos
         private void UpdateHoverLinear(OpenGLControl glControl, Objetos selectedObject, Point mouse)
         {
             var pos = selectedObject.Transform.Position;
+            double Size = GetGizmoSize(selectedObject);
 
             PointF center = WorldToScreen(glControl, pos.X, pos.Y, pos.Z);
             PointF xEnd = WorldToScreen(glControl, pos.X + Size, pos.Y, pos.Z);
@@ -281,14 +290,22 @@ namespace BimpEngine.Engine.Editor.Gizmos
             }
         }
 
-        public void BeginDrag() => ActiveAxis = HoverAxis;
+        public void BeginDrag()
+        {
+            if (Is2D && Mode == GizmoMode.Rotate)
+            {
+                ActiveAxis = GizmoAxis.Z;
+                return;
+            }
+            ActiveAxis = HoverAxis;
+        }
         public void EndDrag() => ActiveAxis = GizmoAxis.None;
 
         public void Drag(Objetos selectedObject, int deltaX, int deltaY)
         {
             if (selectedObject == null || ActiveAxis == GizmoAxis.None) return;
 
-            if (Is2D && ActiveAxis == GizmoAxis.Z) return;
+            if (Is2D && ActiveAxis == GizmoAxis.Z && Mode != GizmoMode.Rotate) return;
 
             if (Mode == GizmoMode.Move) DragMove(selectedObject, deltaX, deltaY);
             if (Mode == GizmoMode.Rotate) DragRotate(selectedObject, deltaX, deltaY);
@@ -306,6 +323,12 @@ namespace BimpEngine.Engine.Editor.Gizmos
         private void DragRotate(Objetos selectedObject, int deltaX, int deltaY)
         {
             double rotateSpeed = 0.5;
+
+            if (Is2D)
+            {
+                selectedObject.Transform.Rotation.Z += deltaX * rotateSpeed;
+                return;
+            }
 
             double delta = System.Math.Abs(deltaX) > System.Math.Abs(deltaY) ? deltaX : deltaY;
 

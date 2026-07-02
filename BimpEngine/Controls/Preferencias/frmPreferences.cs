@@ -1,4 +1,7 @@
 ﻿using BimpEngine.Engine.Core;
+using System;
+using System.Drawing;
+using System.Windows.Forms;
 
 namespace BimpEngine.Controls.Preferencias
 {
@@ -8,6 +11,7 @@ namespace BimpEngine.Controls.Preferencias
         private Panel _panelContenido;
         private Button _btnGuardar;
         private Button _btnCancelar;
+        private FlowLayoutPanel _flpAtajos;
 
         public frmPreferences()
         {
@@ -21,12 +25,11 @@ namespace BimpEngine.Controls.Preferencias
             ForeColor = Color.White;
 
             InicializarComponentes();
-            CargarCategoriaGeneral(); 
+            CargarCategoriaGeneral();
         }
 
         private void InicializarComponentes()
         {
-            // ── Panel Lateral (Categorías) ────────────────────────────────
             _panelLateral = new Panel
             {
                 Width = 180,
@@ -44,13 +47,12 @@ namespace BimpEngine.Controls.Preferencias
                 ForeColor = Color.FromArgb(140, 140, 150),
                 TextAlign = ContentAlignment.MiddleCenter
             };
+
             _panelLateral.Controls.Add(lblTitulo);
 
-            // Botones de categorías
             AgregarBotonCategoria("⚙️ General", CargarCategoriaGeneral);
             AgregarBotonCategoria("⌨️ Atajos de Teclado", CargarCategoriaAtajos);
 
-            // ── Panel Inferior (Botones de Acción) ─────────────────────────
             var panelInferior = new Panel
             {
                 Height = 50,
@@ -62,29 +64,42 @@ namespace BimpEngine.Controls.Preferencias
             {
                 Text = "Guardar",
                 Size = new Size(90, 30),
+                Anchor = AnchorStyles.Right | AnchorStyles.Top,
                 Location = new Point(540, 10),
                 BackColor = Color.FromArgb(45, 110, 45),
+                ForeColor = Color.White,
                 FlatStyle = FlatStyle.Flat,
                 Cursor = Cursors.Hand
             };
             _btnGuardar.FlatAppearance.BorderSize = 0;
-            _btnGuardar.Click += (s, e) => { EngineSettings.Current.Save(); DialogResult = DialogResult.OK; Close(); };
+            _btnGuardar.Click += (s, e) =>
+            {
+                EngineSettings.Current.Save();
+                DialogResult = DialogResult.OK;
+                Close();
+            };
 
             _btnCancelar = new Button
             {
                 Text = "Cancelar",
                 Size = new Size(90, 30),
+                Anchor = AnchorStyles.Right | AnchorStyles.Top,
                 Location = new Point(640, 10),
                 BackColor = Color.FromArgb(50, 50, 55),
+                ForeColor = Color.White,
                 FlatStyle = FlatStyle.Flat,
                 Cursor = Cursors.Hand
             };
             _btnCancelar.FlatAppearance.BorderSize = 0;
-            _btnCancelar.Click += (s, e) => { EngineSettings.Load(); Close(); }; // Recarga el JSON original para descartar cambios
+            _btnCancelar.Click += (s, e) =>
+            {
+                EngineSettings.Load();
+                Close();
+            };
 
-            panelInferior.Controls.AddRange(new Control[] { _btnGuardar, _btnCancelar });
+            panelInferior.Controls.Add(_btnGuardar);
+            panelInferior.Controls.Add(_btnCancelar);
 
-            // ── Panel de Contenido Dinámico ───────────────────────────────
             _panelContenido = new Panel
             {
                 Dock = DockStyle.Fill,
@@ -108,16 +123,18 @@ namespace BimpEngine.Controls.Preferencias
                 TextAlign = ContentAlignment.MiddleLeft,
                 Font = new Font("Segoe UI", 9f),
                 ForeColor = Color.FromArgb(200, 200, 205),
+                BackColor = Color.FromArgb(28, 28, 32),
                 Cursor = Cursors.Hand
             };
+
             btn.FlatAppearance.BorderSize = 0;
             btn.FlatAppearance.MouseOverBackColor = Color.FromArgb(40, 40, 45);
             btn.Click += (s, e) => metodoClick();
+
             _panelLateral.Controls.Add(btn);
-            btn.BringToFront(); // Mantiene el orden de inserción de arriba a abajo
+            btn.BringToFront();
         }
 
-        // ── CATEGORÍA: GENERAL ─────────────────────────────────────────────
         private void CargarCategoriaGeneral()
         {
             _panelContenido.Controls.Clear();
@@ -126,12 +143,19 @@ namespace BimpEngine.Controls.Preferencias
             {
                 Text = "Configuración General del Editor",
                 Font = new Font("Segoe UI", 12f, FontStyle.Bold),
+                ForeColor = Color.White,
                 AutoSize = true,
                 Location = new Point(20, 20)
             };
 
-            // Dropdown Idioma
-            var lblIdioma = new Label { Text = "Idioma del Motor:", Location = new Point(24, 70), AutoSize = true };
+            var lblIdioma = new Label
+            {
+                Text = "Idioma del Motor:",
+                ForeColor = Color.Gainsboro,
+                Location = new Point(24, 70),
+                AutoSize = true
+            };
+
             var cmbIdioma = new ComboBox
             {
                 Location = new Point(160, 66),
@@ -141,25 +165,34 @@ namespace BimpEngine.Controls.Preferencias
                 ForeColor = Color.White,
                 FlatStyle = FlatStyle.Flat
             };
+
             cmbIdioma.Items.AddRange(new string[] { "es-ES", "en-US" });
             cmbIdioma.SelectedItem = EngineSettings.Current.Idioma;
-            cmbIdioma.SelectedIndexChanged += (s, e) => EngineSettings.Current.Idioma = cmbIdioma.SelectedItem.ToString();
+            cmbIdioma.SelectedIndexChanged += (s, e) =>
+            {
+                if (cmbIdioma.SelectedItem != null)
+                    EngineSettings.Current.Idioma = cmbIdioma.SelectedItem.ToString();
+            };
 
-            // Checkbox Cargar Último Proyecto
             var chkCargar = new CheckBox
             {
                 Text = "Cargar automáticamente el último proyecto al iniciar",
+                ForeColor = Color.Gainsboro,
                 Location = new Point(24, 110),
                 AutoSize = true,
                 Checked = EngineSettings.Current.CargarUltimoProyectoAlIniciar,
                 FlatStyle = FlatStyle.Flat
             };
-            chkCargar.CheckedChanged += (s, e) => EngineSettings.Current.CargarUltimoProyectoAlIniciar = chkCargar.Checked;
 
-            _panelContenido.Controls.AddRange(new Control[] { lblSeccion, lblIdioma, cmbIdioma, chkCargar });
+            chkCargar.CheckedChanged += (s, e) =>
+                EngineSettings.Current.CargarUltimoProyectoAlIniciar = chkCargar.Checked;
+
+            _panelContenido.Controls.Add(lblSeccion);
+            _panelContenido.Controls.Add(lblIdioma);
+            _panelContenido.Controls.Add(cmbIdioma);
+            _panelContenido.Controls.Add(chkCargar);
         }
 
-        // ── CATEGORÍA: ATAJOS DE TECLADO ──────────────────────────────────
         private void CargarCategoriaAtajos()
         {
             _panelContenido.Controls.Clear();
@@ -167,67 +200,97 @@ namespace BimpEngine.Controls.Preferencias
             var lblSeccion = new Label
             {
                 Text = "Atajos de Teclado del Editor",
+                ForeColor = Color.White,
                 Font = new Font("Segoe UI", 12f, FontStyle.Bold),
-                AutoSize = true,
-                Location = new Point(20, 20)
+                Dock = DockStyle.Top,
+                Height = 45
             };
 
-            // Contenedor scrolleable para la lista de teclas
-            var listaControles = new FlowLayoutPanel
+            _flpAtajos = new FlowLayoutPanel
             {
-                Location = new Point(20, 60),
-                Size = new Size(500, 320),
-                AutoScroll = true,
+                Dock = DockStyle.Fill,
                 FlowDirection = FlowDirection.TopDown,
-                WrapContents = false
+                WrapContents = false,
+                AutoScroll = true,
+                BackColor = Color.FromArgb(22, 22, 25),
+                Padding = new Padding(0, 10, 0, 0)
             };
 
-            // Generamos dinámicamente una fila por cada atajo guardado en EngineSettings
+            _panelContenido.Controls.Add(_flpAtajos);
+            _panelContenido.Controls.Add(lblSeccion);
+
+            bool encontroAtajos = false;
+
             foreach (var binding in EngineSettings.Current.InputBindings)
             {
-                // Solo listamos los que pertenecen al Editor (para no mezclar con cosas de gameplay por ahora)
-                if (binding.Categoria != "Editor") continue;
+                if (binding.Categoria != "Editor")
+                    continue;
 
-                var fila = new Panel { Size = new Size(460, 40), Padding = new Padding(5) };
-
-                var lblAccion = new Label
+                encontroAtajos = true;
+                AgregarFilaAtajo(binding.Descripcion, binding.Tecla, nuevaTecla =>
                 {
-                    Text = binding.Descripcion,
-                    Location = new Point(5, 10),
-                    Width = 200,
-                    ForeColor = Color.Gainsboro
-                };
-
-                var btnTecla = new Button
-                {
-                    Text = binding.Tecla,
-                    Location = new Point(220, 5),
-                    Size = new Size(120, 25),
-                    BackColor = Color.FromArgb(45, 45, 52),
-                    FlatStyle = FlatStyle.Flat,
-                    Cursor = Cursors.Hand
-                };
-
-                // Evento para cambiar la tecla capturando el teclado directamente
-                btnTecla.Click += (s, e) =>
-                {
-                    btnTecla.Text = "Presione una tecla...";
-                    btnTecla.Focus();
-                };
-
-                btnTecla.KeyDown += (s, ke) =>
-                {
-                    // Guardamos la tecla física presionada
-                    binding.Tecla = ke.KeyCode.ToString();
-                    btnTecla.Text = binding.Tecla;
-                    ke.SuppressKeyPress = true; // Evita el sonido del sistema
-                };
-
-                fila.Controls.AddRange(new Control[] { lblAccion, btnTecla });
-                listaControles.Controls.Add(fila);
+                    binding.Tecla = nuevaTecla;
+                });
             }
 
-            _panelContenido.Controls.AddRange(new Control[] { lblSeccion, listaControles });
+            if (!encontroAtajos)
+            {
+                AgregarFilaAtajo("Mover objeto", "W", tecla => { });
+                AgregarFilaAtajo("Rotar objeto", "E", tecla => { });
+                AgregarFilaAtajo("Escalar objeto", "R", tecla => { });
+            }
+        }
+
+        private void AgregarFilaAtajo(string accion, string tecla, Action<string> alCambiar)
+        {
+            var row = new Panel
+            {
+                Width = 500,
+                Height = 42,
+                BackColor = Color.FromArgb(34, 34, 38),
+                Margin = new Padding(0, 0, 0, 8)
+            };
+
+            var lbl = new Label
+            {
+                Text = accion,
+                ForeColor = Color.White,
+                Location = new Point(12, 12),
+                Width = 280,
+                AutoSize = false
+            };
+
+            var btnTecla = new Button
+            {
+                Text = tecla,
+                Location = new Point(340, 7),
+                Size = new Size(120, 28),
+                BackColor = Color.FromArgb(45, 45, 52),
+                ForeColor = Color.White,
+                FlatStyle = FlatStyle.Flat,
+                Cursor = Cursors.Hand,
+                TabStop = true
+            };
+
+            btnTecla.FlatAppearance.BorderSize = 0;
+
+            btnTecla.Click += (s, e) =>
+            {
+                btnTecla.Text = "Presiona tecla...";
+                btnTecla.Focus();
+            };
+
+            btnTecla.KeyDown += (s, e) =>
+            {
+                string nuevaTecla = e.KeyCode.ToString();
+                btnTecla.Text = nuevaTecla;
+                alCambiar?.Invoke(nuevaTecla);
+                e.SuppressKeyPress = true;
+            };
+
+            row.Controls.Add(lbl);
+            row.Controls.Add(btnTecla);
+            _flpAtajos.Controls.Add(row);
         }
     }
 }

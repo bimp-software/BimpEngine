@@ -121,6 +121,19 @@
     <value>32, 22</value>
   </metadata>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  <data name="verAyudaToolStripMenuItem.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO
+        wAAADsABataJCQAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAFySURBVDhPfVK9
+        TgJBEF4LNfoEtrb+PICdLYmEmyPX2FiYIDeLhZW1D6BCJBob38AX8K+wNrEAKtzZIyaaGCvUSgQzcKx3
+        e4uTfMntfDPfzZ8QlhUqahWQaoC66SN9MvgbUFWh/LRixxvL7bZn/VCfAtIPIA0moAeS6kHQmskkA6o7
+        R4IbUt+mRADVWSYI9SWEessP1aYv6RyQvpO8j3QyTI57Tpcd6n3mvIpe98IoJ8RgioWsn/SKsr0sRgNL
+        EV+l0sM0yGjN+KTaYBFA6iZjvVAdC5CqZQn0uQJAeozf7/lKtBigXhhyqVjd5ApSqhZeucx86WUekK4c
+        fPdfAa+sisHe8xwg3dvcn0C2BYPCTmfJQ9q2/Qk0eIVVB2ECAOnN4Y+hjwSf5/DCMiT1eXC8RgfH6HGF
+        o0OSVHcE8PoOQOqLjH+EmrlEPktAunEEOeEhXfOtGIGxCJ/nhHbGYK6WSU4a752HEw/wI0YDJB2anhP2
+        CwV9FOWyOXJqAAAAAElFTkSuQmCC
+</value>
+  </data>
   <data name="pictureBox3.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAAgAAAAIACAYAAAD0eNT6AAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO

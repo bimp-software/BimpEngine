@@ -16,7 +16,7 @@ namespace BimpEngine.Engine.Core
 
         public string LayoutDefecto { get; set; } = "Default";
 
-        public List<KeyBinding> InputBindings { get; set; } = new List<KeyBinding>();
+        public List<InputBinding> InputBindings { get; set; } = new();
 
         public bool MostrarGrilla { get; set; } = true;
         public float TamañoCeldaGrilla { get; set; } = 1.0f;
@@ -62,7 +62,7 @@ namespace BimpEngine.Engine.Core
                 {
                     // Si no existe, creamos el archivo con los valores por defecto
                     Current = new EngineSettings();
-                    Current.EstablecerControlesPorDefecto();
+                    Current.CargarAtajosPorDefecto();
                     Current.Save();
                 }
             }
@@ -78,7 +78,6 @@ namespace BimpEngine.Engine.Core
         {
             try
             {
-                // Asegurar que la ruta en AppData/Roaming/BimpSoftware/BimpEngine exista
                 if (!Directory.Exists(FolderPath))
                 {
                     Directory.CreateDirectory(FolderPath);
@@ -94,31 +93,47 @@ namespace BimpEngine.Engine.Core
             }
         }
 
-        public void EstablecerControlesPorDefecto()
+        public void CargarAtajosPorDefecto()
         {
-            InputBindings = new List<KeyBinding>
+            InputBindings = new List<InputBinding>
             {
-                new KeyBinding { Accion = "Mover_Adante", Descripcion = "Mover hacia adelante", Categoria = "Juego", Tecla = Keys.W.ToString() },
-                new KeyBinding { Accion = "Mover_Atras", Descripcion = "Mover hacia atrás", Categoria = "Juego", Tecla = Keys.S.ToString() },
-                new KeyBinding { Accion = "Mover_Izquierda", Descripcion = "Mover a la izquierda", Categoria = "Juego", Tecla = Keys.A.ToString() },
-                new KeyBinding { Accion = "Mover_Derecha", Descripcion = "Mover a la derecha", Categoria = "Juego", Tecla = Keys.D.ToString() },
-                new KeyBinding { Accion = "Juego_Saltar", Descripcion = "Saltar", Categoria = "Juego", Tecla = Keys.Space.ToString() },
-                new KeyBinding { Accion = "Juego_Disparar", Descripcion = "Acción / Disparar", Categoria = "Juego", Tecla = Keys.F.ToString() },
+                // Editor
+                new InputBinding("editor_move", "Editor", "Mover objeto", "W"),
+                new InputBinding("editor_rotate", "Editor", "Rotar objeto", "E"),
+                new InputBinding("editor_scale", "Editor", "Escalar objeto", "R"),
+                new InputBinding("editor_delete", "Editor", "Eliminar objeto", "Delete"),
+                new InputBinding("editor_duplicate", "Editor", "Duplicar objeto", "D"),
+                new InputBinding("editor_play", "Editor", "Probar juego", "F5"),
+                new InputBinding("editor_stop", "Editor", "Detener juego", "Escape"),
 
-                // ATAJOS DEL EDITOR
-                new KeyBinding { Accion = "Editor_Guardar", Descripcion = "Guardar cambios", Categoria = "Editor", Tecla = Keys.S.ToString() }, // Se evalúa junto con Ctrl
-                new KeyBinding { Accion = "Editor_Compilar", Descripcion = "Compilar Scripts", Categoria = "Editor", Tecla = Keys.F5.ToString() }
+                // Jugador
+                new InputBinding("player_forward", "Jugador", "Avanzar", "W"),
+                new InputBinding("player_back", "Jugador", "Retroceder", "S"),
+                new InputBinding("player_left", "Jugador", "Mover izquierda", "A"),
+                new InputBinding("player_right", "Jugador", "Mover derecha", "D"),
+                new InputBinding("player_jump", "Jugador", "Saltar", "Space"),
+                new InputBinding("player_run", "Jugador", "Correr", "ShiftKey"),
+                new InputBinding("player_interact", "Jugador", "Interactuar", "E"),
+
+                // Flechas para estudiantes
+                new InputBinding("player_arrow_up", "Jugador", "Avanzar con flecha", "Up"),
+                new InputBinding("player_arrow_down", "Jugador", "Retroceder con flecha", "Down"),
+                new InputBinding("player_arrow_left", "Jugador", "Izquierda con flecha", "Left"),
+                new InputBinding("player_arrow_right", "Jugador", "Derecha con flecha", "Right")
             };
         }
 
-        public bool ValidarTecla(string nombreAccion, Keys teclaPresionada)
+        public string GetKey(string id)
         {
-            var binding = InputBindings.Find(b => b.Accion == nombreAccion);
-            if (binding != null && Enum.TryParse<Keys>(binding.Tecla, out var key))
-            {
-                return key == teclaPresionada;
-            }
-            return false;
+            return InputBindings.FirstOrDefault(x => x.Id == id)?.Tecla ?? "";
+        }
+
+        public void SetKey(string id, string tecla)
+        {
+            var binding = InputBindings.FirstOrDefault(x => x.Id == id);
+
+            if (binding != null)
+                binding.Tecla = tecla;
         }
     }
 }

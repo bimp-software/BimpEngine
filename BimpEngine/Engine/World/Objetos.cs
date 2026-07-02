@@ -1,6 +1,7 @@
 ﻿using BimpEngine.Engine.Core;
 using BimpEngine.Engine.Entities;
 using BimpEngine.Engine.Math;
+using BimpEngine.Engine.Physics;
 using BimpEngine.Engine.Rendering;
 using BimpEngine.Engine.Scripting;
 using SharpGL;
@@ -22,6 +23,8 @@ namespace BimpEngine.Engine.World
         public Objetos Parent { get; set; } = null;
         public List<Objetos> Children { get; } = new List<Objetos>();
         public MoldeLink? Molde { get; set; } = null;
+        public BoxCollider BoxCollider { get; set; }
+        public List<Object> Components { get; } = new();
 
         public NodeGraph Script { get; set; } = new NodeGraph();
 
@@ -87,6 +90,16 @@ namespace BimpEngine.Engine.World
         {
             child.Parent = null;
             Children.Remove(child);
+        }
+
+        public T GetComponent<T>() where T : class
+        {
+            return Components.OfType<T>().FirstOrDefault();
+        }
+
+        public void AddComponent(object component)
+        {
+            Components.Add(component);
         }
     }
 }
