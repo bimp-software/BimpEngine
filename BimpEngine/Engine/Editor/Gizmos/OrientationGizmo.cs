@@ -69,7 +69,7 @@ namespace BimpEngine.Engine.Editor.Gizmos
             gl.MatrixMode(OpenGL.GL_MODELVIEW);
 
             // ── Dibujar texto con GDI (OpenGL fijo no tiene texto) ────
-            DibujarTextoGDI(glControl, camera, ox, oy);
+            DibujarTextoOpenGL(gl, camera, ox, oy, H);
         }
 
         // ── Proyección de un eje 3D al plano 2D del gizmo ────────────────────
@@ -116,19 +116,8 @@ namespace BimpEngine.Engine.Editor.Gizmos
         }
 
         // ── Texto con GDI: etiquetas X Y Z + posición cámara ─────────────────
-        private void DibujarTextoGDI(OpenGLControl glControl, EditorCamera camera,
-                                      int ox, int oy)
+        private void DibujarTextoOpenGL(OpenGL gl, EditorCamera camera, int ox, int oy, int screenH)
         {
-            if (glControl.InvokeRequired) return;
-
-            using var gdi = glControl.CreateGraphics();
-
-            // Fuente para etiquetas de ejes
-            using var fuenteEje = new Font("Segoe UI", 7.5f, FontStyle.Bold);
-            // Fuente para info de cámara
-            using var fuenteInfo = new Font("Consolas", 7.5f);
-
-            // ── Etiquetas X, Y, Z sobre el gizmo ─────────────────────
             int cx = ox + Center;
             int cy = oy + Center;
 
@@ -136,77 +125,69 @@ namespace BimpEngine.Engine.Editor.Gizmos
             ProjectAxis(camera, 0, 1, 0, out double yPx, out double yPy);
             ProjectAxis(camera, 0, 0, 1, out double zPx, out double zPy);
 
-            DibujarLabel(gdi, fuenteEje, "X",
-                cx + (int)xPx - 4, cy + (int)xPy - 6,
-                Color.FromArgb(255, 80, 80));
+            // Etiquetas X Y Z
+            DrawText(gl, cx + (int)xPx - 4, cy + (int)xPy - 6, screenH,
+                1.0f, 0.25f, 0.25f, "X");
 
-            DibujarLabel(gdi, fuenteEje, "Y",
-                cx + (int)yPx - 4, cy + (int)yPy - 6,
-                Color.FromArgb(80, 220, 80));
+            DrawText(gl, cx + (int)yPx - 4, cy + (int)yPy - 6, screenH,
+                0.25f, 1.0f, 0.25f, "Y");
 
-            DibujarLabel(gdi, fuenteEje, "Z",
-                cx + (int)zPx - 4, cy + (int)zPy - 6,
-                Color.FromArgb(80, 160, 255));
+            DrawText(gl, cx + (int)zPx - 4, cy + (int)zPy - 6, screenH,
+                0.25f, 0.65f, 1.0f, "Z");
 
-            // ── "Persp" debajo del círculo ────────────────────────────
             int yBase = oy + GizmoSize + 4;
 
-            DibujarLabel(gdi, fuenteEje, "Persp",
-                ox + Center - 14, yBase,
-                Color.FromArgb(180, 180, 180));
+            DrawText(gl, ox + Center - 14, yBase, screenH,
+                0.8f, 0.8f, 0.8f, "Persp");
 
-            // ── Info de posición y ángulos de la cámara ───────────────
             yBase += 16;
-
-            var bgBrush = new SolidBrush(Color.FromArgb(140, 18, 18, 22));
-            var txtBrush = new SolidBrush(Color.FromArgb(210, 210, 210));
-            var dimBrush = new SolidBrush(Color.FromArgb(120, 120, 130));
 
             string[] lineas =
             {
-                $"Pos  X {camera.EyeX:+0.0;-0.0;0.0}",
-                $"     Y {camera.EyeY:+0.0;-0.0;0.0}",
-                $"     Z {camera.EyeZ:+0.0;-0.0;0.0}",
-                $"Yaw    {camera.Yaw:F1}°",
-                $"Pitch  {camera.Pitch:F1}°",
-                $"Dist   {camera.Distance:F1}",
+                $"Pos X {camera.EyeX:+0.0;-0.0;0.0}",
+                $"Pos Y {camera.EyeY:+0.0;-0.0;0.0}",
+                $"Pos Z {camera.EyeZ:+0.0;-0.0;0.0}",
+                $"Rot H {camera.Yaw:F1}°",
+                $"Rot V {camera.Pitch:F1}°",
+                $"Dist {camera.Distance:F1}",
             };
 
-            // Fondo del bloque de texto
             int panelW = 100;
-            int panelH = lineas.Length * 13 + 6;
+            int panelH = lineas.Length * 13 + 8;
             int panelX = ox + Center - panelW / 2;
 
-            gdi.FillRectangle(bgBrush,
-                new Rectangle(panelX - 2, yBase - 2, panelW + 4, panelH));
+            gl.Enable(OpenGL.GL_BLEND);
+            gl.BlendFunc(OpenGL.GL_SRC_ALPHA, OpenGL.GL_ONE_MINUS_SRC_ALPHA);
+
+            gl.Color(0.07, 0.07, 0.09, 0.65);
+            gl.Begin(OpenGL.GL_QUADS);
+            gl.Vertex(panelX - 2, yBase - 2, 0);
+            gl.Vertex(panelX + panelW + 2, yBase - 2, 0);
+            gl.Vertex(panelX + panelW + 2, yBase + panelH, 0);
+            gl.Vertex(panelX - 2, yBase + panelH, 0);
+            gl.End();
 
             for (int i = 0; i < lineas.Length; i++)
             {
-                // Primera palabra en gris tenue, resto en blanco
-                var partes = lineas[i].Split(' ', 2);
-                gdi.DrawString(partes[0],
-                    fuenteInfo, dimBrush,
-                    panelX, yBase + i * 13);
-
-                if (partes.Length > 1)
-                    gdi.DrawString(partes[1],
-                        fuenteInfo, txtBrush,
-                        panelX + 32, yBase + i * 13);
+                DrawText(gl, panelX + 4, yBase + 2 + i * 13, screenH,
+                    0.85f, 0.85f, 0.85f, lineas[i]);
             }
 
-            bgBrush.Dispose();
-            txtBrush.Dispose();
-            dimBrush.Dispose();
+            gl.Disable(OpenGL.GL_BLEND);
         }
 
-        private void DibujarLabel(Graphics g, Font font, string texto,
-                                   int x, int y, Color color)
+        private void DrawText(OpenGL gl, int x, int y, int screenH,
+                      float r, float g, float b, string text)
         {
-            // Sombra para legibilidad
-            using var sombra = new SolidBrush(Color.FromArgb(160, 0, 0, 0));
-            g.DrawString(texto, font, sombra, x + 1, y + 1);
-            using var brush = new SolidBrush(color);
-            g.DrawString(texto, font, brush, x, y);
+            gl.DrawText(
+                x,
+                screenH - y,
+                r,
+                g,
+                b,
+                "Consolas",
+                9.0f,
+                text);
         }
 
         // ── Círculo relleno en OpenGL ─────────────────────────────────────────
