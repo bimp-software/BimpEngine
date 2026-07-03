@@ -1,4 +1,5 @@
 ﻿using BimpEngine.Engine.Editor;
+using BimpEngine.Engine.Editor.Menus;
 using BimpEngine.Engine.Entities;
 using BimpEngine.Engine.World;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
@@ -21,6 +22,8 @@ namespace BimpEngine.Controls.Herencia
 
         private TreeNode _editorCameraNode;
         private EditorCamera _editorCamera;
+
+        private readonly HerenciaContextMenu _menu = new();
 
         public HerenciaControl()
         {
@@ -49,55 +52,36 @@ namespace BimpEngine.Controls.Herencia
                 }
             };
 
-            // Context menu
-            contextMenu = new ContextMenuStrip();
-            contextMenu.BackColor = Color.FromArgb(45, 45, 45);
-            contextMenu.ForeColor = Color.White;
-            contextMenu.RenderMode = ToolStripRenderMode.System;
+            _menu.Duplicar += DuplicarObjeto;
+            _menu.Renombrar += RenombrarObjeto;
+            _menu.Eliminar += EliminarObjeto;
+            _menu.Subir += MoverArriba;
+            _menu.Bajar += MoverAbajo;
 
-            var itemDuplicar = new ToolStripMenuItem("Duplicar");
-            var itemRenombrar = new ToolStripMenuItem("Renombrar");
-            var itemEliminar = new ToolStripMenuItem("Eliminar");
-            var itemSeparador = new ToolStripSeparator();
-            var itemSubir = new ToolStripMenuItem("Subir");
-            var itemBajar = new ToolStripMenuItem("Bajar");
-
-            // ── Nuevos ítems de Molde ────────────────────────────────────────────
-            var itemCrearMolde = new ToolStripMenuItem("Crear Molde…");
-            var itemAplicarMolde = new ToolStripMenuItem("Aplicar cambios al Molde");
-
-            itemDuplicar.Click += (s, e) => DuplicarObjeto();
-            itemRenombrar.Click += (s, e) => RenombrarObjeto();
-            itemEliminar.Click += (s, e) => EliminarObjeto();
-            itemSubir.Click += (s, e) => MoverArriba();
-            itemBajar.Click += (s, e) => MoverAbajo();
-            itemCrearMolde.Click += (s, e) => { if (_objetoContextMenu != null) OnCrearMolde?.Invoke(_objetoContextMenu); };
-            itemAplicarMolde.Click += (s, e) => { if (_objetoContextMenu != null) OnAplicarCambiosAlMolde?.Invoke(_objetoContextMenu); };
-
-            contextMenu.Items.Add(itemDuplicar);
-            contextMenu.Items.Add(itemRenombrar);
-            contextMenu.Items.Add(itemSeparador);
-            contextMenu.Items.Add(itemSubir);
-            contextMenu.Items.Add(itemBajar);
-            contextMenu.Items.Add(new ToolStripSeparator());
-            contextMenu.Items.Add(itemCrearMolde);
-            contextMenu.Items.Add(itemAplicarMolde);
-            contextMenu.Items.Add(new ToolStripSeparator());
-            contextMenu.Items.Add(itemEliminar);
-
-            contextMenu.Opening += (s, e) =>
+            _menu.CrearMolde += () =>
             {
-                itemAplicarMolde.Visible = _objetoContextMenu?.Molde?.EsInstanciaDeMolde == true;
+                if (_objetoContextMenu != null)
+                    OnCrearMolde?.Invoke(_objetoContextMenu);
+            };
+
+            _menu.AplicarMolde += () =>
+            {
+                if (_objetoContextMenu != null)
+                    OnAplicarCambiosAlMolde?.Invoke(_objetoContextMenu);
             };
 
             ListHerencia.NodeMouseClick += (s, e) =>
             {
-                if (e.Button == MouseButtons.Right)
-                {
-                    ListHerencia.SelectedNode = e.Node;
-                    _objetoContextMenu = e.Node?.Tag as Objetos;
-                    contextMenu.Show(ListHerencia, e.Location);
-                }
+                if (e.Button != MouseButtons.Right)
+                    return;
+
+                ListHerencia.SelectedNode = e.Node;
+                _objetoContextMenu = e.Node?.Tag as Objetos;
+
+                _menu.MostrarAplicarMolde(
+                    _objetoContextMenu?.Molde?.EsInstanciaDeMolde == true);
+
+                _menu.Show(ListHerencia, e.Location);
             };
         }
 

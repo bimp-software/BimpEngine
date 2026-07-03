@@ -39,6 +39,8 @@ namespace BimpEngine.Engine.Core
         public bool AutoguardadoHabilitado { get; set; } = true;
         public int IntervaloAutoguardadoMinutos { get; set; } = 5;
 
+        public static event Action? OnSettingsChanged;
+
         private static readonly string FolderPath = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
             "BimpSoftware",
@@ -57,10 +59,15 @@ namespace BimpEngine.Engine.Core
                 {
                     string json = File.ReadAllText(FilePath);
                     Current = JsonSerializer.Deserialize<EngineSettings>(json) ?? new EngineSettings();
+
+                    if (Current.InputBindings == null || Current.InputBindings.Count == 0)
+                    {
+                        Current.CargarAtajosPorDefecto();
+                        Current.Save();
+                    }
                 }
                 else
                 {
-                    // Si no existe, creamos el archivo con los valores por defecto
                     Current = new EngineSettings();
                     Current.CargarAtajosPorDefecto();
                     Current.Save();
@@ -68,8 +75,8 @@ namespace BimpEngine.Engine.Core
             }
             catch
             {
-                // Si algo falla (archivo corrupto, etc.), respaldamos con los valores base
                 Current = new EngineSettings();
+                Current.CargarAtajosPorDefecto();
             }
         }
 
@@ -91,6 +98,7 @@ namespace BimpEngine.Engine.Core
             {
                 MessageBox.Show($"No se pudo guardar la configuración del motor: {ex.Message}");
             }
+            OnSettingsChanged?.Invoke();
         }
 
         public void CargarAtajosPorDefecto()

@@ -98,7 +98,7 @@
             tbBuscarError.Location = new Point(37, 5);
             tbBuscarError.Multiline = true;
             tbBuscarError.Name = "tbBuscarError";
-            tbBuscarError.Size = new Size(590, 21);
+            tbBuscarError.Size = new Size(889, 21);
             tbBuscarError.TabIndex = 4;
             tbBuscarError.TextChanged += tbBuscarError_TextChanged;
             // 

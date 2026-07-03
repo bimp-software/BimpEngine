@@ -1,4 +1,5 @@
-﻿using BimpEngine.Engine.Core;
+﻿using BimpEngine.Controls.Escena;
+using BimpEngine.Engine.Core;
 using System;
 using System.Drawing;
 using System.Windows.Forms;
@@ -53,24 +54,44 @@ namespace BimpEngine.Controls.Preferencias
             AgregarBotonCategoria("⚙️ General", CargarCategoriaGeneral);
             AgregarBotonCategoria("⌨️ Atajos de Teclado", CargarCategoriaAtajos);
 
+            Panel panelDerecho = new Panel
+            {
+                Dock = DockStyle.Fill,
+                BackColor = Color.FromArgb(22, 22, 25)
+            };
+
+            _panelContenido = new Panel
+            {
+                Dock = DockStyle.Fill,
+                BackColor = Color.FromArgb(22, 22, 25),
+                Padding = new Padding(20)
+            };
+
             var panelInferior = new Panel
             {
-                Height = 50,
+                Height = 55,
                 Dock = DockStyle.Bottom,
-                BackColor = Color.FromArgb(28, 28, 32)
+                BackColor = Color.FromArgb(28, 28, 32),
+                Padding = new Padding(10)
+            };
+
+            var panelBotones = new FlowLayoutPanel
+            {
+                Dock = DockStyle.Right,
+                Width = 210,
+                FlowDirection = FlowDirection.LeftToRight
             };
 
             _btnGuardar = new Button
             {
                 Text = "Guardar",
-                Size = new Size(90, 30),
-                Anchor = AnchorStyles.Right | AnchorStyles.Top,
-                Location = new Point(540, 10),
+                Size = new Size(90, 32),
                 BackColor = Color.FromArgb(45, 110, 45),
                 ForeColor = Color.White,
                 FlatStyle = FlatStyle.Flat,
                 Cursor = Cursors.Hand
             };
+
             _btnGuardar.FlatAppearance.BorderSize = 0;
             _btnGuardar.Click += (s, e) =>
             {
@@ -82,14 +103,13 @@ namespace BimpEngine.Controls.Preferencias
             _btnCancelar = new Button
             {
                 Text = "Cancelar",
-                Size = new Size(90, 30),
-                Anchor = AnchorStyles.Right | AnchorStyles.Top,
-                Location = new Point(640, 10),
+                Size = new Size(90, 32),
                 BackColor = Color.FromArgb(50, 50, 55),
                 ForeColor = Color.White,
                 FlatStyle = FlatStyle.Flat,
                 Cursor = Cursors.Hand
             };
+
             _btnCancelar.FlatAppearance.BorderSize = 0;
             _btnCancelar.Click += (s, e) =>
             {
@@ -97,19 +117,16 @@ namespace BimpEngine.Controls.Preferencias
                 Close();
             };
 
-            panelInferior.Controls.Add(_btnGuardar);
-            panelInferior.Controls.Add(_btnCancelar);
+            panelBotones.Controls.Add(_btnGuardar);
+            panelBotones.Controls.Add(_btnCancelar);
 
-            _panelContenido = new Panel
-            {
-                Dock = DockStyle.Fill,
-                BackColor = Color.FromArgb(22, 22, 25),
-                Padding = new Padding(20)
-            };
+            panelInferior.Controls.Add(panelBotones);
 
-            Controls.Add(_panelContenido);
+            panelDerecho.Controls.Add(_panelContenido);
+            panelDerecho.Controls.Add(panelInferior);
+
+            Controls.Add(panelDerecho);
             Controls.Add(_panelLateral);
-            Controls.Add(panelInferior);
         }
 
         private void AgregarBotonCategoria(string texto, Action metodoClick)

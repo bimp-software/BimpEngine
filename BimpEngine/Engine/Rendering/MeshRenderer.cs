@@ -56,7 +56,41 @@ namespace BimpEngine.Engine.Rendering
                 gl.Disable(OpenGL.GL_TEXTURE_2D);
             }
 
-            if (isSelected) DrawSelectionBox(gl, mesh);
+            DrawMeshEdges(gl, mesh, isSelected);
+
+            if (isSelected)
+                DrawSelectionBox(gl, mesh);
+        }
+
+        private void DrawMeshEdges(OpenGL gl, Mesh mesh, bool isSelected)
+        {
+            if (mesh.Edges == null || mesh.Edges.Count == 0)
+                return;
+
+            gl.Disable(OpenGL.GL_TEXTURE_2D);
+            gl.Disable(OpenGL.GL_LIGHTING);
+
+            gl.LineWidth(isSelected ? 1.4f : 1.1f);
+
+            if (isSelected)
+                gl.Color(1.0, 0.75, 0.25); // seleccionado: naranja suave
+            else
+                gl.Color(0.15, 0.15, 0.15); // no seleccionado: líneas oscuras
+
+            gl.Begin(OpenGL.GL_LINES);
+
+            for (int i = 0; i + 1 < mesh.Edges.Count; i += 2)
+            {
+                var a = mesh.Vertices[mesh.Edges[i]];
+                var b = mesh.Vertices[mesh.Edges[i + 1]];
+
+                gl.Vertex(a.vector.X, a.vector.Y, a.vector.Z);
+                gl.Vertex(b.vector.X, b.vector.Y, b.vector.Z);
+            }
+
+            gl.End();
+
+            gl.LineWidth(1.0f);
         }
 
         private void DrawBlueprint(OpenGL gl, Mesh mesh, bool isSelected)
@@ -118,32 +152,81 @@ namespace BimpEngine.Engine.Rendering
                 if (v.vector.X < minX) minX = v.vector.X;
                 if (v.vector.Y < minY) minY = v.vector.Y;
                 if (v.vector.Z < minZ) minZ = v.vector.Z;
+
                 if (v.vector.X > maxX) maxX = v.vector.X;
                 if (v.vector.Y > maxY) maxY = v.vector.Y;
                 if (v.vector.Z > maxZ) maxZ = v.vector.Z;
             }
 
-            double o = 0.02;
+            double o = 0.025;
+
             minX -= o; minY -= o; minZ -= o;
             maxX += o; maxY += o; maxZ += o;
 
-            gl.Color(1.0, 0.5, 0.0);
-            gl.LineWidth(1.5f);
+            gl.Disable(OpenGL.GL_TEXTURE_2D);
+            gl.Disable(OpenGL.GL_LIGHTING);
+
+            gl.LineWidth(2.0f);
+
+            // Eje X - rojo
+            gl.Color(1.0, 0.15, 0.1);
+            gl.Begin(OpenGL.GL_LINES);
+            DrawLine(gl, minX, minY, minZ, maxX, minY, minZ);
+            DrawLine(gl, minX, maxY, minZ, maxX, maxY, minZ);
+            DrawLine(gl, minX, minY, maxZ, maxX, minY, maxZ);
+            DrawLine(gl, minX, maxY, maxZ, maxX, maxY, maxZ);
+            gl.End();
+
+            // Eje Y - verde
+            gl.Color(0.25, 1.0, 0.25);
+            gl.Begin(OpenGL.GL_LINES);
+            DrawLine(gl, minX, minY, minZ, minX, maxY, minZ);
+            DrawLine(gl, maxX, minY, minZ, maxX, maxY, minZ);
+            DrawLine(gl, minX, minY, maxZ, minX, maxY, maxZ);
+            DrawLine(gl, maxX, minY, maxZ, maxX, maxY, maxZ);
+            gl.End();
+
+            // Eje Z - azul
+            gl.Color(0.15, 0.35, 1.0);
+            gl.Begin(OpenGL.GL_LINES);
+            DrawLine(gl, minX, minY, minZ, minX, minY, maxZ);
+            DrawLine(gl, maxX, minY, minZ, maxX, minY, maxZ);
+            DrawLine(gl, minX, maxY, minZ, minX, maxY, maxZ);
+            DrawLine(gl, maxX, maxY, minZ, maxX, maxY, maxZ);
+            gl.End();
+
+            // Contorno exterior naranja tipo Unity
+            gl.LineWidth(3.0f);
+            gl.Color(1.0, 0.55, 0.0);
+
+            gl.Begin(OpenGL.GL_LINE_LOOP);
+            gl.Vertex(minX, minY, minZ);
+            gl.Vertex(maxX, minY, minZ);
+            gl.Vertex(maxX, maxY, minZ);
+            gl.Vertex(minX, maxY, minZ);
+            gl.End();
+
+            gl.Begin(OpenGL.GL_LINE_LOOP);
+            gl.Vertex(minX, minY, maxZ);
+            gl.Vertex(maxX, minY, maxZ);
+            gl.Vertex(maxX, maxY, maxZ);
+            gl.Vertex(minX, maxY, maxZ);
+            gl.End();
 
             gl.Begin(OpenGL.GL_LINES);
-            gl.Vertex(minX, minY, minZ); gl.Vertex(maxX, minY, minZ);
-            gl.Vertex(maxX, minY, minZ); gl.Vertex(maxX, minY, maxZ);
-            gl.Vertex(maxX, minY, maxZ); gl.Vertex(minX, minY, maxZ);
-            gl.Vertex(minX, minY, maxZ); gl.Vertex(minX, minY, minZ);
-            gl.Vertex(minX, maxY, minZ); gl.Vertex(maxX, maxY, minZ);
-            gl.Vertex(maxX, maxY, minZ); gl.Vertex(maxX, maxY, maxZ);
-            gl.Vertex(maxX, maxY, maxZ); gl.Vertex(minX, maxY, maxZ);
-            gl.Vertex(minX, maxY, maxZ); gl.Vertex(minX, maxY, minZ);
-            gl.Vertex(minX, minY, minZ); gl.Vertex(minX, maxY, minZ);
-            gl.Vertex(maxX, minY, minZ); gl.Vertex(maxX, maxY, minZ);
-            gl.Vertex(maxX, minY, maxZ); gl.Vertex(maxX, maxY, maxZ);
-            gl.Vertex(minX, minY, maxZ); gl.Vertex(minX, maxY, maxZ);
+            DrawLine(gl, minX, minY, minZ, minX, minY, maxZ);
+            DrawLine(gl, maxX, minY, minZ, maxX, minY, maxZ);
+            DrawLine(gl, maxX, maxY, minZ, maxX, maxY, maxZ);
+            DrawLine(gl, minX, maxY, minZ, minX, maxY, maxZ);
             gl.End();
+
+            gl.LineWidth(1.0f);
+        }
+
+        private void DrawLine(OpenGL gl,double x1, double y1, double z1,double x2, double y2, double z2)
+        {
+            gl.Vertex(x1, y1, z1);
+            gl.Vertex(x2, y2, z2);
         }
 
         private void DrawImported(OpenGL gl, Mesh mesh, bool IsSelected)

@@ -317,7 +317,7 @@ namespace BimpEngine.Engine.Editor.Gizmos
             double speed = 0.03;
             if (ActiveAxis == GizmoAxis.X) obj.Transform.Position.X += dx * speed;
             if (ActiveAxis == GizmoAxis.Y) obj.Transform.Position.Y -= dy * speed;
-            if (ActiveAxis == GizmoAxis.Z) obj.Transform.Position.Z += dx * speed;
+            if (ActiveAxis == GizmoAxis.Z) obj.Transform.Position.Z -= dx * speed;
         }
 
         private void DragRotate(Objetos selectedObject, int deltaX, int deltaY)

@@ -15,7 +15,9 @@ namespace BimpEngine.Controls.Escena
     public partial class EscenaControl : UserControl
     {
         #region Core Engine
+
         private ProjectMode _mode = ProjectMode.Mode3D;
+        public ProjectMode CurrentMode => _mode;
 
         private EditorCamera _camera3D = new EditorCamera();
         private EditorCamera2D _camera2D = new EditorCamera2D();
@@ -60,11 +62,14 @@ namespace BimpEngine.Controls.Escena
         public event Action<EditorCamera> OnCameraChanged;
         #endregion
 
+
+
         #region Constructor
         public EscenaControl()
         {
             InitializeComponent();
             glControl.MouseWheel += glControl_MouseWheel;
+            EngineSettings.OnSettingsChanged += ActualizarTextosAtajos;
 
             ConstruirToolbarModo();
             ActualizarBotonesModo();
@@ -91,8 +96,6 @@ namespace BimpEngine.Controls.Escena
             AplicarProyeccion();
             glControl.Invalidate();
         }
-
-        public ProjectMode CurrentMode => _mode;
 
         #endregion
 
@@ -359,11 +362,25 @@ namespace BimpEngine.Controls.Escena
 
         #endregion
 
+        public void ActualizarTextosAtajos()
+        {
+            if (_btnMove != null)
+                _btnMove.Text = $"Mover ({EngineSettings.Current.GetKey("editor_move")})";
+
+            if (_btnRotate != null)
+                _btnRotate.Text = $"Rotar ({EngineSettings.Current.GetKey("editor_rotate")})";
+
+            if (_btnScale != null)
+                _btnScale.Text = $"Escalar ({EngineSettings.Current.GetKey("editor_scale")})";
+        }
+
         private void ConstruirToolbarModo()
         {
-            _btnMove = CrearBotonModo("Mover (W)", 8);
-            _btnRotate = CrearBotonModo("Rotar (E)", 96);
-            _btnScale = CrearBotonModo("Escalar (R)", 184);
+            ActualizarTextosAtajos();
+
+            _btnMove = CrearBotonModo($"Mover ({EngineSettings.Current.GetKey("editor_move")})", 8);
+            _btnRotate = CrearBotonModo($"Rotar ({EngineSettings.Current.GetKey("editor_rotate")})", 96);
+            _btnScale = CrearBotonModo($"Escalar ({EngineSettings.Current.GetKey("editor_scale")})", 184);
 
             _btnMove.Click += (s, e) => SetGizmoMode(GizmoMode.Move);
             _btnRotate.Click += (s, e) => SetGizmoMode(GizmoMode.Rotate);
