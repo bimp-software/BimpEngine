@@ -1,10 +1,13 @@
 ﻿using BimpEngine.Engine.Core.Interface;
 using BimpEngine.Engine.Scripting;
+using BimpEngine.Engine.Scripting.Engines;
 using BimpEngine.Engine.Scripting.Enum;
+using BimpEngine.Engine.Scripting.Interface;
 using BimpEngine.Engine.World;
 using System;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace BimpEngine.Controls.Inspector.Componentes
@@ -19,15 +22,18 @@ namespace BimpEngine.Controls.Inspector.Componentes
         private Button _btnSeleccionar;
         private Button _btnEditar;
         private Button _btnQuitar;
+        private FlowLayoutPanel _panelVariables;
 
         public event Action<Objetos>? OnObjectModified;
         public event Action<ScriptCodeControl>? OnRemoveRequested;
         public event Action<string>? OnEditRequested;
 
+        public ScriptComponent? ComponenteVinculado => _comp;
 
         public ScriptCodeControl()
         {
-            Height = 90;
+            AutoSize = true;
+            AutoSizeMode = AutoSizeMode.GrowAndShrink;
             BackColor = Color.FromArgb(45, 45, 45);
             AllowDrop = true;
 
@@ -62,6 +68,17 @@ namespace BimpEngine.Controls.Inspector.Componentes
             panelBotones.Controls.Add(_btnEditar);
             panelBotones.Controls.Add(_btnQuitar);
 
+            _panelVariables = new FlowLayoutPanel
+            {
+                Dock = DockStyle.Top,
+                FlowDirection = FlowDirection.TopDown,
+                WrapContents = false,
+                AutoSize = true,
+                AutoSizeMode = AutoSizeMode.GrowAndShrink,
+                Padding = new Padding(6, 2, 6, 6)
+            };
+
+            Controls.Add(_panelVariables);
             Controls.Add(panelBotones);
             Controls.Add(panelInfo);
             Controls.Add(titulo);
@@ -124,7 +141,6 @@ namespace BimpEngine.Controls.Inspector.Componentes
             }
             else
             {
-                // Cambió de script → forzar reinicio del motor de ejecución
                 Engine.Scripting.ScriptRuntime.DestroyComponent(_comp);
             }
 
@@ -133,8 +149,49 @@ namespace BimpEngine.Controls.Inspector.Componentes
             _comp.Language = lenguaje;
             _comp.Code = File.ReadAllText(path);
 
+            DetectarVariables();
             ActualizarUI();
             OnObjectModified?.Invoke(_objeto);
+        }
+
+        private void DetectarVariables()
+        {
+            if (_comp == null || _objeto == null) return;
+
+            IScriptEngine motorTemporal = _comp.Language switch
+            {
+                Language.CSharp => new CSharpScriptEngine(),
+                Language.Lua => new LuaScriptEngine(),
+                Language.Python => new PythonScriptEngine(),
+                _ => new CSharpScriptEngine()
+            };
+
+            try
+            {
+                var contexto = new ScriptContext { Owner = _objeto, Scene = null, DeltaTime = 0 };
+                motorTemporal.Load(_comp.Code, contexto);
+
+                var detectadas = motorTemporal.GetExposedVariables().ToList();
+
+                foreach (var det in detectadas)
+                {
+                    var existente = _comp.Variables.FirstOrDefault(v => v.Name == det.Name);
+                    if (existente == null)
+                        _comp.Variables.Add(det);
+                    else
+                        existente.Type = det.Type;
+                }
+
+                _comp.Variables.RemoveAll(v => !detectadas.Any(d => d.Name == v.Name));
+            }
+            catch
+            {
+                // si el script tiene errores de sintaxis, se reportará al presionar Play
+            }
+            finally
+            {
+                motorTemporal.OnDestroy();
+            }
         }
 
         private void Quitar()
@@ -153,6 +210,7 @@ namespace BimpEngine.Controls.Inspector.Componentes
             {
                 _lblArchivo.Text = "Sin script asignado";
                 _lblLenguaje.Text = "";
+                _panelVariables.Controls.Clear();
                 return;
             }
 
@@ -164,6 +222,97 @@ namespace BimpEngine.Controls.Inspector.Componentes
                 Language.Python => "Python",
                 _ => ""
             };
+
+            ActualizarVariablesUI();
+        }
+
+        private void ActualizarVariablesUI()
+        {
+            _panelVariables.Controls.Clear();
+            if (_comp == null || _comp.Variables.Count == 0) return;
+
+            foreach (var variable in _comp.Variables)
+                _panelVariables.Controls.Add(CrearFilaVariable(variable));
+        }
+
+        private Control CrearFilaVariable(ScriptVariable variable)
+        {
+            var fila = new Panel { Height = 26, Width = 260 };
+
+            var lbl = new Label
+            {
+                Text = variable.Name,
+                Location = new Point(0, 4),
+                Width = 100,
+                ForeColor = Color.FromArgb(210, 210, 210),
+                Font = new Font("Segoe UI", 8.5f)
+            };
+            fila.Controls.Add(lbl);
+
+            Control editor = variable.Type switch
+            {
+                VariableType.Bool => CrearEditorBool(variable),
+                VariableType.Vector3 => CrearEditorVector3(variable),
+                _ => CrearEditorTexto(variable)
+            };
+
+            editor.Location = new Point(104, 1);
+            fila.Controls.Add(editor);
+
+            return fila;
+        }
+
+        private Control CrearEditorTexto(ScriptVariable variable)
+        {
+            var tb = new TextBox { Text = variable.ValueRaw, Width = 150 };
+            tb.Leave += (s, e) => GuardarValor(variable, tb.Text);
+            return tb;
+        }
+
+        private Control CrearEditorBool(ScriptVariable variable)
+        {
+            var cb = new CheckBox { Checked = variable.ValueRaw == "True" || variable.ValueRaw == "true" };
+            cb.CheckedChanged += (s, e) => GuardarValor(variable, cb.Checked.ToString());
+            return cb;
+        }
+
+        private Control CrearEditorVector3(ScriptVariable variable)
+        {
+            var partes = variable.ValueRaw.Split(';');
+            string x = partes.Length > 0 ? partes[0] : "0";
+            string y = partes.Length > 1 ? partes[1] : "0";
+            string z = partes.Length > 2 ? partes[2] : "0";
+
+            var panel = new Panel { Width = 150, Height = 22 };
+            var tbX = new TextBox { Text = x, Width = 46, Location = new Point(0, 0) };
+            var tbY = new TextBox { Text = y, Width = 46, Location = new Point(52, 0) };
+            var tbZ = new TextBox { Text = z, Width = 46, Location = new Point(104, 0) };
+
+            void Actualizar(object? s, EventArgs e) => GuardarValor(variable, $"{tbX.Text};{tbY.Text};{tbZ.Text}");
+            tbX.Leave += Actualizar;
+            tbY.Leave += Actualizar;
+            tbZ.Leave += Actualizar;
+
+            panel.Controls.Add(tbX);
+            panel.Controls.Add(tbY);
+            panel.Controls.Add(tbZ);
+            return panel;
+        }
+
+        private void GuardarValor(ScriptVariable variable, string nuevoValorRaw)
+        {
+            variable.ValueRaw = nuevoValorRaw;
+
+            // Si el juego está corriendo (Play), aplica el cambio en caliente
+            if (_comp?.Engine != null)
+            {
+                var valor = ScriptVariableUtils.ParseValor(nuevoValorRaw, variable.Type);
+                if (valor != null)
+                    _comp.Engine.SetVariable(variable.Name, valor);
+            }
+
+            if (_objeto != null)
+                OnObjectModified?.Invoke(_objeto);
         }
 
         public void SetObject(Objetos obj)
@@ -175,10 +324,13 @@ namespace BimpEngine.Controls.Inspector.Componentes
         public void Refresh(Objetos obj)
         {
             if (_comp != null && File.Exists(_comp.ScriptPath))
-                _comp.Code = File.ReadAllText(_comp.ScriptPath); // recarga en caliente
+            {
+                _comp.Code = File.ReadAllText(_comp.ScriptPath);
+                DetectarVariables();
+                ActualizarUI();
+            }
         }
 
-        // Usado por InspectorControl al restaurar componentes ya guardados
         public void VincularExistente(ScriptComponent comp)
         {
             _comp = comp;

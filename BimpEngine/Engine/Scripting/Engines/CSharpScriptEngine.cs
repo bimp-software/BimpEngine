@@ -1,10 +1,9 @@
 ﻿using BimpEngine.Engine.Scripting.Interface;
+using BimpEngine.Engine.World;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using System;
-using System.Collections.Generic;
+using System.Reflection;
 using System.Runtime.Loader;
-using System.Text;
 
 namespace BimpEngine.Engine.Scripting.Engines
 {
@@ -15,8 +14,7 @@ namespace BimpEngine.Engine.Scripting.Engines
 
         public void Load(string code, ScriptContext context)
         {
-            string codigoCompleto = InyectarUsings(code);
-            var syntaxTree = CSharpSyntaxTree.ParseText(codigoCompleto);
+            var syntaxTree = CSharpSyntaxTree.ParseText(InyectarUsings(code));
 
             var references = AppDomain.CurrentDomain.GetAssemblies()
                 .Where(a => !a.IsDynamic && !string.IsNullOrEmpty(a.Location))
@@ -67,22 +65,81 @@ namespace BimpEngine.Engine.Scripting.Engines
             _instance?.OnDestroy();
             _loadContext?.Unload();
             _loadContext = null;
+            _instance = null;
         }
 
-        public void SetVariable(string name, object value) { }
-        public object? GetVariable(string name) => null;
+        private static string InyectarUsings(string code) =>
+            "using System;\n" +
+            "using System.Collections.Generic;\n" +
+            "using BimpEngine.Engine.Scripting;\n" +
+            "using BimpEngine.Engine.Core;\n" +
+            "using BimpEngine.Engine.Math;\n" +
+            "using BimpEngine.Engine.World;\n" + code;
 
-        private static string InyectarUsings(string code)
+        // --- Variables públicas expuestas (campos y propiedades declarados en la clase del usuario) ---
+
+        public IEnumerable<ScriptVariable> GetExposedVariables()
         {
-            const string usings =
-                "using System;\n" +
-                "using System.Collections.Generic;\n" +
-                "using BimpEngine.Engine.Scripting;\n" +
-                "using BimpEngine.Engine.Core;\n" +
-                "using BimpEngine.Engine.Math;\n" +
-                "using BimpEngine.Engine.World;\n";
+            if (_instance == null) yield break;
 
-            return usings + code;
+            var tipo = _instance.GetType();
+
+            foreach (var campo in tipo.GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly))
+            {
+                var vt = ScriptVariableUtils.MapClrType(campo.FieldType);
+                if (vt == null) continue;
+
+                yield return new ScriptVariable
+                {
+                    Name = campo.Name,
+                    Type = vt.Value,
+                    ValueRaw = ScriptVariableUtils.FormatValor(campo.GetValue(_instance), vt.Value)
+                };
+            }
+
+            foreach (var prop in tipo.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly))
+            {
+                if (!prop.CanRead || !prop.CanWrite || prop.GetIndexParameters().Length > 0) continue;
+
+                var vt = ScriptVariableUtils.MapClrType(prop.PropertyType);
+                if (vt == null) continue;
+
+                yield return new ScriptVariable
+                {
+                    Name = prop.Name,
+                    Type = vt.Value,
+                    ValueRaw = ScriptVariableUtils.FormatValor(prop.GetValue(_instance), vt.Value)
+                };
+            }
+        }
+
+        public void SetVariable(string name, object value)
+        {
+            if (_instance == null) return;
+            var tipo = _instance.GetType();
+
+            var campo = tipo.GetField(name, BindingFlags.Public | BindingFlags.Instance);
+            if (campo != null)
+            {
+                campo.SetValue(_instance, ScriptVariableUtils.ConvertirParaClr(value, campo.FieldType));
+                return;
+            }
+
+            var prop = tipo.GetProperty(name, BindingFlags.Public | BindingFlags.Instance);
+            if (prop != null && prop.CanWrite)
+                prop.SetValue(_instance, ScriptVariableUtils.ConvertirParaClr(value, prop.PropertyType));
+        }
+
+        public object? GetVariable(string name)
+        {
+            if (_instance == null) return null;
+            var tipo = _instance.GetType();
+
+            var campo = tipo.GetField(name, BindingFlags.Public | BindingFlags.Instance);
+            if (campo != null) return campo.GetValue(_instance);
+
+            var prop = tipo.GetProperty(name, BindingFlags.Public | BindingFlags.Instance);
+            return prop?.GetValue(_instance);
         }
     }
 }

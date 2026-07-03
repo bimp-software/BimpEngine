@@ -131,8 +131,8 @@ namespace BimpEngine.Controls.Inspector
                 scc.OnRemoveRequested += (ctrl) =>
                 {
                     flpContenedor.Controls.Remove(ctrl);
-                    if (_objetoActual != null)
-                        _componentesPorObjeto[_objetoActual.Id]?.Remove(ctrl);
+                    if (_objetoActual != null && _componentesPorObjeto.TryGetValue(_objetoActual.Id, out var lista))
+                        lista.Remove(ctrl);
                 };
             }
 
@@ -164,6 +164,8 @@ namespace BimpEngine.Controls.Inspector
             transform.SetObject(obj);
             AddComponent(transform);
 
+            SincronizarComponentesPersistidos(obj);
+
             if (_componentesPorObjeto.TryGetValue(obj.Id, out var extras))
             {
                 foreach (var extra in extras)
@@ -191,6 +193,26 @@ namespace BimpEngine.Controls.Inspector
             foreach (Control c in flpContenedor.Controls)
                 if (c is VariableControl vc)
                     vc.CargarTagsYLayers();
+        }
+
+        private void SincronizarComponentesPersistidos(Objetos obj)
+        {
+            if (!_componentesPorObjeto.ContainsKey(obj.Id))
+                _componentesPorObjeto[obj.Id] = new List<UserControl>();
+
+            var lista = _componentesPorObjeto[obj.Id];
+
+            foreach (var scriptComp in obj.Scripts)
+            {
+                bool yaExiste = lista.OfType<ScriptCodeControl>()
+                    .Any(c => c.ComponenteVinculado == scriptComp);
+
+                if (yaExiste) continue;
+
+                var control = new ScriptCodeControl();
+                control.VincularExistente(scriptComp);
+                lista.Add(control);
+            }
         }
     }
 }

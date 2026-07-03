@@ -58,5 +58,35 @@ namespace BimpEngine.Engine.Scripting.Engines
 
         public void SetVariable(string name, object value) => _scope?.SetVariable(name, value);
         public object? GetVariable(string name) => _scope?.GetVariable(name);
+
+        private static readonly HashSet<string> Reservadas = new(StringComparer.OrdinalIgnoreCase)
+        {
+            "gameObject", "transform", "log", "log_warning", "log_error", "get_key", "find", "start", "update", "on_destroy"
+        };
+
+        public IEnumerable<ScriptVariable> GetExposedVariables()
+        {
+            if (_scope == null) yield break;
+
+            foreach (var nombre in _scope.GetVariableNames())
+            {
+                if (Reservadas.Contains(nombre)) continue;
+                if (!_scope.TryGetVariable(nombre, out object valor) || valor == null) continue;
+
+                Enum.VariableType? tipo = valor switch
+                {
+                    double or float => Enum.VariableType.Float,
+                    int => Enum.VariableType.Int,
+                    bool => Enum.VariableType.Bool,
+                    string => Enum.VariableType.String,
+                    Math.Vector3 => Enum.VariableType.Vector3,
+                    _ => (Enum.VariableType?)null
+                };
+
+                if (tipo == null) continue;
+
+                yield return new ScriptVariable { Name = nombre, Type = tipo.Value, ValueRaw = ScriptVariableUtils.FormatValor(valor, tipo.Value) };
+            }
+        }
     }
 }

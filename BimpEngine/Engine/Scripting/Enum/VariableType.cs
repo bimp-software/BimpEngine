@@ -6,6 +6,7 @@ namespace BimpEngine.Engine.Scripting.Enum
 {
     public enum VariableType
     {
+        Int,
         Float,
         Bool,
         String,

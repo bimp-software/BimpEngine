@@ -27,12 +27,38 @@ namespace BimpEngine.Engine.Scripting
             try
             {
                 comp.Engine.Load(comp.Code, context);
+                SincronizarVariables(comp);
                 comp.Engine.Start();
                 comp.Started = true;
             }
             catch (Exception ex)
             {
                 Debug.Console.LogError($"Error al iniciar script '{comp.ScriptName}': {ex.Message}", objeto.Name);
+            }
+        }
+
+        private static void SincronizarVariables(ScriptComponent comp)
+        {
+            if (comp.Engine == null) return;
+
+            var detectadas = comp.Engine.GetExposedVariables().ToList();
+
+            foreach (var det in detectadas)
+            {
+                var existente = comp.Variables.FirstOrDefault(v => v.Name == det.Name);
+                if (existente == null)
+                    comp.Variables.Add(det);
+                else
+                    existente.Type = det.Type;
+            }
+
+            comp.Variables.RemoveAll(v => !detectadas.Any(d => d.Name == v.Name));
+
+            foreach (var v in comp.Variables)
+            {
+                var valor = ScriptVariableUtils.ParseValor(v.ValueRaw, v.Type);
+                if (valor != null)
+                    comp.Engine.SetVariable(v.Name, valor);
             }
         }
 

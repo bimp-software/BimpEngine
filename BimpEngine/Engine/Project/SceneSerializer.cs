@@ -67,7 +67,13 @@ namespace BimpEngine.Engine.Project
                 {
                     Language = s.Language,
                     ScriptName = s.ScriptName,
-                    ScriptPath = s.ScriptPath
+                    ScriptPath = s.ScriptPath,
+                    Variables = s.Variables.Select(v => new ScriptVariable
+                    {
+                        Name = v.Name,
+                        Type = v.Type,
+                        ValueRaw = v.ValueRaw
+                    }).ToList()
                 }).ToList();
 
                 data.Objects.Add(dto);
@@ -185,7 +191,13 @@ namespace BimpEngine.Engine.Project
                     Language = s.Language,
                     ScriptName = s.ScriptName,
                     ScriptPath = s.ScriptPath,
-                    Code = File.Exists(s.ScriptPath) ? File.ReadAllText(s.ScriptPath) : ""
+                    Code = File.Exists(s.ScriptPath) ? File.ReadAllText(s.ScriptPath) : "",
+                    Variables = s.Variables.Select(v => new ScriptVariable
+                    {
+                        Name = v.Name,
+                        Type = v.Type,
+                        ValueRaw = v.ValueRaw
+                    }).ToList()
                 });
             }
 

@@ -9,5 +9,6 @@ namespace BimpEngine.Engine.Scripting.Enum
         public Language Language { get; set; } = Language.CSharp;
         public string ScriptName { get; set; } = "";
         public string ScriptPath { get; set; } = "";
+        public List<ScriptVariable> Variables { get; set; } = new();
     }
 }

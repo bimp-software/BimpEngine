@@ -12,5 +12,6 @@ namespace BimpEngine.Engine.Scripting.Interface
         void OnDestroy();
         void SetVariable(string name, object value);
         object? GetVariable(string name);
+        IEnumerable<ScriptVariable> GetExposedVariables();
     }
 }
