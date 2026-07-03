@@ -9,7 +9,7 @@ namespace BimpEngine.Engine.Core
         public string Name { get; set; } = "Scene";
         public bool IsLoaded { get; set; } = true;
         public List<Objetos> Objetos { get; } = new List<Objetos>();
-        public CameraObject MainCamera { get; set; } = new CameraObject();
+        public CameraObject MainCamera { get; set; } = null;
         public void Add(Objetos objeto)
         {
             if (objeto == null) return;
@@ -61,6 +61,8 @@ namespace BimpEngine.Engine.Core
                 if (objeto.Enabled)
                     objeto.Update();
             }
+
+            Scripting.ScriptRuntime.UpdateAll(this);
         }
 
         public string GenerarNombre(string nombreBase)

@@ -124,7 +124,7 @@
   <data name="verAyudaToolStripMenuItem.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO
-        wAAADsABataJCQAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAFySURBVDhPfVK9
+        vgAADr4B6kKxwAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAFySURBVDhPfVK9
         TgJBEF4LNfoEtrb+PICdLYmEmyPX2FiYIDeLhZW1D6BCJBob38AX8K+wNrEAKtzZIyaaGCvUSgQzcKx3
         e4uTfMntfDPfzZ8QlhUqahWQaoC66SN9MvgbUFWh/LRixxvL7bZn/VCfAtIPIA0moAeS6kHQmskkA6o7
         R4IbUt+mRADVWSYI9SWEessP1aYv6RyQvpO8j3QyTI57Tpcd6n3mvIpe98IoJ8RgioWsn/SKsr0sRgNL
@@ -134,7 +134,7 @@
         CwV9FOWyOXJqAAAAAElFTkSuQmCC
 </value>
   </data>
-  <data name="pictureBox3.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+  <data name="btnPlay.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAAgAAAAIACAYAAAD0eNT6AAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO
         vAAADrwBlbxySQAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAACDOSURBVHhe7d19

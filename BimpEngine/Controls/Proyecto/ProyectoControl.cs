@@ -10,6 +10,8 @@ namespace BimpEngine.Controls.Proyecto
         public event Action<string>? OnOpenBlueprint;
         public event Action<string>? OnInstanciarMolde;
         public event Action<string>? OnImportModelRequested;
+        public event Action<string>? OnOpenScript;
+
 
         private string? _rootPath;
 
@@ -20,6 +22,9 @@ namespace BimpEngine.Controls.Proyecto
         private const int ICON_PROJECT = 4;
         private const int ICON_BLUEPRINT = 5;
         private const int ICON_MOLDE = 6;
+        private const int ICON_SCRIPT_CS = 7;
+        private const int ICON_SCRIPT_LUA = 8;
+        private const int ICON_SCRIPT_PY = 9;
 
         public ProyectoControl()
         {
@@ -83,6 +88,21 @@ namespace BimpEngine.Controls.Proyecto
                 g.FillRectangle(new SolidBrush(Color.FromArgb(160, 200, 255)), 4, 4, 6, 1);
                 g.FillRectangle(new SolidBrush(Color.FromArgb(160, 200, 255)), 4, 7, 6, 1);
                 g.FillRectangle(new SolidBrush(Color.FromArgb(160, 200, 255)), 4, 10, 4, 1);
+            }));
+            _icons.Images.Add(DrawIcon((g, r) => // 7 - C#
+            {
+                g.FillRectangle(new SolidBrush(Color.FromArgb(80, 140, 80)), 2, 1, 10, 13);
+                g.DrawString("C#", new Font("Segoe UI", 5.5f, FontStyle.Bold), Brushes.White, 1f, 4f);
+            }));
+            _icons.Images.Add(DrawIcon((g, r) => // 8 - Lua
+            {
+                g.FillRectangle(new SolidBrush(Color.FromArgb(60, 90, 180)), 2, 1, 10, 13);
+                g.DrawString("Lu", new Font("Segoe UI", 6f, FontStyle.Bold), Brushes.White, 1f, 4f);
+            }));
+            _icons.Images.Add(DrawIcon((g, r) => // 9 - Python
+            {
+                g.FillRectangle(new SolidBrush(Color.FromArgb(210, 170, 60)), 2, 1, 10, 13);
+                g.DrawString("Py", new Font("Segoe UI", 6f, FontStyle.Bold), Brushes.White, 1f, 4f);
             }));
         }
 
@@ -173,6 +193,9 @@ namespace BimpEngine.Controls.Proyecto
                     ".bscene" => ICON_SCENE,
                     ".bscript" => ICON_BLUEPRINT,
                     ".bmold" => ICON_MOLDE,
+                    ".cs" => ICON_SCRIPT_CS,
+                    ".lua" => ICON_SCRIPT_LUA,
+                    ".py" => ICON_SCRIPT_PY,
                     _ => ICON_FILE
                 };
 
@@ -210,6 +233,8 @@ namespace BimpEngine.Controls.Proyecto
                     OnOpenBlueprint?.Invoke(path);
                 else if (ext == ".bmold")
                     OnInstanciarMolde?.Invoke(path);
+                else if (ext is ".cs" or ".lua" or ".py")
+                    OnOpenScript?.Invoke(path);
             }
         }
 
@@ -249,6 +274,12 @@ namespace BimpEngine.Controls.Proyecto
                 Add(menu, "Mostrar en Explorador…", () => AbrirEnExplorador(folder));
                 menu.Items.Add(new ToolStripSeparator());
                 Add(menu, "Actualizar", () => RefrescarArbol());
+                var subScript = new ToolStripMenuItem("Nuevo Script");
+                subScript.ForeColor = Color.White;
+                Add2(subScript, "C#", () => NuevoScript(folder, "cs"));
+                Add2(subScript, "Lua", () => NuevoScript(folder, "lua"));
+                Add2(subScript, "Python", () => NuevoScript(folder, "py"));
+                menu.Items.Add(subScript);
             }
             else if (isFile)
             {
@@ -263,6 +294,9 @@ namespace BimpEngine.Controls.Proyecto
 
                 if (ext == ".bmold")
                     Add(menu, "Instanciar en la Escena", () => OnInstanciarMolde?.Invoke(file));
+
+                if (ext is ".cs" or ".lua" or ".py")
+                    Add(menu, "Editar Script", () => OnOpenScript?.Invoke(file));
 
                 menu.Items.Add(new ToolStripSeparator());
                 Add(menu, "Renombrar (F2)", () => IniciarRenombrar(node));
@@ -489,10 +523,64 @@ namespace BimpEngine.Controls.Proyecto
         {
             if (e.Item is TreeNode node && node.Tag is string path && File.Exists(path))
             {
-                string tex = Path.GetExtension(path).ToLower();
-                if (EsModelo3D(tex))
+                string ext = Path.GetExtension(path).ToLower();
+                if (EsModelo3D(ext) || ext is ".cs" or ".lua" or ".py")
                     DoDragDrop(path, DragDropEffects.Copy);
             }
+        }
+
+        private void NuevoScript(string folder, string ext)
+        {
+            string name = Prompt("Nombre del Script:", "MiScript");
+            if (string.IsNullOrWhiteSpace(name)) return;
+
+            string path = Path.Combine(folder, name + "." + ext);
+            if (File.Exists(path)) { MessageBox.Show("Ya existe un script con ese nombre."); return; }
+
+            Directory.CreateDirectory(folder);
+            File.WriteAllText(path, PlantillaScript(name, ext));
+            RefrescarArbol();
+            OnOpenScript?.Invoke(path);
+        }
+
+        private static string PlantillaScript(string nombre, string ext) => ext switch
+        {
+            "cs" =>
+        $@"using BimpEngine.Engine.Scripting;
+
+public class {nombre} : IScript
+{{
+    public override void Start()
+    {{
+        Log(""{nombre} iniciado en "" + gameObject.Name);
+    }}
+
+    public override void Update(float deltaTime)
+    {{
+    }}
+}}",
+            "lua" =>
+        @"function start()
+    log(""Script Lua iniciado en "" .. gameObject.Name)
+end
+
+function update(deltaTime)
+end",
+            "py" =>
+        @"def start():
+    log(""Script Python iniciado en "" + gameObject.Name)
+
+def update(deltaTime):
+    pass",
+            _ => ""
+        };
+
+        private static void Add2(ToolStripMenuItem parent, string text, Action action)
+        {
+            var item = new ToolStripMenuItem(text);
+            item.ForeColor = Color.White;
+            item.Click += (s, e) => action();
+            parent.DropDownItems.Add(item);
         }
     }
 }

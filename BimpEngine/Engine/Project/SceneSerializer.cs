@@ -2,6 +2,8 @@
 using BimpEngine.Engine.Entities;
 using BimpEngine.Engine.Entities.Primitive;
 using BimpEngine.Engine.Math;
+using BimpEngine.Engine.Scripting;
+using BimpEngine.Engine.Scripting.Enum;
 using BimpEngine.Engine.World;
 using System.Text.Json;
 
@@ -25,6 +27,7 @@ namespace BimpEngine.Engine.Project
             foreach (var obj in all)
             {
                 bool is2D = obj is PrimitiveObject2D;
+                bool esCamara = obj is CameraObject;
 
                 var dto = new ObjectData
                 {
@@ -48,8 +51,25 @@ namespace BimpEngine.Engine.Project
                                                  obj.Transform.Scale.Y,
                                                  obj.Transform.Scale.Z),
                     ParentId = obj.Parent?.Id,
-                    ChildrenIds = obj.Children.Select(c => c.Id).ToList()
+                    ChildrenIds = obj.Children.Select(c => c.Id).ToList(),
+                    IsCamera = esCamara
                 };
+
+                if (esCamara)
+                {
+                    var cam = (CameraObject)obj;
+                    dto.FieldOfView = cam.FieldOfView;
+                    dto.NearClip = cam.NearClip;
+                    dto.FarClip = cam.FarClip;
+                }
+
+                dto.Scripts = obj.Scripts.Select(s => new ScriptData
+                {
+                    Language = s.Language,
+                    ScriptName = s.ScriptName,
+                    ScriptPath = s.ScriptPath
+                }).ToList();
+
                 data.Objects.Add(dto);
             }
 
@@ -87,6 +107,13 @@ namespace BimpEngine.Engine.Project
                     scene.Objetos.Add(map[dto.Id]);
             }
 
+            // Reasignar la cámara principal (Scene.Load no pasa por Scene.Add())
+            var todos = new List<Objetos>();
+            foreach (var raiz in scene.Objetos)
+                CollectAll(raiz, todos);
+
+            scene.MainCamera = todos.OfType<CameraObject>().FirstOrDefault();
+
             return scene;
         }
 
@@ -101,7 +128,16 @@ namespace BimpEngine.Engine.Project
         {
             Objetos obj;
 
-            if (dto.Is2D)
+            if (dto.IsCamera)
+            {
+                obj = new CameraObject
+                {
+                    FieldOfView = dto.FieldOfView,
+                    NearClip = dto.NearClip,
+                    FarClip = dto.FarClip
+                };
+            }
+            else if (dto.Is2D)
             {
                 System.Enum.TryParse<PrimitiveType2D>(dto.PrimitiveType, out var type2D);
                 obj = PrimitiveFactory2D.Create(type2D);
@@ -139,7 +175,19 @@ namespace BimpEngine.Engine.Project
             obj.Transform.Scale.Y = dto.Scale.Y;
             obj.Transform.Scale.Z = dto.Scale.Z;
 
-            obj.MeshRenderer.Material.BlueprintMode = dto.BlueprintMode;
+            if (!dto.IsCamera)
+                obj.MeshRenderer.Material.BlueprintMode = dto.BlueprintMode;
+
+            foreach (var s in dto.Scripts)
+            {
+                obj.Scripts.Add(new ScriptComponent
+                {
+                    Language = s.Language,
+                    ScriptName = s.ScriptName,
+                    ScriptPath = s.ScriptPath,
+                    Code = File.Exists(s.ScriptPath) ? File.ReadAllText(s.ScriptPath) : ""
+                });
+            }
 
             return obj;
         }

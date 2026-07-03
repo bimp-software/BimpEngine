@@ -37,6 +37,8 @@ namespace BimpEngine.Vista
         private bool _hasUnsavedChanges = false;
         private string? _currentScenePath = null;
 
+        private BimpEngine.Controls.Play.frmGameWindow? _gameWindow;
+
         public frmBimpEngine()
         {
             InitializeComponent();
@@ -101,7 +103,7 @@ namespace BimpEngine.Vista
             inspector = new InspectorControl();
             console = new ConsolaControl();
             proyecto = new ProyectoControl();
-            
+
             hierarchy.SetEditorCamera(sceneView.GetEditorCamera());
 
             sceneView.OnCameraChanged += (cam) =>
@@ -227,6 +229,18 @@ namespace BimpEngine.Vista
                     }
                 };
 
+                editor.Show(this);
+            };
+            proyecto.OnOpenScript += (path) =>
+            {
+                var editor = new BimpEngine.Controls.Proyecto.frmScriptEditor(path);
+                editor.Show(this);
+            };
+
+            inspector.OnEditScriptRequested += (path) =>
+            {
+                if (string.IsNullOrEmpty(path) || !File.Exists(path)) return;
+                var editor = new BimpEngine.Controls.Proyecto.frmScriptEditor(path);
                 editor.Show(this);
             };
 
@@ -546,7 +560,7 @@ namespace BimpEngine.Vista
             GuardarEscenaComo();
         }
 
-       
+
 
         private void CrearMoldeDesdeObjeto(Objetos objeto)
         {
@@ -758,5 +772,51 @@ namespace BimpEngine.Vista
 
         #endregion
 
+        private void TogglePlay()
+        {
+            if (_gameWindow != null)
+            {
+                _gameWindow.Close();
+                return;
+            }
+
+            var scene = sceneView.GetScene();
+            if (scene == null) return;
+
+            _gameWindow = new BimpEngine.Controls.Play.frmGameWindow(scene);
+            btnConstruirCorrer.Text = "⏹  Detener";
+
+            _gameWindow.OnStopped += () =>
+            {
+                btnConstruirCorrer.Text = "▶  Jugar";
+                sceneView.RefrescarEscena();
+            };
+
+            _gameWindow.FormClosed += (s, e) =>
+            {
+                _gameWindow = null;
+                btnConstruirCorrer.Text = "▶  Jugar";
+                sceneView.RefrescarEscena();
+            };
+
+            _gameWindow.Show(this);
+        }
+
+        private void btnPlay_Click(object sender, EventArgs e)
+        {
+            TogglePlay();
+        }
+
+        private void tsmCamara_Click(object sender, EventArgs e)
+        {
+            var camara = new CameraObject { Name = "Camera" };
+            camara.Transform.Position = new Engine.Math.Vector3(0,2,10);
+
+            sceneView.GetScene().Add(camara);
+            hierarchy.AddObject(camara);
+            sceneView.SetSelection(camara, sceneView.GetScene().Objetos.Count - 1);
+            inspector.ShowObject(camara);
+            sceneView.RefrescarEscena();
+        }
     }
 }

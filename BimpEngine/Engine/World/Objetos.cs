@@ -27,6 +27,7 @@ namespace BimpEngine.Engine.World
         public List<Object> Components { get; } = new();
 
         public NodeGraph Script { get; set; } = new NodeGraph();
+        public List<ScriptComponent> Scripts { get; } = new();
 
         protected Objetos() { }
         public virtual void Update() { }

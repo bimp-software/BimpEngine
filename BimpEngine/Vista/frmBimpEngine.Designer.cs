@@ -44,6 +44,8 @@
             btnIrLauncher = new ToolStripMenuItem();
             toolStripMenuItem8 = new ToolStripMenuItem();
             editarToolStripMenuItem = new ToolStripMenuItem();
+            toolStripMenuItem2 = new ToolStripMenuItem();
+            toolStripSeparator7 = new ToolStripSeparator();
             tsmiConfiguracionProyecto = new ToolStripMenuItem();
             tsmiPreferencias = new ToolStripMenuItem();
             verToolStripMenuItem = new ToolStripMenuItem();
@@ -88,7 +90,7 @@
             soporteTecnicoToolStripMenuItem = new ToolStripMenuItem();
             panel1 = new Panel();
             flpComenzar = new FlowLayoutPanel();
-            pictureBox3 = new PictureBox();
+            btnPlay = new PictureBox();
             pictureBox4 = new PictureBox();
             pictureBox5 = new PictureBox();
             flpOtrasOpciones = new FlowLayoutPanel();
@@ -103,12 +105,11 @@
             pictureBox1 = new PictureBox();
             pictureBox2 = new PictureBox();
             pnlContenedor = new Panel();
-            toolStripSeparator7 = new ToolStripSeparator();
-            toolStripMenuItem2 = new ToolStripMenuItem();
+            tsmCamara = new ToolStripMenuItem();
             msMenuPrincipal.SuspendLayout();
             panel1.SuspendLayout();
             flpComenzar.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)pictureBox3).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)btnPlay).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox4).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox5).BeginInit();
             flpOtrasOpciones.SuspendLayout();
@@ -220,6 +221,17 @@
             editarToolStripMenuItem.Size = new Size(56, 23);
             editarToolStripMenuItem.Text = "Edi&tar";
             // 
+            // toolStripMenuItem2
+            // 
+            toolStripMenuItem2.Name = "toolStripMenuItem2";
+            toolStripMenuItem2.Size = new Size(243, 24);
+            toolStripMenuItem2.Text = "Ir a";
+            // 
+            // toolStripSeparator7
+            // 
+            toolStripSeparator7.Name = "toolStripSeparator7";
+            toolStripSeparator7.Size = new Size(240, 6);
+            // 
             // tsmiConfiguracionProyecto
             // 
             tsmiConfiguracionProyecto.Name = "tsmiConfiguracionProyecto";
@@ -250,7 +262,7 @@
             // 
             // objetosToolStripMenuItem
             // 
-            objetosToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { crearVacioToolStripMenuItem, dObjetoToolStripMenuItem, dObjetosToolStripMenuItem, toolStripSeparator4, toolStripMenuItem1 });
+            objetosToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { crearVacioToolStripMenuItem, dObjetoToolStripMenuItem, dObjetosToolStripMenuItem, toolStripSeparator4, toolStripMenuItem1, tsmCamara });
             objetosToolStripMenuItem.ForeColor = Color.FromArgb(250, 250, 250);
             objetosToolStripMenuItem.Name = "objetosToolStripMenuItem";
             objetosToolStripMenuItem.Size = new Size(69, 23);
@@ -322,63 +334,63 @@
             // tsmiCuadrado
             // 
             tsmiCuadrado.Name = "tsmiCuadrado";
-            tsmiCuadrado.Size = new Size(180, 24);
+            tsmiCuadrado.Size = new Size(146, 24);
             tsmiCuadrado.Text = "Cuadrado";
             tsmiCuadrado.Click += tsmiCuadrado_Click;
             // 
             // tsmiRectagulo
             // 
             tsmiRectagulo.Name = "tsmiRectagulo";
-            tsmiRectagulo.Size = new Size(180, 24);
+            tsmiRectagulo.Size = new Size(146, 24);
             tsmiRectagulo.Text = "Rectangulo";
             tsmiRectagulo.Click += tsmiRectagulo_Click;
             // 
             // circuloToolStripMenuItem
             // 
             circuloToolStripMenuItem.Name = "circuloToolStripMenuItem";
-            circuloToolStripMenuItem.Size = new Size(180, 24);
+            circuloToolStripMenuItem.Size = new Size(146, 24);
             circuloToolStripMenuItem.Text = "Circulo";
             // 
             // trianguloToolStripMenuItem
             // 
             trianguloToolStripMenuItem.Name = "trianguloToolStripMenuItem";
-            trianguloToolStripMenuItem.Size = new Size(180, 24);
+            trianguloToolStripMenuItem.Size = new Size(146, 24);
             trianguloToolStripMenuItem.Text = "Triangulo";
             // 
             // diamanteToolStripMenuItem
             // 
             diamanteToolStripMenuItem.Name = "diamanteToolStripMenuItem";
-            diamanteToolStripMenuItem.Size = new Size(180, 24);
+            diamanteToolStripMenuItem.Size = new Size(146, 24);
             diamanteToolStripMenuItem.Text = "Diamante";
             // 
             // pentagonoToolStripMenuItem
             // 
             pentagonoToolStripMenuItem.Name = "pentagonoToolStripMenuItem";
-            pentagonoToolStripMenuItem.Size = new Size(180, 24);
+            pentagonoToolStripMenuItem.Size = new Size(146, 24);
             pentagonoToolStripMenuItem.Text = "Pentagono";
             // 
             // hexagonoToolStripMenuItem
             // 
             hexagonoToolStripMenuItem.Name = "hexagonoToolStripMenuItem";
-            hexagonoToolStripMenuItem.Size = new Size(180, 24);
+            hexagonoToolStripMenuItem.Size = new Size(146, 24);
             hexagonoToolStripMenuItem.Text = "Hexagono";
             // 
             // estrellaToolStripMenuItem
             // 
             estrellaToolStripMenuItem.Name = "estrellaToolStripMenuItem";
-            estrellaToolStripMenuItem.Size = new Size(180, 24);
+            estrellaToolStripMenuItem.Size = new Size(146, 24);
             estrellaToolStripMenuItem.Text = "Estrella";
             // 
             // flechaToolStripMenuItem
             // 
             flechaToolStripMenuItem.Name = "flechaToolStripMenuItem";
-            flechaToolStripMenuItem.Size = new Size(180, 24);
+            flechaToolStripMenuItem.Size = new Size(146, 24);
             flechaToolStripMenuItem.Text = "Flecha";
             // 
             // lineaToolStripMenuItem
             // 
             lineaToolStripMenuItem.Name = "lineaToolStripMenuItem";
-            lineaToolStripMenuItem.Size = new Size(180, 24);
+            lineaToolStripMenuItem.Size = new Size(146, 24);
             lineaToolStripMenuItem.Text = "Linea";
             // 
             // toolStripSeparator4
@@ -514,7 +526,7 @@
             // flpComenzar
             // 
             flpComenzar.Anchor = AnchorStyles.Left | AnchorStyles.Right;
-            flpComenzar.Controls.Add(pictureBox3);
+            flpComenzar.Controls.Add(btnPlay);
             flpComenzar.Controls.Add(pictureBox4);
             flpComenzar.Controls.Add(pictureBox5);
             flpComenzar.Location = new Point(568, 0);
@@ -522,17 +534,18 @@
             flpComenzar.Size = new Size(98, 31);
             flpComenzar.TabIndex = 1;
             // 
-            // pictureBox3
+            // btnPlay
             // 
-            pictureBox3.BackColor = Color.FromArgb(48, 48, 48);
-            pictureBox3.Image = (Image)resources.GetObject("pictureBox3.Image");
-            pictureBox3.Location = new Point(3, 3);
-            pictureBox3.Name = "pictureBox3";
-            pictureBox3.Size = new Size(25, 25);
-            pictureBox3.SizeMode = PictureBoxSizeMode.Zoom;
-            pictureBox3.TabIndex = 2;
-            pictureBox3.TabStop = false;
-            pictureBox3.Tag = "Iniciar";
+            btnPlay.BackColor = Color.FromArgb(48, 48, 48);
+            btnPlay.Image = (Image)resources.GetObject("btnPlay.Image");
+            btnPlay.Location = new Point(3, 3);
+            btnPlay.Name = "btnPlay";
+            btnPlay.Size = new Size(25, 25);
+            btnPlay.SizeMode = PictureBoxSizeMode.Zoom;
+            btnPlay.TabIndex = 2;
+            btnPlay.TabStop = false;
+            btnPlay.Tag = "Iniciar";
+            btnPlay.Click += btnPlay_Click;
             // 
             // pictureBox4
             // 
@@ -695,16 +708,12 @@
             pnlContenedor.Size = new Size(1201, 666);
             pnlContenedor.TabIndex = 4;
             // 
-            // toolStripSeparator7
+            // tsmCamara
             // 
-            toolStripSeparator7.Name = "toolStripSeparator7";
-            toolStripSeparator7.Size = new Size(240, 6);
-            // 
-            // toolStripMenuItem2
-            // 
-            toolStripMenuItem2.Name = "toolStripMenuItem2";
-            toolStripMenuItem2.Size = new Size(243, 24);
-            toolStripMenuItem2.Text = "Ir a";
+            tsmCamara.Name = "tsmCamara";
+            tsmCamara.Size = new Size(180, 24);
+            tsmCamara.Text = "Camara";
+            tsmCamara.Click += tsmCamara_Click;
             // 
             // frmBimpEngine
             // 
@@ -725,7 +734,7 @@
             msMenuPrincipal.PerformLayout();
             panel1.ResumeLayout(false);
             flpComenzar.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)pictureBox3).EndInit();
+            ((System.ComponentModel.ISupportInitialize)btnPlay).EndInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox4).EndInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox5).EndInit();
             flpOtrasOpciones.ResumeLayout(false);
@@ -754,7 +763,7 @@
         private ToolStripMenuItem ayudaToolStripMenuItem;
         private Panel panel1;
         private FlowLayoutPanel flpComenzar;
-        private PictureBox pictureBox3;
+        private PictureBox btnPlay;
         private PictureBox pictureBox4;
         private PictureBox pictureBox5;
         private FlowLayoutPanel flpOtrasOpciones;
@@ -818,5 +827,6 @@
         private ToolStripMenuItem soporteTecnicoToolStripMenuItem;
         private ToolStripMenuItem toolStripMenuItem2;
         private ToolStripSeparator toolStripSeparator7;
+        private ToolStripMenuItem tsmCamara;
     }
 }

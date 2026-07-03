@@ -1,6 +1,7 @@
 using BimpEngine.Engine.Core;
 using BimpEngine.Engine.Project;
 using BimpEngine.Vista;
+using System.Windows.Forms;
 
 namespace BimpEngine
 {
@@ -9,6 +10,11 @@ namespace BimpEngine
         [STAThread]
         static void Main()
         {
+            Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException);
+            Application.ThreadException += (s, e) => MostrarError(e.Exception);
+            AppDomain.CurrentDomain.UnhandledException += (s, e) =>
+                MostrarError(e.ExceptionObject as Exception ?? new Exception("Error desconocido"));
+
             EngineSettings.Load();
 
             ApplicationConfiguration.Initialize();
@@ -17,7 +23,7 @@ namespace BimpEngine
             using (var launcher = new frmLauncher())
             {
                 if (launcher.ShowDialog() != System.Windows.Forms.DialogResult.OK)
-                    return; 
+                    return;
 
                 projectFolder = launcher.SelectedProjectFolder;
             }
@@ -30,10 +36,9 @@ namespace BimpEngine
             }
             catch (Exception ex)
             {
-                System.Windows.Forms.MessageBox.Show(
+                MessageBox.Show(
                     $"No se pudo abrir el proyecto:\n{ex.Message}",
-                    "Error", System.Windows.Forms.MessageBoxButtons.OK,
-                    System.Windows.Forms.MessageBoxIcon.Error);
+                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
@@ -53,6 +58,13 @@ namespace BimpEngine
 
             editor.ShowDialog();
             Application.Run();
+        }
+
+        private static void MostrarError(Exception ex)
+        {
+            MessageBox.Show(
+                $"Ocurrió un error inesperado:\n\n{ex.Message}\n\n{ex.StackTrace}",
+                "Error no controlado", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
 }

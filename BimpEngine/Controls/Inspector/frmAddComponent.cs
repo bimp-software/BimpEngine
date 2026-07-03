@@ -24,6 +24,7 @@ namespace BimpEngine.Controls.Inspector
             new ComponenteInfo("Colisionador",       "Define el área de colisión del objeto",             null),
             new ComponenteInfo("RigidBody",          "Aplica física y gravedad al objeto",                null),
             new ComponenteInfo("Audio",              "Reproduce sonidos desde este objeto",               null),
+            new ComponenteInfo("Script (Código)", "Adjunta un script en C#, Lua o Python",                null),
         };
 
         public frmAddComponent(Objetos objeto)

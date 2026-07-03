@@ -23,6 +23,7 @@ namespace BimpEngine.Controls.Inspector
         public event Action<Objetos> OnObjectModified;
         public event Action<PrimitiveType> OnCreatePrimitive;
         public event Action<Objetos, Objetos> OnChildCreated;
+        public event Action<string>? OnEditScriptRequested;
 
         public InspectorControl()
         {
@@ -77,6 +78,7 @@ namespace BimpEngine.Controls.Inspector
             {
                 "Mueblería" => new FurnitureControl(),
                 "Script (Blueprint)" => new BlueprintControl(),
+                "Script (Código)" => new ScriptCodeControl(),
                 "Colisionador" => new BoxColliderControl(),
                 _ => null
             };
@@ -121,6 +123,18 @@ namespace BimpEngine.Controls.Inspector
 
             if (control is BoxColliderControl bc)
                 bc.OnObjectModified += (obj) => OnObjectModified?.Invoke(obj);
+
+            if (control is ScriptCodeControl scc)
+            {
+                scc.OnObjectModified += (obj) => OnObjectModified?.Invoke(obj);
+                scc.OnEditRequested += (path) => OnEditScriptRequested?.Invoke(path);
+                scc.OnRemoveRequested += (ctrl) =>
+                {
+                    flpContenedor.Controls.Remove(ctrl);
+                    if (_objetoActual != null)
+                        _componentesPorObjeto[_objetoActual.Id]?.Remove(ctrl);
+                };
+            }
 
             int w = flpContenedor.ClientSize.Width - 6;
             control.Width = w;
