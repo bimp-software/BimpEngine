@@ -17,6 +17,7 @@ namespace BimpEngine.Engine.Core
         public string LayoutDefecto { get; set; } = "Default";
 
         public List<InputBinding> InputBindings { get; set; } = new();
+        public List<AxisBinding> AxisBindings { get; set; } = new();
 
         public bool MostrarGrilla { get; set; } = true;
         public float TamañoCeldaGrilla { get; set; } = 1.0f;
@@ -65,11 +66,18 @@ namespace BimpEngine.Engine.Core
                         Current.CargarAtajosPorDefecto();
                         Current.Save();
                     }
+
+                    if (Current.AxisBindings == null || Current.AxisBindings.Count == 0)
+                    {
+                        Current.CargarEjesPorDefecto();
+                        Current.Save();
+                    }
                 }
                 else
                 {
                     Current = new EngineSettings();
                     Current.CargarAtajosPorDefecto();
+                    Current.CargarEjesPorDefecto();
                     Current.Save();
                 }
             }
@@ -77,6 +85,7 @@ namespace BimpEngine.Engine.Core
             {
                 Current = new EngineSettings();
                 Current.CargarAtajosPorDefecto();
+                Current.CargarEjesPorDefecto();
             }
         }
 
@@ -129,6 +138,20 @@ namespace BimpEngine.Engine.Core
                 new InputBinding("player_arrow_left", "Jugador", "Izquierda con flecha", "Left"),
                 new InputBinding("player_arrow_right", "Jugador", "Derecha con flecha", "Right")
             };
+        }
+
+        public void CargarEjesPorDefecto()
+        {
+            AxisBindings = new List<AxisBinding>
+            {
+                new AxisBinding("Horizontal", "player_right", "player_left", "player_arrow_right", "player_arrow_left"),
+                new AxisBinding("Vertical", "player_forward", "player_back", "player_arrow_up", "player_arrow_down"),
+            };
+        }
+
+        public AxisBinding GetAxisBinding(string nombre)
+        {
+            return AxisBindings.FirstOrDefault(x => x.Nombre == nombre);
         }
 
         public string GetKey(string id)

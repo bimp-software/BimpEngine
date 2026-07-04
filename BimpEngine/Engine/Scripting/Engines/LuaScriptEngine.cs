@@ -32,6 +32,8 @@ namespace BimpEngine.Engine.Scripting.Engines
             _script.Globals["logWarning"] = (Action<string>)(m => Debug.Console.LogWarning(m, _owner?.Name ?? "Lua"));
             _script.Globals["logError"] = (Action<string>)(m => Debug.Console.LogError(m, _owner?.Name ?? "Lua"));
             _script.Globals["getKey"] = (Func<string, bool>)(k => InputManager.GetAction(k));
+            _script.Globals["getAxis"] = (Func<string, float>)(n => InputManager.GetAxis(n));
+            _script.Globals["getAxisRaw"] = (Func<string, float>)(n => InputManager.GetAxisRaw(n));
             _script.Globals["find"] = (Func<string, Objetos?>)(n => context.Scene?.FindByName(n));
 
             try
@@ -72,7 +74,7 @@ namespace BimpEngine.Engine.Scripting.Engines
 
         private static readonly HashSet<string> Reservadas = new(StringComparer.OrdinalIgnoreCase)
         {
-            "gameObject", "transform", "log", "logWarning", "logError", "getKey", "find", "start", "update", "onDestroy"
+            "gameObject", "transform", "log", "logWarning", "logError", "getKey", "getAxis", "getAxisRaw", "find", "start", "update", "onDestroy"
         };
 
         public IEnumerable<ScriptVariable> GetExposedVariables()

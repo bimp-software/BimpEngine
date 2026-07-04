@@ -25,6 +25,8 @@ namespace BimpEngine.Engine.Scripting.Engines
             _scope.SetVariable("log_warning", new Action<string>(m => Debug.Console.LogWarning(m, _owner?.Name ?? "Python")));
             _scope.SetVariable("log_error", new Action<string>(m => Debug.Console.LogError(m, _owner?.Name ?? "Python")));
             _scope.SetVariable("get_key", new Func<string, bool>(k => InputManager.GetAction(k)));
+            _scope.SetVariable("get_axis", new Func<string, float>(n => InputManager.GetAxis(n)));
+            _scope.SetVariable("get_axis_raw", new Func<string, float>(n => InputManager.GetAxisRaw(n)));
             _scope.SetVariable("find", new Func<string, Objetos?>(n => context.Scene?.FindByName(n)));
 
             try
@@ -61,7 +63,7 @@ namespace BimpEngine.Engine.Scripting.Engines
 
         private static readonly HashSet<string> Reservadas = new(StringComparer.OrdinalIgnoreCase)
         {
-            "gameObject", "transform", "log", "log_warning", "log_error", "get_key", "find", "start", "update", "on_destroy"
+            "gameObject", "transform", "log", "log_warning", "log_error", "get_key", "get_axis", "get_axis_raw", "find", "start", "update", "on_destroy"
         };
 
         public IEnumerable<ScriptVariable> GetExposedVariables()

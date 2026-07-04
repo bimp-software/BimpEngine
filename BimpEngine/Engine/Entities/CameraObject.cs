@@ -9,7 +9,6 @@ namespace BimpEngine.Engine.Entities
         public double NearClip { get; set; } = 0.1;
         public double FarClip { get; set; } = 1000;
 
-        // Largo visual del frustum en el editor (no afecta el renderizado real)
         public double GizmoLength { get; set; } = 4;
 
         public CameraObject()
@@ -17,7 +16,9 @@ namespace BimpEngine.Engine.Entities
             Name = "Cámara";
         }
 
-        public override void Draw(OpenGLControl glControl)
+        public override void Draw(OpenGLControl glControl) => Draw(glControl, true);
+
+        public override void Draw(OpenGLControl glControl, bool mostrarGizmosEditor)
         {
             var gl = glControl.OpenGL;
 
@@ -32,8 +33,11 @@ namespace BimpEngine.Engine.Entities
             gl.Rotate(Transform.Rotation.Y, 0, 1, 0);
             gl.Rotate(Transform.Rotation.Z, 0, 0, 1);
 
-            DrawCameraIcon(gl);
-            DrawFrustum(gl);
+            if (mostrarGizmosEditor)
+            {
+                DrawCameraIcon(gl);
+                DrawFrustum(gl);
+            }
 
             gl.PopMatrix();
         }
@@ -122,15 +126,14 @@ namespace BimpEngine.Engine.Entities
             gl.Vertex(-0.5, 0.3, 0);
             gl.Vertex(-0.5, -0.3, 0);
 
-            // lente
-            gl.Vertex(0.5, 0.2, 0);
-            gl.Vertex(1.0, 0.5, 0);
+            gl.Vertex(0, 0.2, 0);
+            gl.Vertex(0, 0.5, -1.0);
 
-            gl.Vertex(0.5, -0.2, 0);
-            gl.Vertex(1.0, -0.5, 0);
+            gl.Vertex(0, -0.2, 0);
+            gl.Vertex(0, -0.5, -1.0);
 
-            gl.Vertex(1.0, 0.5, 0);
-            gl.Vertex(1.0, -0.5, 0);
+            gl.Vertex(0, 0.5, -1.0);
+            gl.Vertex(0, -0.5, -1.0);
 
             // dirección
             gl.Vertex(0, 0, 0);

@@ -16,6 +16,7 @@ namespace BimpEngine.Controls.Inspector.Componentes
     {
         private Objetos? _objeto;
         private ScriptComponent? _comp;
+        private DateTime _ultimaEscrituraConocida;
 
         private Label _lblArchivo;
         private Label _lblLenguaje;
@@ -23,6 +24,10 @@ namespace BimpEngine.Controls.Inspector.Componentes
         private Button _btnEditar;
         private Button _btnQuitar;
         private FlowLayoutPanel _panelVariables;
+
+        private Label _titulo;
+        private Panel _panelInfo;
+        private FlowLayoutPanel _panelBotones;
 
         public event Action<Objetos>? OnObjectModified;
         public event Action<ScriptCodeControl>? OnRemoveRequested;
@@ -32,12 +37,11 @@ namespace BimpEngine.Controls.Inspector.Componentes
 
         public ScriptCodeControl()
         {
-            AutoSize = true;
-            AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            AutoSize = false;
             BackColor = Color.FromArgb(45, 45, 45);
             AllowDrop = true;
 
-            var titulo = new Label
+            _titulo = new Label
             {
                 Text = "Script",
                 Dock = DockStyle.Top,
@@ -47,13 +51,13 @@ namespace BimpEngine.Controls.Inspector.Componentes
                 Padding = new Padding(6, 4, 0, 0)
             };
 
-            var panelInfo = new Panel { Dock = DockStyle.Top, Height = 36, Padding = new Padding(6, 0, 6, 0) };
+            _panelInfo = new Panel { Dock = DockStyle.Top, Height = 36, Padding = new Padding(6, 0, 6, 0) };
             _lblArchivo = new Label { Text = "Sin script asignado", Dock = DockStyle.Top, ForeColor = Color.Gray, Font = new Font("Segoe UI", 8.5f) };
             _lblLenguaje = new Label { Text = "", Dock = DockStyle.Top, ForeColor = Color.FromArgb(120, 180, 255), Font = new Font("Segoe UI", 8f) };
-            panelInfo.Controls.Add(_lblLenguaje);
-            panelInfo.Controls.Add(_lblArchivo);
+            _panelInfo.Controls.Add(_lblLenguaje);
+            _panelInfo.Controls.Add(_lblArchivo);
 
-            var panelBotones = new FlowLayoutPanel { Dock = DockStyle.Top, Height = 30, FlowDirection = FlowDirection.LeftToRight };
+            _panelBotones = new FlowLayoutPanel { Dock = DockStyle.Top, Height = 30, FlowDirection = FlowDirection.LeftToRight };
 
             _btnSeleccionar = BotonPequeño("Seleccionar...");
             _btnSeleccionar.Click += (s, e) => SeleccionarArchivo();
@@ -64,9 +68,9 @@ namespace BimpEngine.Controls.Inspector.Componentes
             _btnQuitar = BotonPequeño("Quitar");
             _btnQuitar.Click += (s, e) => Quitar();
 
-            panelBotones.Controls.Add(_btnSeleccionar);
-            panelBotones.Controls.Add(_btnEditar);
-            panelBotones.Controls.Add(_btnQuitar);
+            _panelBotones.Controls.Add(_btnSeleccionar);
+            _panelBotones.Controls.Add(_btnEditar);
+            _panelBotones.Controls.Add(_btnQuitar);
 
             _panelVariables = new FlowLayoutPanel
             {
@@ -79,9 +83,11 @@ namespace BimpEngine.Controls.Inspector.Componentes
             };
 
             Controls.Add(_panelVariables);
-            Controls.Add(panelBotones);
-            Controls.Add(panelInfo);
-            Controls.Add(titulo);
+            Controls.Add(_panelBotones);
+            Controls.Add(_panelInfo);
+            Controls.Add(_titulo);
+
+            ActualizarAltura();
 
             DragEnter += (s, e) =>
             {
@@ -211,6 +217,7 @@ namespace BimpEngine.Controls.Inspector.Componentes
                 _lblArchivo.Text = "Sin script asignado";
                 _lblLenguaje.Text = "";
                 _panelVariables.Controls.Clear();
+                ActualizarAltura();
                 return;
             }
 
@@ -229,10 +236,21 @@ namespace BimpEngine.Controls.Inspector.Componentes
         private void ActualizarVariablesUI()
         {
             _panelVariables.Controls.Clear();
-            if (_comp == null || _comp.Variables.Count == 0) return;
+            if (_comp != null)
+            {
+                foreach (var variable in _comp.Variables)
+                    _panelVariables.Controls.Add(CrearFilaVariable(variable));
+            }
 
-            foreach (var variable in _comp.Variables)
-                _panelVariables.Controls.Add(CrearFilaVariable(variable));
+            ActualizarAltura();
+        }
+
+        private void ActualizarAltura()
+        {
+            if (_titulo == null || _panelInfo == null || _panelBotones == null || _panelVariables == null)
+                return;
+
+            Height = _titulo.Height + _panelInfo.Height + _panelBotones.Height + _panelVariables.PreferredSize.Height + 4;
         }
 
         private Control CrearFilaVariable(ScriptVariable variable)
@@ -323,12 +341,17 @@ namespace BimpEngine.Controls.Inspector.Componentes
 
         public void Refresh(Objetos obj)
         {
-            if (_comp != null && File.Exists(_comp.ScriptPath))
-            {
-                _comp.Code = File.ReadAllText(_comp.ScriptPath);
-                DetectarVariables();
-                ActualizarUI();
-            }
+            if (_comp == null || string.IsNullOrEmpty(_comp.ScriptPath) || !File.Exists(_comp.ScriptPath))
+                return;
+
+            var ultimaEscritura = File.GetLastWriteTimeUtc(_comp.ScriptPath);
+            if (ultimaEscritura == _ultimaEscrituraConocida)
+                return;
+
+            _ultimaEscrituraConocida = ultimaEscritura;
+            _comp.Code = File.ReadAllText(_comp.ScriptPath);
+            DetectarVariables();
+            ActualizarUI();
         }
 
         public void VincularExistente(ScriptComponent comp)

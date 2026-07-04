@@ -31,7 +31,8 @@ namespace BimpEngine.Engine.World
 
         protected Objetos() { }
         public virtual void Update() { }
-        public virtual void Draw(OpenGLControl glControl)
+        public virtual void Draw(OpenGLControl glControl) => Draw(glControl, true);
+        public virtual void Draw(OpenGLControl glControl, bool mostrarGizmosEditor)
         {
             var gl = glControl.OpenGL;
 
@@ -63,7 +64,7 @@ namespace BimpEngine.Engine.World
 
                 foreach (var mat in MeshRenderer.Materials)
                 {
-                    if(mat.HasTexture && mat.TextureId == 0)
+                    if (mat.HasTexture && mat.TextureId == 0)
                         mat.TextureId = TextureManager.GetOrLoad(gl, mat.TexturePath);
                 }
             }

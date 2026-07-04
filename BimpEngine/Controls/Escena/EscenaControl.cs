@@ -1,6 +1,7 @@
 ﻿using BimpEngine.Engine.Core;
 using BimpEngine.Engine.Editor;
 using BimpEngine.Engine.Editor.Gizmos;
+using BimpEngine.Engine.Entities;
 using BimpEngine.Engine.Input;
 using BimpEngine.Engine.Physics;
 using BimpEngine.Engine.Project;
@@ -143,6 +144,10 @@ namespace BimpEngine.Controls.Escena
                 Draw2D(gl);
             }
             _orientationGizmo.Draw(glControl, _camera3D);
+
+            if (_selection.SelectedObject is CameraObject camaraSeleccionada)
+                DrawCameraPreview(gl, camaraSeleccionada);
+
             OnCameraChanged?.Invoke(_camera3D);
             gl.Flush();
         }
@@ -190,6 +195,84 @@ namespace BimpEngine.Controls.Escena
                 _camera2D.Apply(gl, w, h);
             }
             gl.Viewport(0, 0, glControl.Width, glControl.Height);
+        }
+
+        #endregion
+
+        #region Vista previa de cámara
+
+        private void DrawCameraPreview(OpenGL gl, CameraObject camara)
+        {
+            const int margen = 10;
+            int ancho = System.Math.Max(160, System.Math.Min(280, glControl.Width / 3));
+            int alto = (int)(ancho * 9.0 / 16.0);
+
+            int x = glControl.Width - ancho - margen;
+            int y = margen; // en OpenGL, Y=0 es la parte inferior de la ventana
+
+            gl.Enable(OpenGL.GL_SCISSOR_TEST);
+            gl.Scissor(x, y, ancho, alto);
+            gl.Viewport(x, y, ancho, alto);
+
+            gl.ClearColor(0.05f, 0.05f, 0.05f, 1f);
+            gl.Clear(OpenGL.GL_COLOR_BUFFER_BIT | OpenGL.GL_DEPTH_BUFFER_BIT);
+
+            gl.MatrixMode(OpenGL.GL_PROJECTION);
+            gl.PushMatrix();
+            gl.LoadIdentity();
+            gl.Perspective(camara.FieldOfView, ancho / (double)alto, camara.NearClip, camara.FarClip);
+
+            gl.MatrixMode(OpenGL.GL_MODELVIEW);
+            gl.PushMatrix();
+            gl.LoadIdentity();
+
+            // Inversa de la transformación de la cámara (para "pararnos" en su punto de vista)
+            gl.Rotate(-camara.Transform.Rotation.Z, 0, 0, 1);
+            gl.Rotate(-camara.Transform.Rotation.Y, 0, 1, 0);
+            gl.Rotate(-camara.Transform.Rotation.X, 1, 0, 0);
+            gl.Translate(-camara.Transform.Position.X, -camara.Transform.Position.Y, -camara.Transform.Position.Z);
+
+            _renderer.DrawScene(glControl, _scene, mostrarGizmosEditor: false);
+
+            gl.PopMatrix();
+            gl.MatrixMode(OpenGL.GL_PROJECTION);
+            gl.PopMatrix();
+            gl.MatrixMode(OpenGL.GL_MODELVIEW);
+
+            gl.Disable(OpenGL.GL_SCISSOR_TEST);
+
+            gl.ClearColor(0.18f, 0.18f, 0.18f, 1f);
+            gl.Viewport(0, 0, glControl.Width, glControl.Height);
+
+            DrawCameraPreviewBorde(gl, x, y, ancho, alto);
+        }
+
+        private void DrawCameraPreviewBorde(OpenGL gl, int x, int y, int ancho, int alto)
+        {
+            gl.MatrixMode(OpenGL.GL_PROJECTION);
+            gl.PushMatrix();
+            gl.LoadIdentity();
+            gl.Ortho(0, glControl.Width, 0, glControl.Height, -1, 1);
+
+            gl.MatrixMode(OpenGL.GL_MODELVIEW);
+            gl.PushMatrix();
+            gl.LoadIdentity();
+
+            gl.Disable(OpenGL.GL_DEPTH_TEST);
+            gl.LineWidth(2f);
+            gl.Color(1.0, 1.0, 0.0);
+            gl.Begin(OpenGL.GL_LINE_LOOP);
+            gl.Vertex(x, y);
+            gl.Vertex(x + ancho, y);
+            gl.Vertex(x + ancho, y + alto);
+            gl.Vertex(x, y + alto);
+            gl.End();
+            gl.Enable(OpenGL.GL_DEPTH_TEST);
+
+            gl.MatrixMode(OpenGL.GL_PROJECTION);
+            gl.PopMatrix();
+            gl.MatrixMode(OpenGL.GL_MODELVIEW);
+            gl.PopMatrix();
         }
 
         #endregion

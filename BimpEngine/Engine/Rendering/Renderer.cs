@@ -6,7 +6,7 @@ namespace BimpEngine.Engine.Rendering
     public class Renderer
     {
         public bool ShowErrorsInConsole { get; set; } = true;
-        public void DrawScene(OpenGLControl glControl, Scene scene)
+        public void DrawScene(OpenGLControl glControl, Scene scene, bool mostrarGizmosEditor = true)
         {
             if (glControl == null || scene == null) return;
 
@@ -16,13 +16,13 @@ namespace BimpEngine.Engine.Rendering
 
                 try
                 {
-                    obj.Draw(glControl);
+                    obj.Draw(glControl, mostrarGizmosEditor);
                 }
                 catch (Exception ex)
                 {
                     if (ShowErrorsInConsole)
                     {
-                        Debug.Console.LogError($"Error dibujando '{obj.Name}': {ex.Message}","Renderer");
+                        Debug.Console.LogError($"Error dibujando '{obj.Name}': {ex.Message}", "Renderer");
                     }
                 }
             }

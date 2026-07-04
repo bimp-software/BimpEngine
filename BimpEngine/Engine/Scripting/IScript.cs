@@ -22,6 +22,8 @@ namespace BimpEngine.Engine.Scripting
         protected void LogError(string mensaje) => Debug.Console.LogError(mensaje, gameObject?.Name ?? "Script");
 
         protected bool GetKey(string accion) => InputManager.GetAction(accion);
+        protected float GetAxis(string nombre) => InputManager.GetAxis(nombre);
+        protected float GetAxisRaw(string nombre) => InputManager.GetAxisRaw(nombre);
         protected Objetos? Find(string nombre) => Context?.Scene?.FindByName(nombre);
         protected List<Objetos> FindByTag(string tag) => Context?.Scene?.FindByTag(tag) ?? new List<Objetos>();
     }
