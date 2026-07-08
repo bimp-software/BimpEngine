@@ -572,4 +572,4 @@ namespace BimpEngine.Controls.Escena
             InputManager.KeyUp(e.KeyCode);
         }
     }
-}
+}   

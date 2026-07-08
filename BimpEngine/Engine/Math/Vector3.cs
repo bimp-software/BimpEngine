@@ -1,4 +1,6 @@
-﻿namespace BimpEngine.Engine.Math
+﻿using System.Numerics;
+
+namespace BimpEngine.Engine.Math
 {
     public class Vector3
     {

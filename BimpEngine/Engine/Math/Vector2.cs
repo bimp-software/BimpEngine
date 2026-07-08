@@ -15,5 +15,16 @@ namespace BimpEngine.Engine.Math
         {
             this.X = X; this.Y = Y;
         }
+
+        public static Vector2 Zero() => new Vector2(0, 0);
+        public static Vector2 One() => new Vector2(1, 1);
+        public static Vector2 Up() => new Vector2(0, 1);
+        public static Vector2 Right() => new Vector2(0, -1);
+
+
+        public override string ToString()
+        {
+            return $"({X}, {Y})";
+        }
     }
 }
